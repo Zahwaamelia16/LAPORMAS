@@ -1275,3 +1275,38 @@ tbody tr:hover {background: #f8fbf8;}
 .sidebar-bottom > button { color: #496B58; opacity: 1; }
 .sidebar-bottom > a:hover,
 .sidebar-bottom > button:hover { background: #EEF5F0; color: #216443; }
+
+
+/* Perbaikan alignment ikon dan teks back-link */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+.back-link svg {
+  display: block;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+}
+
+
+/* Perbaikan posisi bagian atas sidebar */
+.workspace-sidebar {
+  padding-top: 22px;
+}
+
+/* Logo LAPORMAS */
+.workspace-sidebar .brand {
+  color: #103B29;
+  margin-bottom: 0;
+}
+
+/* Label role administrator */
+.workspace-sidebar .workspace-role {
+  margin: 22px 13px 12px;
+}

@@ -1,4 +1,9 @@
-import AdminLayout from './layouts/admin-layout';
+import AdminLayout from './layouts/AdminLayout';
+import AdminDashboardPage from './pages/admin/AdminDashboard';
+import AdminReportsPage from './pages/admin/AdminReports';
+import AdminStaffRequestsPage from './pages/admin/AdminStaffRequests';
+import AdminUsersPage from './pages/admin/AdminUsers';
+
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -1552,385 +1557,6 @@ function StaffReportDetail({ admin = false }) {
   </WorkspaceLayout>;
 }
 
-function AdminDashboard() {
-  const [summary, setSummary] = useState(null);
-  const [requests, setRequests] = useState([]);
-  const [reports, setReports] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  const reload = () => {
-    return Promise.all([
-      api('/admin/summary'),
-      api('/admin/staff-requests?status=pending'),
-      api('/reports'),
-    ])
-      .then(([summaryData, requestData, reportData]) => {
-        setSummary(summaryData.summary);
-        setRequests(requestData.requests);
-        setReports(reportData.reports);
-      })
-      .catch((requestError) => setError(requestError.message))
-      .finally(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    reload();
-  }, []);
-
-  const decide = async (id, decision) => {
-    const note = decision === 'rejected'
-      ? window.prompt('Alasan penolakan (opsional):') || 'Pengajuan belum memenuhi persyaratan.'
-      : 'Pengajuan telah diverifikasi.';
-
-    try {
-      await api(`/admin/staff-requests/${id}`, {
-        method: 'PATCH',
-        body: { decision, admin_note: note },
-      });
-      reload();
-    } catch (requestError) {
-      setError(requestError.message);
-    }
-  };
-
-  return (
-    <AdminLayout
-      title="Dashboard admin"
-      subtitle="Pantau keseluruhan laporan dan verifikasi akun pengelola."
-    >
-      {error && <Notice type="error">{error}</Notice>}
-
-      {loading ? (
-        <div className="screen-loading">Memuat data...</div>
-      ) : (
-        <>
-          <div className="stat-cards">
-            <StatCard label="Total laporan" value={summary?.total || 0} icon={ClipboardList} />
-            <StatCard label="Laporan diterima" value={summary?.received || 0} icon={Clock3} />
-            <StatCard label="Sedang diproses" value={summary?.processing || 0} icon={Settings} />
-            <StatCard label="Selesai" value={summary?.completed || 0} icon={CheckCircle2} />
-            <StatCard label="Pengajuan petugas" value={summary?.pending_staff || 0} icon={ShieldCheck} />
-            <StatCard label="Warga terdaftar" value={summary?.citizens || 0} icon={Users} />
-          </div>
-
-          <div className="panel">
-            <div className="panel-heading">
-              <div>
-                <h2>Pengajuan pengelola</h2>
-                <p>Periksa bukti penugasan sebelum memberikan akses petugas.</p>
-              </div>
-              <Link to="/admin/verifikasi" className="text-link">
-                Lihat semua <ArrowRight size={15} />
-              </Link>
-            </div>
-
-            {requests.length > 0 ? (
-              <div className="request-list">
-                {requests.slice(0, 4).map((request) => (
-                  <div className="request-item" key={request.request_id}>
-                    <div className="request-avatar">{request.name.slice(0, 1)}</div>
-                    <div className="request-info">
-                      <b>{request.name}</b>
-                      <span>{request.agency} · {request.unit_name}</span>
-                      <small>
-                        {request.village_name}, {request.district_name}, {request.regency_name}
-                      </small>
-                    </div>
-                    <div className="request-actions">
-                      <a
-                        href={imageUrl(request.proof_url)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn btn-outline btn-small"
-                      >
-                        Bukti tugas
-                      </a>
-                      <button
-                        className="btn btn-primary btn-small"
-                        onClick={() => decide(request.request_id, 'approved')}
-                      >
-                        Setujui
-                      </button>
-                      <button
-                        className="btn btn-danger btn-small"
-                        onClick={() => decide(request.request_id, 'rejected')}
-                      >
-                        Tolak
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state compact">
-                <BadgeCheck />
-                <b>Tidak ada pengajuan menunggu</b>
-                <span>Semua pengajuan pengelola sudah diproses.</span>
-              </div>
-            )}
-          </div>
-
-          <div className="panel">
-            <div className="panel-heading">
-              <div>
-                <h2>Laporan terbaru seluruh wilayah</h2>
-                <p>Admin dapat memantau dan meninjau laporan dari semua area.</p>
-              </div>
-              <Link to="/admin/laporan" className="text-link">
-                Kelola laporan <ArrowRight size={15} />
-              </Link>
-            </div>
-            <StaffReportsTableAdmin reports={reports.slice(0, 5)} />
-          </div>
-        </>
-      )}
-    </AdminLayout>
-  );
-}
-function AdminStaffRequests() {
-  const [requests, setRequests] = useState([]);
-  const [status, setStatus] = useState('pending');
-  const [error, setError] = useState('');
-
-  const load = () => {
-    return api(`/admin/staff-requests?status=${status}`)
-      .then((data) => setRequests(data.requests))
-      .catch((requestError) => setError(requestError.message));
-  };
-
-  useEffect(() => {
-    load();
-  }, [status]);
-
-  const decide = async (id, decision) => {
-    const note = window.prompt(
-      decision === 'rejected' ? 'Alasan penolakan:' : 'Catatan verifikasi:',
-      decision === 'approved' ? 'Bukti penugasan telah diverifikasi.' : '',
-    ) || '';
-
-    try {
-      await api(`/admin/staff-requests/${id}`, {
-        method: 'PATCH',
-        body: { decision, admin_note: note },
-      });
-      load();
-    } catch (requestError) {
-      setError(requestError.message);
-    }
-  };
-
-  return (
-    <WorkspaceLayout
-      title="Verifikasi pengelola"
-      subtitle="Setujui atau tolak pengajuan berdasarkan bukti penugasan."
-    >
-      {error && <Notice type="error">{error}</Notice>}
-
-      <div className="panel">
-        <div className="panel-heading">
-          <div>
-            <h2>Daftar pengajuan</h2>
-            <p>Pengguna baru memperoleh role petugas setelah disetujui.</p>
-          </div>
-          <select
-            className="select-compact"
-            value={status}
-            onChange={(event) => setStatus(event.target.value)}
-          >
-            <option value="pending">Menunggu</option>
-            <option value="approved">Disetujui</option>
-            <option value="rejected">Ditolak</option>
-            <option value="semua">Semua</option>
-          </select>
-        </div>
-
-        <div className="request-list">
-          {requests.map((request) => (
-            <div className="request-item full" key={request.request_id}>
-              <div className="request-avatar">{request.name.slice(0, 1)}</div>
-              <div className="request-info">
-                <b>{request.name}</b>
-                <span>{request.email} · {request.phone}</span>
-                <small>{request.agency} / {request.unit_name}</small>
-                <small>
-                  {request.village_name}, {request.district_name}, {request.regency_name}
-                </small>
-                <small>Alamat kantor: {request.office_address}</small>
-                <Status
-                  value={request.status === 'pending'
-                    ? 'Menunggu verifikasi'
-                    : request.status === 'approved'
-                      ? 'Disetujui'
-                      : 'Ditolak'}
-                />
-              </div>
-
-              <div className="request-actions">
-                <a
-                  href={imageUrl(request.proof_url)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-outline btn-small"
-                >
-                  Lihat bukti
-                </a>
-                {request.status === 'pending' && (
-                  <>
-                    <button
-                      className="btn btn-primary btn-small"
-                      onClick={() => decide(request.request_id, 'approved')}
-                    >
-                      Setujui
-                    </button>
-                    <button
-                      className="btn btn-danger btn-small"
-                      onClick={() => decide(request.request_id, 'rejected')}
-                    >
-                      Tolak
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {!requests.length && (
-          <div className="empty-state">
-            <ShieldCheck />
-            <b>Tidak ada data pengajuan</b>
-          </div>
-        )}
-      </div>
-    </WorkspaceLayout>
-  );
-}
-function AdminReports() {
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api('/reports')
-      .then((data) => setReports(data.reports))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  return (
-    <WorkspaceLayout
-      title="Semua laporan"
-      subtitle="Pantau laporan publik dan area kejadian secara menyeluruh."
-    >
-      <div className="panel">
-        {loading
-          ? <div className="screen-loading">Memuat...</div>
-          : <StaffReportsTableAdmin reports={reports} />}
-      </div>
-    </WorkspaceLayout>
-  );
-}
-function StaffReportsTableAdmin({ reports = [] }) {
-  if (!reports.length) {
-    return (
-      <div className="empty-state">
-        <ClipboardList />
-        <b>Belum ada laporan</b>
-      </div>
-    );
-  }
-
-  return (
-    <div className="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Nomor / Judul</th>
-            <th>Kategori</th>
-            <th>Area</th>
-            <th>Tanggal</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {reports.map((report) => (
-            <tr key={report.report_id}>
-              <td>
-                <b>{report.report_code}</b>
-                <span>{report.title}</span>
-              </td>
-              <td>{report.category_name}</td>
-              <td>{report.village_name}, {report.district_name}</td>
-              <td>{formatDate(report.created_at)}</td>
-              <td><Status value={report.status_name} /></td>
-              <td>
-                <Link to={`/admin/laporan/${report.report_id}`} className="table-link">
-                  Kelola
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-function AdminUsers() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api('/admin/users')
-      .then((data) => setUsers(data.users))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  return (
-    <WorkspaceLayout
-      title="Data pengguna"
-      subtitle="Daftar akun warga, petugas terverifikasi, dan admin."
-    >
-      <div className="panel">
-        {loading ? (
-          <div className="screen-loading">Memuat...</div>
-        ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nama</th>
-                  <th>Email</th>
-                  <th>Telepon</th>
-                  <th>Role</th>
-                  <th>Wilayah</th>
-                  <th>Terdaftar</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.user_id}>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.phone || '-'}</td>
-                    <td><span className="role-pill">{user.role}</span></td>
-                    <td>
-                      {user.village_name
-                        ? `${user.village_name}, ${user.district_name}`
-                        : '-'}
-                    </td>
-                    <td>{formatDate(user.created_at)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </WorkspaceLayout>
-  );
-}
 function App() {
   return (
     <>
@@ -2044,7 +1670,7 @@ function App() {
           path="/admin"
           element={
             <Protected roles={['admin']}>
-              <AdminDashboard />
+              <AdminDashboardPage />
             </Protected>
           }
         />
@@ -2052,7 +1678,7 @@ function App() {
           path="/admin/laporan"
           element={
             <Protected roles={['admin']}>
-              <AdminReports />
+              <AdminReportsPage />
             </Protected>
           }
         />
@@ -2068,7 +1694,7 @@ function App() {
           path="/admin/verifikasi"
           element={
             <Protected roles={['admin']}>
-              <AdminStaffRequests />
+              <AdminStaffRequestsPage />
             </Protected>
           }
         />
@@ -2076,7 +1702,7 @@ function App() {
           path="/admin/pengguna"
           element={
             <Protected roles={['admin']}>
-              <AdminUsers />
+              <AdminUsersPage />
             </Protected>
           }
         />
