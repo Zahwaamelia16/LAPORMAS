@@ -4,6 +4,11 @@ import AdminReportsPage from './pages/admin/AdminReports';
 import AdminStaffRequestsPage from './pages/admin/AdminStaffRequests';
 import AdminUsersPage from './pages/admin/AdminUsers';
 
+import CitizenDashboardPage from './pages/warga/CitizenDashboard';
+import CitizenReportsPage from './pages/warga/CitizenReports';
+import NewReportPageModule from './pages/warga/NewReportPage';
+import ProfilePageModule from './pages/warga/ProfilePage';
+
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -1079,309 +1084,6 @@ function StatCard({ label, value, icon: Icon, sub }) {
   </div>;
 }
 
-function CitizenDashboard() {
-  const { user } = useAuth();
-  const [reports, setReports] = useState([]);
-  const [busy, setBusy] = useState(true);
-  useEffect(() => {
-    api('/reports/mine').then(d => setReports(d.reports)).catch(() => { }).finally(() => setBusy(false));
-  }, []);
-  const completed = reports.filter(r => r.status_name === 'Selesai').length;
-  const process = reports.filter(r => ['Diproses', 'Diverifikasi'].includes(r.status_name)).length;
-  return <WorkspaceLayout title={`Halo, ${user?.name?.split(' ')[0] || 'Warga'}!`} subtitle="Pantau laporan dan perkembangan penanganannya di sini.">
-    <div className="workspace-actions">
-      <span className="area-chip"><MapPin size={15} />{user?.village_name || 'Area profil'}, {user?.district_name || ''}</span>
-      <Link to="/warga/laporan/baru" className="btn btn-primary"><Plus size={17} /> Buat laporan</Link>
-    </div>
-    <div className="stat-cards"><StatCard label="Total laporan" value={reports.length} icon={ClipboardList} /><StatCard label="Sedang diproses" value={process} icon={Clock3} /><StatCard label="Selesai" value={completed} icon={CheckCircle2} /></div>
-    <div className="panel">
-      <div className="panel-heading">
-        <div>
-          <h2>Laporan saya</h2>
-          <p>Daftar laporan yang pernah kamu kirim.</p>
-        </div>
-        <Link to="/warga/laporan" className="text-link">Lihat semua <ArrowRight size={15} /></Link>
-      </div>
-      {busy ? <div className="screen-loading">Memuat laporan...</div> : <MyReportsTable reports={reports.slice(0, 6)} />}
-    </div>
-    <div className="privacy-banner"><ShieldCheck /><div><b>Privasi pelapor tetap terjaga</b><span>Identitas dan kontakmu tidak ditampilkan pada halaman laporan publik.</span></div></div>
-  </WorkspaceLayout>;
-}
-function MyReportsTable({ reports = [] }) {
-  if (!reports.length) {
-    return (
-      <div className="empty-state">
-        <FilePlus2 />
-        <b>Belum ada laporan</b>
-        <span>Mulai sampaikan masalah yang kamu temukan di lingkungan sekitar.</span>
-        <Link to="/warga/laporan/baru" className="btn btn-primary btn-small">
-          Buat laporan pertama
-        </Link>
-      </div>
-    );
-  }
-
-  return (
-    <div className="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Nomor / Judul</th>
-            <th>Kategori</th>
-            <th>Wilayah kejadian</th>
-            <th>Tanggal</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {reports.map((report) => (
-            <tr key={report.report_id}>
-              <td>
-                <b>{report.report_code}</b>
-                <span>{report.title}</span>
-              </td>
-              <td>{report.category_name}</td>
-              <td>{report.village_name}, {report.district_name}</td>
-              <td>{formatDate(report.created_at)}</td>
-              <td><Status value={report.status_name} /></td>
-              <td>
-                <Link to={`/warga/laporan/${report.report_id}`} className="table-link">
-                  Detail
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-function CitizenReports() {
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    api('/reports/mine').then(d => setReports(d.reports)).catch(() => { }).finally(() => setLoading(false));
-  }, []);
-  return <WorkspaceLayout title="Laporan saya" subtitle="Pantau semua laporan yang pernah kamu sampaikan.">
-    <div className="panel">
-      <div className="panel-heading">
-        <div>
-          <h2>Riwayat laporan</h2>
-          <p>Lokasi kejadian dapat berbeda dari lokasi profil akunmu.</p>
-        </div>
-        <Link to="/warga/laporan/baru" className="btn btn-primary btn-small"><Plus size={15} /> Buat laporan</Link>
-      </div>
-      {loading ? <div className="screen-loading">Memuat...</div> : <MyReportsTable reports={reports} />}
-    </div>
-  </WorkspaceLayout>;
-}
-function ProfilePage() {
-  const { user } = useAuth();
-  return <WorkspaceLayout title="Profil saya" subtitle="Informasi akun warga yang tersimpan di LAPORMAS.">
-    <div className="profile-card">
-      <div className="profile-avatar">{user?.name?.slice(0, 1)}</div>
-      <h2>{user?.name}</h2>
-      <span className="role-pill">Warga terdaftar</span>
-      <div className="profile-grid">
-        <div>
-          <span>Nama lengkap</span>
-          <b>{user?.name}</b>
-        </div>
-        <div>
-          <span>Email</span>
-          <b>{user?.email}</b>
-        </div>
-        <div>
-          <span>Nomor telepon</span>
-          <b>{user?.citizen_phone || '-'}</b>
-        </div>
-        <div>
-          <span>Alamat</span>
-          <b>{user?.address || '-'}</b>
-        </div>
-        <div>
-          <span>Area profil</span>
-          <b>{user?.village_name || '-'}</b>
-        </div>
-        <div>
-          <span>Status lokasi</span>
-          <b>{user?.citizen_area_id ? 'Terverifikasi' : 'Belum tersedia'}</b>
-        </div>
-      </div>
-      <div className="notice info"><MapPin /><span>Area profil digunakan sebagai informasi tempat tinggal. Setiap laporan tetap menggunakan GPS lokasi kejadian saat laporan dibuat.</span></div>
-    </div>
-  </WorkspaceLayout>;
-}
-
-function NewReportPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [categories, setCategories] = useState([]);
-  const [form, setForm] = useState({ title: '', category_id: '', location: '', description: '' });
-  const [position, setPosition] = useState(null);
-  const [locBusy, setLocBusy] = useState(false);
-  const [locMessage, setLocMessage] = useState('Lokasi kejadian wajib dideteksi menggunakan GPS.');
-  const [files, setFiles] = useState([]);
-  const [step, setStep] = useState(1);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  useEffect(() => {
-    api('/categories').then(d => {
-      setCategories(d.categories);
-      const categoryName = new URLSearchParams(location.search).get('category');
-      if (categoryName) {
-        const match = d.categories.find(c => c.category_name.toLowerCase() === categoryName.toLowerCase());
-        if (match) setForm(old => ({ ...old, category_id: String(match.category_id) }));
-      }
-    }).catch(() => { });
-  }, [location.search]);
-  const update = (k, v) => setForm(o => ({ ...o, [k]: v }));
-  const detect = async () => {
-    setLocBusy(true);
-    setError('');
-    try {
-      const p = await getPosition();
-      setPosition(p);
-      setLocMessage(`Koordinat kejadian ditemukan · akurasi ±${Math.round(p.accuracy)} meter.`);
-    } catch (e) {
-      setPosition(null);
-      setLocMessage(e.message);
-    } finally {
-      setLocBusy(false);
-    }
-  };
-  const onFiles = (e) => {
-    const selected = Array.from(e.target.files || []);
-    if (selected.length > 3) {
-      setError('Maksimal 3 foto dalam satu laporan.');
-      e.target.value = '';
-      return;
-    }
-    if (selected.some(f => f.size > 5 * 1024 * 1024)) {
-      setError('Ukuran setiap foto maksimal 5 MB.');
-      e.target.value = '';
-      return;
-    }
-    if (selected.some(f => !['image/jpeg', 'image/png', 'image/webp'].includes(f.type))) {
-      setError('Format foto harus JPG, PNG, atau WEBP.');
-      e.target.value = '';
-      return;
-    }
-    setFiles(selected);
-    setError('');
-  };
-  const submit = async () => {
-    setBusy(true);
-    setError('');
-    const body = new FormData();
-    Object.entries(form).forEach(([k, v]) => body.append(k, v));
-    body.append('latitude', position.latitude);
-    body.append('longitude', position.longitude);
-    files.forEach(f => body.append('images', f));
-    try {
-      const d = await api('/reports', { method: 'POST', body });
-      navigate(`/laporan-terkirim/${d.report.report_code}`, { state: { report: d.report } });
-    } catch (e) {
-      setError(e.message);
-      setStep(1);
-    } finally {
-      setBusy(false);
-    }
-  };
-  return <PublicLayout>
-    <PageIntro eyebrow="BERANDA / BUAT LAPORAN" title="Ceritakan masalah di sekitarmu." subtitle="Laporan yang jelas membantu pihak terkait mengambil tindakan yang tepat.">
-      <div className="progress-steps">
-        <span className={step === 1 ? 'current' : 'done'}>01 Isi laporan</span>
-        <span className={step === 2 ? 'current' : ''}>02 Tinjau laporan</span>
-        <span>03 Laporan terkirim</span>
-      </div>
-    </PageIntro>
-    <main className="container section create-layout">
-      <section className="form-card">
-        <h2>{step === 1 ? 'Detail laporan' : 'Tinjau laporan'}</h2>
-        <p className="form-hint">Kolom bertanda * wajib diisi.</p>
-        {step === 1 ? <form className="form-stack" onSubmit={e => {
-          e.preventDefault();
-          setError('');
-          if (!position) return setError('Deteksi GPS lokasi kejadian terlebih dahulu.');
-          setStep(2);
-        }}>
-          <label>Judul laporan *<input value={form.title} onChange={e => update('title', e.target.value)} placeholder="Contoh: Jalan berlubang di depan taman" required /></label>
-          <div className="field-grid">
-            <label>Kategori masalah *<select value={form.category_id} onChange={e => update('category_id', e.target.value)} required><option value="">Pilih kategori</option>{categories.map(c => <option key={c.category_id} value={c.category_id}>{c.category_name}</option>)}</select></label>
-            <label>Lokasi kejadian *<button type="button" className={`gps-button ${position ? 'detected' : ''}`} onClick={detect} disabled={locBusy}><LocateFixed size={16} />{locBusy ? 'Mendeteksi lokasi...' : position ? 'Lokasi berhasil dideteksi' : 'Deteksi lokasi GPS'}</button><small className="field-note">{locMessage}</small></label>
-          </div>
-          <label>Lokasi lengkap *<input value={form.location} onChange={e => update('location', e.target.value)} placeholder="Nama jalan, RT/RW, atau patokan terdekat" required /></label>
-          <label>Deskripsi kejadian *<textarea rows="5" value={form.description} onChange={e => update('description', e.target.value)} placeholder="Ceritakan masalah yang terjadi, sejak kapan, dan dampaknya bagi warga sekitar." required /><small className="field-note">Tuliskan informasi yang faktual dan hindari data pribadi orang lain.</small></label>
-          <label>Foto pendukung (opsional)<div className="file-drop"><UploadCloud /><b>+ Tambahkan foto</b><span>Pilih foto atau tarik ke area ini</span><small>JPG, PNG, WEBP · Maks. 3 foto, masing-masing 5 MB</small><input type="file" multiple accept="image/jpeg,image/png,image/webp" onChange={onFiles} /></div>{files.length > 0 && <div className="selected-files">{files.map((f, i) => <span className="selected-file-item" key={`${f.name}-${i}`}><LocalImagePreview file={f} alt={`Pratinjau ${f.name}`} /><span className="selected-file-name"><FileImage size={13} />{f.name}</span><button type="button" aria-label={`Hapus ${f.name}`} onClick={() => setFiles(old => old.filter((_, idx) => idx !== i))}><X size={13} /></button></span>)}</div>}</label>
-          <div className="privacy-note"><ShieldCheck /><div><b>Privasi kamu tetap terjaga</b><span>Nama dan kontak pelapor tidak ditampilkan pada laporan publik.</span></div></div>
-          {error && <Notice type="error">{error}</Notice>}
-          <div className="form-actions">
-            <button type="submit" className="btn btn-primary">Tinjau laporan <ArrowRight size={16} /></button>
-            <button type="button" className="btn btn-ghost" onClick={() => navigate('/warga')}>Batal</button>
-          </div>
-        </form> : <div className="review-panel">
-          <div className="review-row">
-            <span>Judul</span>
-            <b>{form.title}</b>
-          </div>
-          <div className="review-row">
-            <span>Kategori</span>
-            <b>{categories.find(c => String(c.category_id) === String(form.category_id))?.category_name}</b>
-          </div>
-          <div className="review-row">
-            <span>Alamat kejadian</span>
-            <b>{form.location}</b>
-          </div>
-          <div className="review-row">
-            <span>Koordinat GPS</span>
-            <b>{position.latitude.toFixed(6)}, {position.longitude.toFixed(6)}</b>
-          </div>
-          <div className="review-row vertical">
-            <span>Deskripsi</span>
-            <p>{form.description}</p>
-          </div>
-          <div className="review-row">
-            <span>Foto pendukung</span>
-            <b>{files.length} foto</b>
-          </div>
-          <Notice type="info">Lokasi kejadian akan dicocokkan dengan batas wilayah untuk menentukan area laporan.</Notice>
-          <div className="form-actions">
-            <button className="btn btn-primary" disabled={busy} onClick={submit}>{busy ? 'Mengirim...' : 'Kirim laporan'}</button>
-            <button className="btn btn-ghost" onClick={() => setStep(1)}>Kembali edit</button>
-          </div>
-        </div>}
-      </section>
-      <aside className="create-aside">
-        <div className="aside-guide">
-          <h3>Bantu kami memahami masalahnya.</h3>
-          <div>
-            <b>01 Jelas dan spesifik</b>
-            <span>Ceritakan satu masalah dalam satu laporan.</span>
-          </div>
-          <div>
-            <b>02 Lokasi yang tepat</b>
-            <span>Tambahkan alamat dan patokan agar mudah ditemukan.</span>
-          </div>
-          <div>
-            <b>03 Foto yang relevan</b>
-            <span>Sertakan foto terbaru yang memperlihatkan kondisi sebenarnya.</span>
-          </div>
-        </div>
-        <div className="emergency-note">
-          <b>Bukan layanan darurat</b>
-          <p>Untuk kondisi yang mengancam keselamatan, segera hubungi layanan darurat atau petugas setempat.</p>
-        </div>
-        <div className="aside-after">
-          <h3>Setelah laporan dikirim</h3>
-          <p>Kamu akan mendapatkan nomor laporan untuk memantau proses verifikasi dan penanganannya.</p>
-        </div>
-      </aside>
-    </main>
-  </PublicLayout>;
-}
-
 function SubmittedPage() {
   const { code } = useParams();
   const loc = useLocation();
@@ -1582,46 +1284,34 @@ function App() {
         <Route path="/daftar-pengelola" element={<RegisterStaff />} />
 
         {/* Alur warga */}
-        <Route
-          path="/laporan/buat"
-          element={
-            <Protected roles={['warga']}>
-              <NewReportPage />
-            </Protected>
-          }
-        />
-        <Route
-          path="/laporan-terkirim/:code"
-          element={
-            <Protected roles={['warga']}>
-              <SubmittedPage />
-            </Protected>
-          }
-        />
+
         <Route
           path="/warga"
           element={
             <Protected roles={['warga']}>
-              <CitizenDashboard />
+              <CitizenDashboardPage />
             </Protected>
           }
         />
+
         <Route
           path="/warga/laporan"
           element={
             <Protected roles={['warga']}>
-              <CitizenReports />
+              <CitizenReportsPage />
             </Protected>
           }
         />
+
         <Route
           path="/warga/laporan/baru"
           element={
             <Protected roles={['warga']}>
-              <NewReportPage />
+              <NewReportPageModule />
             </Protected>
           }
         />
+
         <Route
           path="/warga/laporan/:id"
           element={
@@ -1630,11 +1320,12 @@ function App() {
             </Protected>
           }
         />
+
         <Route
           path="/warga/profil"
           element={
             <Protected roles={['warga']}>
-              <ProfilePage />
+              <ProfilePageModule />
             </Protected>
           }
         />
