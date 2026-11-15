@@ -1,3 +1,4 @@
+import AdminLayout from './layouts/admin-layout';
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -1594,7 +1595,7 @@ function AdminDashboard() {
   };
 
   return (
-    <WorkspaceLayout
+    <AdminLayout
       title="Dashboard admin"
       subtitle="Pantau keseluruhan laporan dan verifikasi akun pengelola."
     >
@@ -1684,7 +1685,7 @@ function AdminDashboard() {
           </div>
         </>
       )}
-    </WorkspaceLayout>
+    </AdminLayout>
   );
 }
 function AdminStaffRequests() {
