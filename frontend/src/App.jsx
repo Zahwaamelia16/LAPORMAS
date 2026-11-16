@@ -9,6 +9,10 @@ import CitizenReportsPage from './pages/warga/CitizenReports';
 import NewReportPageModule from './pages/warga/NewReportPage';
 import ProfilePageModule from './pages/warga/ProfilePage';
 
+import StaffDashboardPage from './pages/pengelola/StaffDashboard';
+import StaffReportsPage from './pages/pengelola/StaffReports';
+import StaffReportDetailPage from './pages/pengelola/StaffReportDetail';
+
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -22,7 +26,6 @@ import {
   CheckCircle2,
   CircleHelp,
   Clock3,
-  ClipboardList,
   Droplets,
   Eye,
   EyeOff,
@@ -31,17 +34,12 @@ import {
   FilePlus2,
   Filter,
   HeartHandshake,
-  Home,
-  LayoutDashboard,
   Lightbulb,
-  ListFilter,
   LocateFixed,
-  LogOut,
   MapPin,
   Menu,
   Plus,
   Search,
-  Settings,
   ShieldCheck,
   Trash2,
   Trees,
@@ -990,99 +988,6 @@ function RegisterStaff() {
   </div>;
 }
 
-function WorkspaceLayout({ title, subtitle, children }) {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const linksByRole = {
-    admin: [
-      ['/admin', 'Ringkasan', LayoutDashboard],
-      ['/admin/laporan', 'Semua laporan', ClipboardList],
-      ['/admin/verifikasi', 'Verifikasi pengelola', ShieldCheck],
-      ['/admin/pengguna', 'Data pengguna', Users],
-    ],
-    petugas: [
-      ['/petugas', 'Ringkasan', LayoutDashboard],
-      ['/laporan', 'Laporan publik', ListFilter],
-      ['/petugas/laporan', 'Laporan area tugas', ClipboardList],
-    ],
-    warga: [
-      ['/warga', 'Ringkasan', LayoutDashboard],
-      ['/warga/laporan', 'Laporan saya', ClipboardList],
-      ['/warga/profil', 'Profil saya', UserRound],
-    ],
-  };
-
-  const links = linksByRole[user?.role] || linksByRole.warga;
-  const roleLabel = user?.role === 'admin'
-    ? 'ADMINISTRATOR'
-    : user?.role === 'petugas'
-      ? 'PENGELOLA'
-      : 'RUANG WARGA';
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  return (
-    <div className="workspace">
-      <aside className="workspace-sidebar">
-        <Link to="/" className="brand">LAPORMAS</Link>
-        <div className="workspace-role">{roleLabel}</div>
-
-        <div className="workspace-user">
-          <div className="avatar">{user?.name?.slice(0, 1) || 'L'}</div>
-          <div>
-            <b>{user?.name}</b>
-            <span>{user?.email}</span>
-          </div>
-        </div>
-
-        <nav>
-          {links.map(([to, label, Icon]) => (
-            <NavLink end to={to} key={to}>
-              <Icon size={17} aria-hidden="true" />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="sidebar-bottom">
-          <Link to="/">
-            <Home size={17} aria-hidden="true" />
-            Kembali ke website
-          </Link>
-          <button type="button" onClick={handleLogout}>
-            <LogOut size={17} aria-hidden="true" />
-            Keluar
-          </button>
-        </div>
-      </aside>
-
-      <main className="workspace-main">
-        <header className="workspace-top">
-          <div>
-            <span className="eyebrow">LAPORMAS · {user?.role?.toUpperCase()}</span>
-            <h1>{title}</h1>
-            <p>{subtitle}</p>
-          </div>
-          <div className="top-avatar">{user?.name?.slice(0, 1) || 'L'}</div>
-        </header>
-
-        <div className="workspace-content">{children}</div>
-      </main>
-    </div>
-  );
-}
-function StatCard({ label, value, icon: Icon, sub }) {
-  return <div className="stat-card">
-    <div className="stat-card-icon"><Icon size={20} /></div>
-    <span>{label}</span>
-    <strong>{value}</strong>
-    {sub && <small>{sub}</small>}
-  </div>;
-}
 
 function SubmittedPage() {
   const { code } = useParams();
@@ -1108,156 +1013,6 @@ function SubmittedPage() {
   </PublicLayout>;
 }
 
-function StaffDashboard() {
-  const { user } = useAuth();
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    api('/reports/assigned').then(d => setReports(d.reports)).catch(() => { }).finally(() => setLoading(false));
-  }, []);
-  const pending = reports.filter(r => ['Diterima', 'Diverifikasi'].includes(r.status_name)).length;
-  const processing = reports.filter(r => r.status_name === 'Diproses').length;
-  const complete = reports.filter(r => r.status_name === 'Selesai').length;
-  return <WorkspaceLayout title="Dashboard pengelola" subtitle="Kelola laporan yang masuk sesuai wilayah tugasmu.">
-    <div className="workspace-actions">
-      <span className="area-chip"><MapPin size={15} />{user?.task_village || 'Area tugas'}, {user?.task_district || ''}</span>
-      <span className="role-pill">Akun terverifikasi</span>
-    </div>
-    <div className="stat-cards"><StatCard label="Laporan area" value={reports.length} icon={ClipboardList} /><StatCard label="Perlu verifikasi" value={pending} icon={Clock3} /><StatCard label="Sedang ditangani" value={processing} icon={Settings} /><StatCard label="Selesai" value={complete} icon={CheckCircle2} /></div>
-    <div className="panel">
-      <div className="panel-heading">
-        <div>
-          <h2>Laporan wilayah tugas</h2>
-          <p>Daftar laporan sesuai area tugas yang terdaftar pada akunmu.</p>
-        </div>
-        <Link to="/petugas/laporan" className="text-link">Lihat semua <ArrowRight size={15} /></Link>
-      </div>
-      {loading ? <div className="screen-loading">Memuat laporan...</div> : <StaffReportsTable reports={reports.slice(0, 8)} />}
-    </div>
-  </WorkspaceLayout>;
-}
-function StaffReportsTable({ reports = [] }) {
-  if (!reports.length) {
-    return (
-      <div className="empty-state">
-        <ClipboardList />
-        <b>Belum ada laporan di wilayah tugas</b>
-        <span>Laporan baru akan muncul setelah warga mengirim laporan pada area ini.</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Nomor / Judul</th>
-            <th>Kategori</th>
-            <th>Lokasi kejadian</th>
-            <th>Tanggal</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {reports.map((report) => (
-            <tr key={report.report_id}>
-              <td>
-                <b>{report.report_code}</b>
-                <span>{report.title}</span>
-              </td>
-              <td>{report.category_name}</td>
-              <td>{report.location}</td>
-              <td>{formatDate(report.created_at)}</td>
-              <td><Status value={report.status_name} /></td>
-              <td>
-                <Link to={`/petugas/laporan/${report.report_id}`} className="table-link">
-                  Tangani
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-function StaffReportsPage() {
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    api('/reports/assigned').then(d => setReports(d.reports)).catch(() => { }).finally(() => setLoading(false));
-  }, []);
-  return <WorkspaceLayout title="Laporan area tugas" subtitle="Verifikasi dan perbarui progres laporan pada wilayahmu.">
-    <div className="panel">{loading ? <div className="screen-loading">Memuat...</div> : <StaffReportsTable reports={reports} />}</div>
-  </WorkspaceLayout>;
-}
-function StaffReportDetail({ admin = false }) {
-  const { id } = useParams();
-  const [report, setReport] = useState(null);
-  const [error, setError] = useState('');
-  const [status, setStatus] = useState('');
-  const [notes, setNotes] = useState('');
-  const [busy, setBusy] = useState(false);
-  const navigate = useNavigate();
-  const load = () => api(`/reports/${id}`).then(d => {
-    setReport(d.report);
-    setStatus(d.report.status_name);
-  }).catch(e => setError(e.message));
-  useEffect(() => {
-    load();
-  }, [id]);
-  const save = async () => {
-    setBusy(true);
-    setError('');
-    try {
-      await api(`/reports/${id}/status`, { method: 'PATCH', body: { status_name: status, notes } });
-      await load();
-      setNotes('');
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-  return <WorkspaceLayout title={admin ? 'Kelola laporan' : 'Detail penanganan'} subtitle={admin ? 'Tinjau laporan dan perbarui status penanganan lintas wilayah.' : 'Periksa informasi laporan dan catat perkembangan penanganan.'}>
-    <button className="text-link back-inline" onClick={() => navigate(admin ? '/admin/laporan' : '/petugas/laporan')}><ArrowLeft size={15} aria-hidden="true" /> Kembali ke daftar laporan</button>
-    {error && <Notice type="error">{error}</Notice>}
-    {!report ? <div className="screen-loading">Memuat laporan...</div> : <div className="detail-work-grid">
-      <section className="panel">
-        <div className="detail-status-row"><Status value={report.status_name} /><span>{report.report_code} · {formatDate(report.created_at)}</span></div>
-        <h2>{report.title}</h2>
-        <p>{report.description}</p>
-        <div className="detail-info-grid">
-          <div>
-            <span>Kategori</span>
-            <b>{report.category_name}</b>
-          </div>
-          <div>
-            <span>Lokasi</span>
-            <b>{report.location}</b>
-          </div>
-          <div>
-            <span>Area kejadian</span>
-            <b>{report.village_name}, {report.district_name}</b>
-          </div>
-        </div>
-        {report.images?.length > 0 && <div className="detail-images">{report.images.map((img, i) => <img key={i} src={imageUrl(img.image_url)} alt={`Bukti ${i + 1}`} />)}</div>}
-      </section>
-      <aside className="panel update-panel">
-        <h3>Perbarui penanganan</h3>
-        <label>Status terbaru<select value={status} onChange={e => setStatus(e.target.value)}>{['Diterima', 'Diverifikasi', 'Diproses', 'Selesai', 'Ditolak'].map(s => <option key={s}>{s}</option>)}</select></label>
-        <label>Catatan penanganan<textarea rows="5" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Tuliskan hasil verifikasi atau perkembangan..." /></label>
-        <button className="btn btn-primary btn-block" disabled={busy} onClick={save}>{busy ? 'Menyimpan...' : 'Simpan pembaruan'}</button>
-        <div className="timeline compact-timeline">
-          <b>Riwayat sebelumnya</b>
-          {(report.updates || []).map((u, i) => <div className="timeline-item" key={i}><span className="timeline-dot" /><div><b>{u.new_status}</b><small>{formatDate(u.updated_at)}</small>{u.notes && <p>{u.notes}</p>}</div></div>)}
-        </div>
-      </aside>
-    </div>}
-  </WorkspaceLayout>;
-}
 
 function App() {
   return (
@@ -1335,7 +1090,7 @@ function App() {
           path="/petugas"
           element={
             <Protected roles={['petugas']}>
-              <StaffDashboard />
+              <StaffDashboardPage />
             </Protected>
           }
         />
@@ -1351,7 +1106,7 @@ function App() {
           path="/petugas/laporan/:id"
           element={
             <Protected roles={['petugas']}>
-              <StaffReportDetail />
+              <StaffReportDetailPage />
             </Protected>
           }
         />
@@ -1377,7 +1132,7 @@ function App() {
           path="/admin/laporan/:id"
           element={
             <Protected roles={['admin']}>
-              <StaffReportDetail admin />
+              <StaffReportDetailPage admin />
             </Protected>
           }
         />
@@ -1419,4 +1174,4 @@ function App() {
     </>
   );
 }
-export default App;
+export default App;
