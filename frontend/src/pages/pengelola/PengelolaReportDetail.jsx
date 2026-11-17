@@ -5,13 +5,13 @@ import { AlertTriangle, ArrowLeft } from 'lucide-react';
 
 import { api, formatDate, imageUrl } from '../../api';
 import AdminLayout from '../../layouts/AdminLayout';
-import StaffLayout from '../../layouts/StaffLayout';
-import { StatusBadge } from './StaffReports';
+import StaffLayout from '../../layouts/PengelolaLayout';
+import { StatusBadge } from './PengelolaReports';
 
 const STATUS_OPTIONS = ['Diterima', 'Diverifikasi', 'Diproses', 'Selesai', 'Ditolak'];
 
 // Halaman Detail Penanganan.
-// Dipakai pengelola (/petugas/laporan/:id) dan admin (/admin/laporan/:id lewat prop `admin`).
+// Dipakai pengelola (/pengelola/laporan/:id) dan admin (/admin/laporan/:id lewat prop `admin`).
 export default function StaffReportDetailPage({ admin = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ export default function StaffReportDetailPage({ admin = false }) {
     >
       <button
         className="text-link back-inline"
-        onClick={() => navigate(admin ? '/admin/laporan' : '/petugas/laporan')}
+        onClick={() => navigate(admin ? '/admin/laporan' : '/pengelola/laporan')}
       >
         <ArrowLeft size={15} aria-hidden="true" /> Kembali ke daftar laporan
       </button>

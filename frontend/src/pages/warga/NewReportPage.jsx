@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 import { api, getPosition } from '../../api';
-import CitizenLayout from '../../layouts/CitizenLayout';
+import CitizenLayout from '../../layouts/WargaLayout';
 
 // Notifikasi
 function Notice({ type = 'info', children }) {
@@ -559,7 +559,7 @@ export default function NewReportPage() {
             <b>Bukan layanan darurat</b>
             <p>
               Untuk kondisi yang mengancam keselamatan,
-              segera hubungi layanan darurat atau petugas setempat.
+              segera hubungi layanan darurat atau instansi setempat.
             </p>
           </div>
 

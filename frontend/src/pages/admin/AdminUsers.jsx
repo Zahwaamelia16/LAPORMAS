@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { AlertTriangle, Users } from 'lucide-react';
 
@@ -26,7 +25,7 @@ export default function AdminUsersPage() {
   return (
     <AdminLayout
       title="Data pengguna"
-      subtitle="Daftar akun warga, petugas terverifikasi, dan admin."
+      subtitle="Daftar akun warga, pengelola terverifikasi, dan admin."
     >
       {error && (
         <div className="notice error" role="alert">
@@ -77,7 +76,7 @@ export default function AdminUsersPage() {
 
                     <td>
                       <span className="role-pill">
-                        {user.role}
+                        {user.role === 'petugas' ? 'pengelola' : user.role}
                       </span>
                     </td>
 

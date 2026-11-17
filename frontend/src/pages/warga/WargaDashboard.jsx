@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -15,7 +14,7 @@ import {
 
 import { api, formatDate } from '../../api';
 import { useAuth } from '../../auth';
-import CitizenLayout from '../../layouts/CitizenLayout';
+import CitizenLayout from '../../layouts/WargaLayout';
 
 // Komponen status laporan
 function StatusBadge({ value }) {
@@ -55,7 +54,7 @@ function MyReportsTable({ reports = [] }) {
           di lingkungan sekitar.
         </span>
         <Link
-          to="/warga/laporan/baru"
+          to="/laporan/buat"
           className="btn btn-primary btn-small"
         >
           Buat laporan pertama
@@ -155,7 +154,7 @@ export default function CitizenDashboardPage() {
         </span>
 
         <Link
-          to="/warga/laporan/baru"
+          to="/laporan/buat"
           className="btn btn-primary"
         >
           <Plus size={17} />

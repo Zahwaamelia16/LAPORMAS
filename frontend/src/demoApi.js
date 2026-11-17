@@ -100,14 +100,14 @@ const seedReports = [
     district_name: 'Jambangan',
     regency_name: 'Surabaya',
     title: 'Lampu jalan kembali menyala',
-    description: 'Lampu penerangan jalan sebelumnya mati. Petugas telah melakukan pemeriksaan dan mengganti komponen yang rusak.',
+    description: 'Lampu penerangan jalan sebelumnya mati. Pengelola telah melakukan pemeriksaan dan mengganti komponen yang rusak.',
     location: 'Jl. Anggrek, sisi lapangan warga',
     latitude: -7.329,
     longitude: 112.724,
     created_at: '2026-11-11T12:15:00.000Z',
     images: [{ image_id: 3, image_url: 'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1000&q=80' }],
     updates: [
-      { new_status: 'Diverifikasi', notes: 'Petugas memastikan lampu tidak berfungsi.', updated_at: '2026-11-11T14:00:00.000Z' },
+      { new_status: 'Diverifikasi', notes: 'Pengelola memastikan lampu tidak berfungsi.', updated_at: '2026-11-11T14:00:00.000Z' },
       { new_status: 'Diproses', notes: 'Penggantian komponen penerangan dilakukan.', updated_at: '2026-11-12T02:00:00.000Z' },
       { new_status: 'Selesai', notes: 'Lampu jalan sudah kembali menyala.', updated_at: '2026-11-12T08:00:00.000Z' },
     ],
@@ -131,7 +131,7 @@ const seedReports = [
     longitude: 112.725,
     created_at: '2026-11-10T09:20:00.000Z',
     images: [],
-    updates: [{ new_status: 'Diverifikasi', notes: 'Petugas sedang memastikan kondisi saluran di lokasi.', updated_at: '2026-11-11T01:30:00.000Z' }],
+    updates: [{ new_status: 'Diverifikasi', notes: 'Pengelola sedang memastikan kondisi saluran di lokasi.', updated_at: '2026-11-11T01:30:00.000Z' }],
   },
 ];
 
@@ -152,7 +152,7 @@ const demoUsers = [
     user_id: 2,
     name: 'Amel Pratama',
     email: 'pengelola@lapormas.id',
-    role: 'petugas',
+    role: 'pengelola',
     task_village: 'Ketintang',
     task_district: 'Gayungan',
     task_area_id: 1,
@@ -184,7 +184,10 @@ function getRequests() {
   return read(STORAGE.requests, defaultRequests);
 }
 function getUsers() {
-  return read(STORAGE.users, demoUsers);
+  return read(STORAGE.users, demoUsers).map((user) => ({
+    ...user,
+    role: user.role === 'petugas' ? 'pengelola' : user.role,
+  }));
 }
 function currentUser() {
   return read(STORAGE.currentUser, null);
@@ -211,15 +214,16 @@ export async function demoApi(path, options = {}) {
   if (pathname === '/auth/login' && method === 'POST') {
     const identifier = String(options.body?.identifier || '').trim();
     const role = options.body?.role || 'warga';
+    const normalizedRole = role === 'petugas' ? 'pengelola' : role;
     const password = String(options.body?.password || '');
     if (!identifier || !password) throw new Error('Masukkan email/nomor telepon dan kata sandi.');
     const users = getUsers();
     const normalizedIdentifier = identifier.toLowerCase();
-    const user = users.find((item) => item.role === role && (String(item.email || '').toLowerCase() === normalizedIdentifier || String(item.citizen_phone || item.phone || '').replaceAll(' ', '') === identifier.replaceAll(' ', ''))) || users.find((item) => item.role === role) || demoUsers.find((item) => item.role === role);
+    const user = users.find((item) => item.role === normalizedRole && (String(item.email || '').toLowerCase() === normalizedIdentifier || String(item.citizen_phone || item.phone || '').replaceAll(' ', '') === identifier.replaceAll(' ', ''))) || users.find((item) => item.role === normalizedRole) || demoUsers.find((item) => item.role === normalizedRole);
     if (!user) throw new Error('Role akun tidak tersedia pada mode pratinjau.');
     localStorage.setItem('lapormas_demo_user', JSON.stringify(user));
-    localStorage.setItem('lapormas_token', `demo-${role}-token`);
-    return createResponse({ token: `demo-${role}-token`, user });
+    localStorage.setItem('lapormas_token', `demo-${normalizedRole}-token`);
+    return createResponse({ token: `demo-${normalizedRole}-token`, user });
   }
 
   if (pathname === '/auth/me') {
@@ -404,7 +408,7 @@ export async function demoApi(path, options = {}) {
         user_id: Math.max(0, ...users.map((item) => Number(item.user_id) || 0)) + 1,
         name: request.name,
         email: request.email,
-        role: 'petugas',
+        role: 'pengelola',
         task_village: request.village_name || 'Wilayah tugas',
         task_district: request.district_name || '',
         task_area_id: Number(request.area_id) || 1,

@@ -12,8 +12,8 @@ import {
 
 import { api } from '../../api';
 import { useAuth } from '../../auth';
-import StaffLayout from '../../layouts/StaffLayout';
-import { StaffReportsTable } from './StaffReports';
+import StaffLayout from '../../layouts/PengelolaLayout';
+import { StaffReportsTable } from './PengelolaReports';
 
 // Kartu statistik ringkasan
 function StatCard({ label, value, icon: Icon, sub }) {
@@ -70,7 +70,7 @@ export default function StaffDashboardPage() {
             <h2>Laporan wilayah tugas</h2>
             <p>Daftar laporan sesuai area tugas yang terdaftar pada akunmu.</p>
           </div>
-          <Link to="/petugas/laporan" className="text-link">
+          <Link to="/pengelola/laporan" className="text-link">
             Lihat semua <ArrowRight size={15} />
           </Link>
         </div>

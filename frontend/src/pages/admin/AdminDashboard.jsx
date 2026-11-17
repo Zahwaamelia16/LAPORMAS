@@ -195,7 +195,7 @@ export default function AdminDashboardPage() {
             />
 
             <StatCard
-              label="Pengajuan petugas"
+              label="Pengajuan pengelola"
               value={summary?.pending_staff || 0}
               icon={ShieldCheck}
             />
@@ -213,7 +213,7 @@ export default function AdminDashboardPage() {
               <div>
                 <h2>Pengajuan pengelola</h2>
                 <p>
-                  Periksa bukti penugasan sebelum memberikan akses petugas.
+                  Periksa bukti penugasan sebelum memberikan akses pengelola.
                 </p>
               </div>
 

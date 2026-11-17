@@ -4,14 +4,18 @@ import AdminReportsPage from './pages/admin/AdminReports';
 import AdminStaffRequestsPage from './pages/admin/AdminStaffRequests';
 import AdminUsersPage from './pages/admin/AdminUsers';
 
-import CitizenDashboardPage from './pages/warga/CitizenDashboard';
-import CitizenReportsPage from './pages/warga/CitizenReports';
+import CitizenDashboardPage from './pages/warga/WargaDashboard';
+import CitizenReportsPage from './pages/warga/WargaReports';
 import NewReportPageModule from './pages/warga/NewReportPage';
 import ProfilePageModule from './pages/warga/ProfilePage';
 
-import StaffDashboardPage from './pages/pengelola/StaffDashboard';
-import StaffReportsPage from './pages/pengelola/StaffReports';
-import StaffReportDetailPage from './pages/pengelola/StaffReportDetail';
+import StaffDashboardPage from './pages/pengelola/PengelolaDashboard';
+import StaffReportsPage from './pages/pengelola/PengelolaReports';
+import StaffReportDetailPage from './pages/pengelola/PengelolaReportDetail';
+import PengelolaPublicReportsPage from './pages/pengelola/PengelolaPublicReports';
+import StaffLayout from './layouts/PengelolaLayout';
+import PublicReportFilters from './pages/shared/PublicReportFilters';
+import { usePublicReports } from './pages/shared/usePublicReports';
 
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -82,6 +86,9 @@ function Status({ value }) {
   const key = (value || 'diterima').toLowerCase().replaceAll(' ', '-');
   return <span className={`status status-${key}`}>{value || 'Diterima'}</span>;
 }
+function getDashboardPath(role) {
+  return role === 'admin' ? '/admin' : role === 'pengelola' ? '/pengelola' : '/warga';
+}
 function PageIntro({ eyebrow, title, subtitle, children }) {
   return <section className="page-intro">
     <div className="container">
@@ -121,11 +128,7 @@ function PublicNav() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
-  const dashboardPath = user?.role === 'admin'
-    ? '/admin'
-    : user?.role === 'petugas'
-      ? '/petugas'
-      : '/warga';
+  const dashboardPath = getDashboardPath(user?.role);
 
   const handleLogout = () => {
     logout();
@@ -209,7 +212,7 @@ function Protected({ roles, children }) {
   const location = useLocation();
   if (loading) return <div className="screen-loading">Memuat akun...</div>;
   if (!user) return <Navigate to="/masuk" state={{ from: location.pathname }} replace />;
-  if (roles && !roles.includes(user.role)) return <Navigate to={user.role === 'admin' ? '/admin' : user.role === 'petugas' ? '/petugas' : '/warga'} replace />;
+  if (roles && !roles.includes(user.role)) return <Navigate to={getDashboardPath(user.role)} replace />;
   return children;
 }
 
@@ -243,7 +246,7 @@ function HomePage() {
     ['Masalah apa saja yang bisa dilaporkan?', 'Kamu bisa melaporkan masalah infrastruktur, kebersihan, penerangan, drainase, pohon tumbang, dan kerusakan fasilitas umum di wilayah yang terdaftar.'],
     ['Apakah identitas pelapor ditampilkan ke publik?', 'Tidak. Nama, nomor telepon, dan email pelapor tidak ditampilkan pada halaman laporan publik.'],
     ['Bagaimana cara memantau laporan saya?', 'Gunakan nomor laporan yang diterima setelah pengiriman. Kamu juga dapat melihat riwayat penanganan melalui dashboard akun.'],
-    ['Apakah LAPORMAS untuk keadaan darurat?', 'Bukan. Untuk kondisi yang mengancam keselamatan, segera hubungi layanan darurat atau petugas setempat.'],
+    ['Apakah LAPORMAS untuk keadaan darurat?', 'Bukan. Untuk kondisi yang mengancam keselamatan, segera hubungi layanan darurat atau instansi setempat.'],
   ];
   return <PublicLayout>
     <main>
@@ -460,28 +463,7 @@ function TrackSummary({ report }) {
 }
 
 function PublicReportsPage() {
-  const [reports, setReports] = useState([]);
-  const [areas, setAreas] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [statuses, setStatuses] = useState([]);
-  const [filters, setFilters] = useState({ regency: '', district: '', village: '', category: '', status: '', search: '' });
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    Promise.all([api('/areas'), api('/categories'), api('/statuses')]).then(([a, c, s]) => {
-      setAreas(a.areas);
-      setCategories(c.categories);
-      setStatuses(s.statuses);
-    }).catch(() => { });
-  }, []);
-  useEffect(() => {
-    setLoading(true);
-    const params = new URLSearchParams(Object.entries(filters).filter(([, v]) => v));
-    api(`/reports?${params}`).then(d => setReports(d.reports)).catch(() => setReports([])).finally(() => setLoading(false));
-  }, [filters]);
-  const regencies = [...new Set(areas.map(a => a.regency_name))];
-  const districts = [...new Set(areas.filter(a => !filters.regency || a.regency_name === filters.regency).map(a => a.district_name))];
-  const villages = areas.filter(a => (!filters.regency || a.regency_name === filters.regency) && (!filters.district || a.district_name === filters.district));
-  const update = (key, value) => setFilters(old => ({ ...old, [key]: value, ...(key === 'regency' ? { district: '', village: '' } : {}), ...(key === 'district' ? { village: '' } : {}) }));
+  const { reports, areas, categories, statuses, filters, setFilters, resetFilters, loading } = usePublicReports();
   return <PublicLayout>
     <PageIntro eyebrow="TRANSPARANSI LAPORAN" title="Laporan publik" subtitle="Pantau masalah dan proses penanganannya di berbagai wilayah.">
       <div className="intro-meta">
@@ -490,17 +472,7 @@ function PublicReportsPage() {
       </div>
     </PageIntro>
     <main className="container section public-listing">
-      <div className="filter-panel">
-        <div className="filter-title"><Filter size={17} /><b>Filter laporan</b><button className="text-link" onClick={() => setFilters({ regency: '', district: '', village: '', category: '', status: '', search: '' })}>Reset</button></div>
-        <div className="filter-grid">
-          <label>Kabupaten / Kota<select value={filters.regency} onChange={e => update('regency', e.target.value)}><option value="">Semua wilayah</option>{regencies.map(x => <option key={x}>{x}</option>)}</select></label>
-          <label>Kecamatan<select value={filters.district} onChange={e => update('district', e.target.value)} disabled={!filters.regency}><option value="">Semua kecamatan</option>{districts.map(x => <option key={x}>{x}</option>)}</select></label>
-          <label>Desa / Kelurahan<select value={filters.village} onChange={e => update('village', e.target.value)} disabled={!filters.district}><option value="">Semua desa/kelurahan</option>{villages.map(x => <option key={x.area_id} value={x.village_name}>{x.village_name}</option>)}</select></label>
-          <label>Kategori<select value={filters.category} onChange={e => update('category', e.target.value)}><option value="">Semua kategori</option>{categories.map(x => <option key={x.category_id} value={x.category_id}>{x.category_name}</option>)}</select></label>
-          <label>Status<select value={filters.status} onChange={e => update('status', e.target.value)}><option value="">Semua status</option>{statuses.map(x => <option key={x.status_id} value={x.status_id}>{x.status_name}</option>)}</select></label>
-          <label className="search-field">Cari laporan<div><Search size={16} /><input value={filters.search} onChange={e => update('search', e.target.value)} placeholder="Judul atau nomor laporan" /></div></label>
-        </div>
-      </div>
+      <PublicReportFilters areas={areas} categories={categories} statuses={statuses} filters={filters} setFilters={setFilters} onReset={resetFilters} />
       <div className="listing-heading">
         <div>
           <h2>Daftar laporan</h2>
@@ -516,7 +488,7 @@ function GlobeIcon() {
   return <MapPin size={15} />;
 }
 
-function PublicReportDetail({ track = false }) {
+function PublicReportDetail({ track = false, manager = false }) {
   const { id, code } = useParams();
   const [report, setReport] = useState(null);
   const [error, setError] = useState('');
@@ -539,13 +511,28 @@ function PublicReportDetail({ track = false }) {
     ].filter(Boolean).join(', ')}`
     : 'Informasi laporan dan riwayat penanganan.';
 
+  const Layout = manager ? StaffLayout : PublicLayout;
+
   return (
-    <PublicLayout>
-      <PageIntro
-        eyebrow="DETAIL LAPORAN"
-        title={report?.title || 'Detail laporan'}
-        subtitle={subtitle}
-      />
+    <Layout
+      {...(manager ? {
+        title: report?.title || 'Detail laporan publik',
+        subtitle,
+      } : {})}
+    >
+      {!manager && (
+        <PageIntro
+          eyebrow="DETAIL LAPORAN"
+          title={report?.title || 'Detail laporan'}
+          subtitle={subtitle}
+        />
+      )}
+
+      {manager && (
+        <Link to="/pengelola/laporan-publik" className="text-link back-inline">
+          Kembali ke laporan publik
+        </Link>
+      )}
 
       <main className="container section detail-layout">
         {error ? (
@@ -623,7 +610,7 @@ function PublicReportDetail({ track = false }) {
           </>
         )}
       </main>
-    </PublicLayout>
+    </Layout>
   );
 }
 function HowPage() {
@@ -651,7 +638,7 @@ function HowPage() {
             <ShieldCheck />
             <h2>Verifikasi laporan</h2>
             <p>
-              Laporan masuk ke sistem untuk diverifikasi. Petugas sesuai area kejadian
+              Laporan masuk ke sistem untuk diverifikasi. Pengelola sesuai area kejadian
               dapat melihat dan menindaklanjutinya.
             </p>
           </div>
@@ -670,7 +657,7 @@ function HowPage() {
           <AlertTriangle aria-hidden="true" />
           <span>
             LAPORMAS bukan layanan darurat. Untuk kondisi yang mengancam keselamatan,
-            hubungi layanan darurat atau petugas setempat.
+            hubungi layanan darurat atau instansi setempat.
           </span>
         </div>
 
@@ -702,7 +689,7 @@ function AboutPage() {
           <h2>Lingkungan yang nyaman dimulai dari kepedulian bersama.</h2>
           <p>
             Warga dapat melaporkan masalah di berbagai wilayah, memantau progres
-            penanganan, dan melihat laporan publik. Petugas hanya menangani laporan
+            penanganan, dan melihat laporan publik. Pengelola menangani laporan
             sesuai area tugasnya, sedangkan admin memantau keseluruhan sistem.
           </p>
 
@@ -718,7 +705,7 @@ function AboutPage() {
             <MapPin />
             <div>
               <b>Berbasis wilayah</b>
-              <span>Lokasi kejadian digunakan untuk menentukan area dan petugas yang menangani.</span>
+              <span>Lokasi kejadian digunakan untuk menentukan area dan pengelola yang menangani.</span>
             </div>
           </div>
 
@@ -739,14 +726,14 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const requestedRole = new URLSearchParams(location.search).get('role');
-  const [role, setRole] = useState(requestedRole === 'admin' ? 'admin' : requestedRole === 'petugas' ? 'petugas' : 'warga');
+  const [role, setRole] = useState(requestedRole === 'admin' ? 'admin' : requestedRole === 'pengelola' ? 'pengelola' : 'warga');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
-    if (user) navigate(user.role === 'admin' ? '/admin' : user.role === 'petugas' ? '/petugas' : '/warga', { replace: true });
+    if (user) navigate(getDashboardPath(user.role), { replace: true });
   }, [user, navigate]);
   const chooseRole = (nextRole) => {
     setRole(nextRole);
@@ -759,7 +746,7 @@ function LoginPage() {
     setError('');
     try {
       const data = await login({ identifier: identifier.trim(), password, role });
-      const defaultPath = data.user.role === 'admin' ? '/admin' : data.user.role === 'petugas' ? '/petugas' : '/warga';
+      const defaultPath = getDashboardPath(data.user.role);
       const requestedPath = location.state?.from;
       navigate(requestedPath && data.user.role === 'warga' && requestedPath.startsWith('/laporan') ? requestedPath : defaultPath, { replace: true });
     } catch (err) {
@@ -810,7 +797,7 @@ function LoginPage() {
           <div className="role-switch" aria-label="Pilih jenis akun">
             {[
               { value: 'warga', label: 'Warga', Icon: UserRound },
-              { value: 'petugas', label: 'Pengelola', Icon: Users },
+              { value: 'pengelola', label: 'Pengelola', Icon: Users },
             ].map(({ value, label, Icon }) => (
               <button
                 type="button"
@@ -826,7 +813,7 @@ function LoginPage() {
           </div>
         )}
         <form onSubmit={submit} className="form-stack">
-          <label>Email / No. Telepon<input value={identifier} onChange={e => setIdentifier(e.target.value)} placeholder={role === 'petugas' ? 'pengelola@lapormas.id' : 'nama@email.com'} autoComplete="username" required /></label>
+          <label>Email / No. Telepon<input value={identifier} onChange={e => setIdentifier(e.target.value)} placeholder={role === 'pengelola' ? 'pengelola@lapormas.id' : 'nama@email.com'} autoComplete="username" required /></label>
           <label>Kata Sandi<div className="password-field"><input type={show ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Masukkan kata sandi" autoComplete="current-password" required /><button type="button" onClick={() => setShow(!show)} aria-label={show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}>{show ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></label>
           <div className="form-between">
             <span></span>
@@ -835,7 +822,7 @@ function LoginPage() {
           {error && <Notice type="error">{error}</Notice>}
           <button className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Memproses...' : 'Masuk'}</button>
         </form>
-        {role === 'warga' ? <div className="auth-signup">Belum punya akun? <Link to="/daftar">Daftar sebagai warga</Link></div> : role === 'petugas' ? <div className="auth-signup">Belum punya akun pengelola? <Link to="/daftar-pengelola">Ajukan pendaftaran</Link></div> : <div className="auth-signup">Akun admin dibuat khusus dan tidak tersedia melalui pendaftaran publik.</div>}
+        {role === 'warga' ? <div className="auth-signup">Belum punya akun? <Link to="/daftar">Daftar sebagai warga</Link></div> : role === 'pengelola' ? <div className="auth-signup">Belum punya akun pengelola? <Link to="/daftar-pengelola">Ajukan pendaftaran</Link></div> : <div className="auth-signup">Akun admin dibuat khusus dan tidak tersedia melalui pendaftaran publik.</div>}
         {IS_DEMO_MODE && <div className="demo-credentials">
           <b>Akun pratinjau</b>
           <span>Warga: warga@lapormas.id</span>
@@ -953,10 +940,10 @@ function RegisterStaff() {
   return <div className="auth-simple">
     <Link to="/" className="brand">LAPORMAS</Link>
     <div className="auth-card register-card wide">
-      <Link to="/masuk?role=petugas" className="back-link"><ArrowLeft size={16} aria-hidden="true" /> Kembali ke masuk</Link>
+      <Link to="/masuk?role=pengelola" className="back-link"><ArrowLeft size={16} aria-hidden="true" /> Kembali ke masuk</Link>
       <span className="eyebrow">PENGAJUAN AKUN</span>
       <h1>Daftar sebagai pengelola</h1>
-      <p>Pengajuan akan diperiksa admin. Akses petugas diberikan setelah penugasan disetujui.</p>
+      <p>Pengajuan akan diperiksa admin. Akses pengelola diberikan setelah penugasan disetujui.</p>
       <form onSubmit={submit} className="form-stack">
         <div className="field-grid">
           <label>Nama lengkap<input value={form.name} onChange={e => update('name', e.target.value)} required /></label>
@@ -983,7 +970,7 @@ function RegisterStaff() {
         {success && <Notice type="success">{success}</Notice>}
         <button className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Mengirim pengajuan...' : 'Kirim pengajuan'}</button>
       </form>
-      <div className="auth-signup">Sudah disetujui? <Link to="/masuk?role=petugas">Masuk sebagai pengelola</Link></div>
+      <div className="auth-signup">Sudah disetujui? <Link to="/masuk?role=pengelola">Masuk sebagai pengelola</Link></div>
     </div>
   </div>;
 }
@@ -1059,10 +1046,19 @@ function App() {
         />
 
         <Route
-          path="/warga/laporan/baru"
+          path="/laporan/buat"
           element={
             <Protected roles={['warga']}>
               <NewReportPageModule />
+            </Protected>
+          }
+        />
+
+        <Route
+          path="/warga/laporan/baru"
+          element={
+            <Protected roles={['warga']}>
+              <Navigate to="/laporan/buat" replace />
             </Protected>
           }
         />
@@ -1087,26 +1083,42 @@ function App() {
 
         {/* Alur pengelola */}
         <Route
-          path="/petugas"
+          path="/pengelola"
           element={
-            <Protected roles={['petugas']}>
+            <Protected roles={['pengelola']}>
               <StaffDashboardPage />
             </Protected>
           }
         />
         <Route
-          path="/petugas/laporan"
+          path="/pengelola/laporan"
           element={
-            <Protected roles={['petugas']}>
+            <Protected roles={['pengelola']}>
               <StaffReportsPage />
             </Protected>
           }
         />
         <Route
-          path="/petugas/laporan/:id"
+          path="/pengelola/laporan/:id"
           element={
-            <Protected roles={['petugas']}>
+            <Protected roles={['pengelola']}>
               <StaffReportDetailPage />
+            </Protected>
+          }
+        />
+        <Route
+          path="/pengelola/laporan-publik"
+          element={
+            <Protected roles={['pengelola']}>
+              <PengelolaPublicReportsPage />
+            </Protected>
+          }
+        />
+        <Route
+          path="/pengelola/laporan-publik/:id"
+          element={
+            <Protected roles={['pengelola']}>
+              <PublicReportDetail manager />
             </Protected>
           }
         />
@@ -1174,4 +1186,4 @@ function App() {
     </>
   );
 }
-export default App;
+export default App;

@@ -39,7 +39,7 @@ Akses admin tersedia melalui tautan **Masuk sebagai admin** pada halaman login. 
 
 - Publik: Beranda, Laporan publik, Detail laporan, Pelacakan laporan, Cara melapor, Tentang kami.
 - Autentikasi: Login Warga/Pengelola/Admin, Registrasi Warga, Pengajuan Pengelola.
-- Warga: Ringkasan, Laporan saya, Buat laporan, Profil.
+- Warga: Ringkasan, Laporan saya, Buat laporan di `/laporan/buat`, Profil.
 - Pengelola: Ringkasan, Laporan publik, Laporan area tugas, Detail penanganan.
 - Admin: Ringkasan, Semua laporan, Verifikasi pengelola, Data pengguna.
 

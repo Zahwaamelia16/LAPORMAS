@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -10,7 +9,7 @@ import {
 } from 'lucide-react';
 
 import { api, formatDate } from '../../api';
-import CitizenLayout from '../../layouts/CitizenLayout';
+import CitizenLayout from '../../layouts/WargaLayout';
 
 // Label status laporan
 function StatusBadge({ value }) {
@@ -38,7 +37,7 @@ function MyReportsTable({ reports = [] }) {
         </span>
 
         <Link
-          to="/warga/laporan/baru"
+          to="/laporan/buat"
           className="btn btn-primary btn-small"
         >
           Buat laporan pertama
@@ -131,7 +130,7 @@ export default function CitizenReportsPage() {
           </div>
 
           <Link
-            to="/warga/laporan/baru"
+            to="/laporan/buat"
             className="btn btn-primary btn-small"
           >
             <Plus size={15} />

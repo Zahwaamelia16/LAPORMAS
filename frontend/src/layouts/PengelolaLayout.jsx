@@ -4,15 +4,14 @@ import {
   LayoutDashboard,
   ListFilter,
   ClipboardList,
-  Home,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../auth';
 
 const staffLinks = [
-  ['/petugas', 'Ringkasan', LayoutDashboard],
-  ['/laporan', 'Laporan publik', ListFilter],
-  ['/petugas/laporan', 'Laporan area tugas', ClipboardList],
+  ['/pengelola', 'Ringkasan', LayoutDashboard],
+  ['/pengelola/laporan-publik', 'Laporan publik', ListFilter],
+  ['/pengelola/laporan', 'Laporan area tugas', ClipboardList],
 ];
 
 export default function StaffLayout({ title, subtitle, children }) {
@@ -51,11 +50,6 @@ export default function StaffLayout({ title, subtitle, children }) {
         </nav>
 
         <div className="sidebar-bottom">
-          <Link to="/">
-            <Home size={17} aria-hidden="true" />
-            Kembali ke website
-          </Link>
-
           <button type="button" onClick={handleLogout}>
             <LogOut size={17} aria-hidden="true" />
             Keluar

@@ -5,7 +5,6 @@ import {
   ClipboardList,
   ShieldCheck,
   Users,
-  Home,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../auth';
@@ -53,11 +52,6 @@ export default function AdminLayout({ title, subtitle, children }) {
         </nav>
 
         <div className="sidebar-bottom">
-          <Link to="/">
-            <Home size={17} aria-hidden="true" />
-            Kembali ke website
-          </Link>
-
           <button type="button" onClick={handleLogout}>
             <LogOut size={17} aria-hidden="true" />
             Keluar

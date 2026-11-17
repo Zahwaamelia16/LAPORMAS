@@ -2,7 +2,7 @@
 import { MapPin } from 'lucide-react';
 
 import { useAuth } from '../../auth';
-import CitizenLayout from '../../layouts/CitizenLayout';
+import CitizenLayout from '../../layouts/WargaLayout';
 
 export default function ProfilePageModule() {
   const { user } = useAuth();

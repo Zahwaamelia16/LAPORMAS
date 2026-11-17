@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ClipboardList } from 'lucide-react';
 
 import { api, formatDate } from '../../api';
-import StaffLayout from '../../layouts/StaffLayout';
+import StaffLayout from '../../layouts/PengelolaLayout';
 
 // Label status laporan
 export function StatusBadge({ value }) {
@@ -58,7 +57,7 @@ export function StaffReportsTable({ reports = [] }) {
               <td><StatusBadge value={report.status_name} /></td>
               <td>
                 <Link
-                  to={`/petugas/laporan/${report.report_id}`}
+                  to={`/pengelola/laporan/${report.report_id}`}
                   className="table-link"
                 >
                   Tangani

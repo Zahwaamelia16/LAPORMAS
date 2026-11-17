@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { ShieldCheck, AlertTriangle } from 'lucide-react';
 
@@ -93,7 +92,7 @@ export default function AdminStaffRequestsPage() {
           <div>
             <h2>Daftar pengajuan</h2>
             <p>
-              Pengguna baru memperoleh role petugas setelah disetujui.
+              Pengguna baru memperoleh role pengelola setelah disetujui.
             </p>
           </div>
 
