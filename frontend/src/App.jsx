@@ -1066,6 +1066,15 @@ function App() {
         />
 
         <Route
+          path="/laporan-terkirim/:code"
+          element={
+            <Protected roles={['warga']}>
+              <SubmittedPage />
+            </Protected>
+          }
+        />
+
+        <Route
           path="/warga/laporan/baru"
           element={
             <Protected roles={['warga']}>
