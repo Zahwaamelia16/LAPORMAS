@@ -540,15 +540,136 @@ input::placeholder,textarea::placeholder {color: #98ad9d; font-weight: 400;}
 
 .workspace-main {min-width: 0;}
 
-.workspace-top {padding: 34px 42px 23px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e4ece5; background: #fff;}
+/* Dashboard header bersama untuk Admin, Warga, dan Pengelola */
+.workspace-top {
+  position: relative;
+  isolation: isolate;
+  min-height: 148px;
+  padding: 28px 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 26px;
+  overflow: hidden;
+  border-bottom: 1px solid #e5eee6;
+  background: linear-gradient(112deg, #ffffff 0%, #fbfdfb 58%, #eff7f0 100%);
+}
 
-.workspace-top .eyebrow {margin-bottom: 6px;}
+.workspace-top::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -138px;
+  right: -78px;
+  width: 330px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(215, 237, 218, .62) 0%,
+    rgba(230, 243, 232, .22) 54%,
+    transparent 74%
+  );
+  pointer-events: none;
+}
 
-.workspace-top h1 {font-size: 27px; margin: 0 0 5px;}
+.workspace-top > * {
+  position: relative;
+  z-index: 1;
+}
 
-.workspace-top p {font-size: 11px; margin: 0;}
+.workspace-heading {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-.workspace-top .top-avatar {width: 42px; height: 42px;}
+.workspace-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 10px;
+  color: #819487;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .015em;
+}
+
+.breadcrumb-divider { color: #c3d0c5; }
+
+.workspace-breadcrumb .breadcrumb-current {
+  color: #267044;
+  font-weight: 800;
+}
+
+.workspace-top .workspace-heading h1 {
+  margin: 0 0 6px;
+  color: #143b2a;
+  font-family: Manrope, sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -.045em;
+}
+
+.workspace-top .workspace-heading p {
+  max-width: 650px;
+  margin: 0;
+  color: #718477;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.workspace-top-account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+  padding: 9px 13px 9px 16px;
+  border: 1px solid rgba(220, 234, 222, .95);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .84);
+  box-shadow: 0 5px 18px rgba(20, 58, 36, .055);
+}
+
+.workspace-top-account-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 0;
+}
+
+.workspace-top-account-info b {
+  max-width: 155px;
+  overflow: hidden;
+  color: #214d33;
+  font-size: 11px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-top-account-info span {
+  color: #829487;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.workspace-top .top-avatar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border: 3px solid #fff;
+  background: #e2f1e5;
+  color: #17643a;
+  font-size: 15px;
+  font-weight: 900;
+  box-shadow: 0 0 0 1px #dceade;
+}
 
 .workspace-content {padding: 28px 42px 50px; max-width: 1500px; margin: 0 auto;}
 
@@ -776,7 +897,7 @@ td:first-child span {color: var(--text); font-size: 11px; font-weight: 700;}
   .create-layout {gap: 24px;}
   .workspace {grid-template-columns: 220px 1fr;}
   .workspace-content {padding: 24px;}
-  .workspace-top {padding: 26px 24px;}
+  .workspace-top {padding: 26px 28px; min-height: 130px;}
   .stat-cards {grid-template-columns: repeat(2,1fr);}
   .request-actions {flex-wrap: wrap; justify-content: flex-end;}
   .auth-visual {padding: 40px 35px;}
@@ -845,8 +966,13 @@ td:first-child span {color: var(--text); font-size: 11px; font-weight: 700;}
   .workspace-sidebar nav {flex-direction: row; overflow: auto; margin-top: 12px;}
   .workspace-sidebar nav a {white-space: nowrap; padding: 9px 10px; font-size: 10px;}
   .workspace-sidebar nav a svg {display: none;}
-  .workspace-top {padding: 22px 18px;}
-  .workspace-top h1 {font-size: 23px;}
+  .workspace-top {padding: 22px 20px; min-height: 116px; gap: 14px;}
+  .workspace-top .workspace-heading h1 {font-size: 23px;}
+  .workspace-top .workspace-heading p {font-size: 10px;}
+  .workspace-breadcrumb {gap: 6px; margin-bottom: 8px; font-size: 9px;}
+  .workspace-top-account {padding: 5px; border-radius: 50%;}
+  .workspace-top-account-info {display: none;}
+  .workspace-top .top-avatar {width: 38px; height: 38px; flex-basis: 38px;}
   .workspace-content {padding: 18px;}
   .stat-cards {grid-template-columns: repeat(2,1fr);}
   .panel {padding: 15px;}
@@ -902,7 +1028,11 @@ td:first-child span {color: var(--text); font-size: 11px; font-weight: 700;}
   .stat-card-icon {width: 30px; height: 30px;}
   .workspace-sidebar nav {gap: 3px;}
   .workspace-sidebar nav a {font-size: 9px;}
-  .workspace-top .top-avatar {display: none;}
+  .workspace-top {min-height: 105px; padding: 19px 16px; gap: 9px;}
+  .workspace-top .workspace-heading h1 {font-size: 20px;}
+  .workspace-top .workspace-heading p {max-width: 250px; font-size: 9px; line-height: 1.5;}
+  .workspace-breadcrumb {gap: 5px; font-size: 8px;}
+  .workspace-top .top-avatar {display: grid; width: 34px; height: 34px; flex-basis: 34px; font-size: 12px;}
   .profile-grid {grid-template-columns: 1fr;}
 }
 
@@ -1184,7 +1314,7 @@ textarea {min-height: 120px; line-height: 1.65; resize: vertical;}
 
 .workspace-user b, .workspace-user span {overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
 
-.workspace-top {border-bottom: 1px solid #e9efe9; background: rgba(255,255,255,.86);}
+.workspace-top {border-bottom: 1px solid #e5eee6;}
 
 .workspace-top h1 {letter-spacing: -.04em;}
 

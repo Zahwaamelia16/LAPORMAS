@@ -1,4 +1,3 @@
-
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -20,6 +19,8 @@ export default function AdminLayout({ title, subtitle, children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const userInitial = user?.name?.trim()?.charAt(0).toUpperCase() || 'A';
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -28,17 +29,17 @@ export default function AdminLayout({ title, subtitle, children }) {
   return (
     <div className="workspace">
       <aside className="workspace-sidebar admin-sidebar">
-        <Link to="/" className="brand">LAPORMAS</Link>
+        <Link to="/admin" className="brand">
+          LAPORMAS
+        </Link>
 
         <div className="workspace-role">ADMINISTRATOR</div>
 
         <div className="workspace-user">
-          <div className="avatar">
-            {user?.name?.slice(0, 1) || 'L'}
-          </div>
+          <div className="avatar">{userInitial}</div>
           <div>
-            <b>{user?.name}</b>
-            <span>{user?.email}</span>
+            <b>{user?.name || 'Admin LAPORMAS'}</b>
+            <span>{user?.email || 'Administrator'}</span>
           </div>
         </div>
 
@@ -60,17 +61,27 @@ export default function AdminLayout({ title, subtitle, children }) {
       </aside>
 
       <main className="workspace-main">
-        <header className="workspace-top">
-          <div>
-            <span className="eyebrow">
-              LAPORMAS · ADMIN
-            </span>
+        <header className="workspace-top admin-top">
+          <div className="workspace-heading">
+            <div className="workspace-breadcrumb">
+              <span>LAPORMAS</span>
+              <span className="breadcrumb-divider">/</span>
+              <span>Administrator</span>
+              <span className="breadcrumb-divider">/</span>
+              <span className="breadcrumb-current">{title}</span>
+            </div>
+
             <h1>{title}</h1>
             <p>{subtitle}</p>
           </div>
 
-          <div className="top-avatar">
-            {user?.name?.slice(0, 1) || 'L'}
+          <div className="workspace-top-account">
+            <div className="workspace-top-account-info">
+              <b>{user?.name || 'Admin LAPORMAS'}</b>
+              <span>Administrator</span>
+            </div>
+
+            <div className="top-avatar">{userInitial}</div>
           </div>
         </header>
 

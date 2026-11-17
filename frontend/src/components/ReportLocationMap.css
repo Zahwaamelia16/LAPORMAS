@@ -1,0 +1,120 @@
+
+.report-map-section {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.report-map-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 14px;
+}
+
+.report-map-heading h3 {
+  margin: 0 0 6px;
+  color: #173b2a;
+  font-family: Manrope, sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.report-map-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.report-map-frame {
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  border: 1px solid #dfe9e1;
+  border-radius: 12px;
+  background: #edf4ee;
+}
+
+.report-map-frame .leaflet-container {
+  width: 100%;
+  height: 100%;
+  font-family: "DM Sans", sans-serif;
+  z-index: 0;
+}
+
+.report-map-link {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 11px;
+  border: 1px solid #d7e7da;
+  border-radius: 8px;
+  background: #f3f8f3;
+  color: #17643a;
+  font-size: 10px;
+  font-weight: 800;
+  transition: .2s ease;
+}
+
+.report-map-link:hover {
+  background: #e4f3e7;
+  border-color: #a9c9b0;
+}
+
+.report-map-coordinate {
+  margin-top: 10px;
+  color: #839488;
+  font-size: 9px;
+}
+
+.report-map-unavailable {
+  display: flex;
+  min-height: 120px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 20px;
+  border: 1px dashed #cbdccb;
+  border-radius: 11px;
+  background: #f7faf7;
+  text-align: center;
+}
+
+.report-map-unavailable span {
+  color: #466b51;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.report-map-unavailable small {
+  color: #819184;
+  font-size: 10px;
+}
+
+@media (max-width: 600px) {
+  .report-map-frame {
+    height: 250px;
+  }
+
+  .report-map-heading {
+    flex-direction: column;
+  }
+
+  .report-map-link {
+    align-self: flex-start;
+  }
+}
+.report-map-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.report-map-title svg {
+  color: #17643a;
+  flex-shrink: 0;
+}

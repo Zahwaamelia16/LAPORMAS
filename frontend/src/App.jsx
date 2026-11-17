@@ -16,6 +16,7 @@ import PengelolaPublicReportsPage from './pages/pengelola/PengelolaPublicReports
 import StaffLayout from './layouts/PengelolaLayout';
 import PublicReportFilters from './pages/shared/PublicReportFilters';
 import { usePublicReports } from './pages/shared/usePublicReports';
+import ReportLocationMap from './components/ReportLocationMap';
 
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -555,10 +556,12 @@ function PublicReportDetail({ track = false, manager = false }) {
                   <span>Kategori</span>
                   <b>{report.category_name}</b>
                 </div>
+
                 <div>
                   <span>Lokasi kejadian</span>
                   <b>{report.location}</b>
                 </div>
+
                 <div>
                   <span>Wilayah terdeteksi</span>
                   <b>
@@ -571,6 +574,14 @@ function PublicReportDetail({ track = false, manager = false }) {
                 </div>
               </div>
 
+              {/* Peta lokasi kejadian */}
+              <ReportLocationMap
+                latitude={report.latitude}
+                longitude={report.longitude}
+                location={report.location}
+              />
+
+              {/* Foto bukti laporan */}
               {report.images?.length > 0 && (
                 <div className="detail-images">
                   {report.images.map((image, index) => (
