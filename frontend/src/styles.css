@@ -169,7 +169,35 @@ p {color: var(--muted); line-height: 1.7;}
 .report-thumb {height: 160px; position: relative; background: #e9f1ea;}
 
 .report-thumb img {width: 100%; height: 100%; object-fit: cover;}
+/* Placeholder gambar laporan berdasarkan kategori */
+.report-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+  background: linear-gradient(135deg, #edf5ee, #dceade);
+  color: #315d3e;
+}
 
+.report-placeholder-icon {
+  font-size: 38px;
+  line-height: 1;
+}
+
+.report-placeholder-text {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.report-image-placeholder small {
+  font-size: 10px;
+  color: #63816c;
+}
 .report-thumb .status {position: absolute; top: 12px; left: 12px;}
 
 .report-card-body {padding: 16px;}

@@ -418,19 +418,40 @@ function ReportCards({ reports = [] }) {
   return (
     <div className="report-grid">
       {reports.map((report, index) => {
-        const reportImage = report.image_url || report.images?.[0]?.image_url;
-        const fallbackImages = [DEMO_PHOTOS.road, DEMO_PHOTOS.trash, DEMO_PHOTOS.light];
-        const imageSource = reportImage
-          ? imageUrl(reportImage)
-          : fallbackImages[index % fallbackImages.length];
+      const reportImage = report.images?.[0]?.image_url || report.image_url;
+
+      const categoryIcons = {
+        'Sampah Menumpuk': '🗑️',
+        'Jalan Rusak': '🛣️',
+        'Pohon Tumbang': '🌳',
+        'Lampu Jalan Mati': '💡',
+        'Saluran Tersumbat': '🚧',
+        'Banjir': '🌊',
+        'Fasilitas Umum Rusak': '🏚️',
+        'Lainnya': '📍',
+      };
+
+      const placeholderIcon = categoryIcons[report.category_name] || '📍';
 
         return (
           <article className="report-card" key={report.report_id}>
             <div className="report-thumb">
+            {reportImage ? (
               <img
-                src={imageSource}
-                alt={reportImage ? 'Foto laporan' : 'Ilustrasi laporan'}
+                src={imageUrl(reportImage)}
+                alt={`Foto laporan ${report.title}`}
               />
+            ) : (
+              <div className="report-image-placeholder">
+                <span className="report-placeholder-icon">
+                  {placeholderIcon}
+                </span>
+                <span className="report-placeholder-text">
+                  Foto belum tersedia
+                </span>
+                <small>{report.category_name}</small>
+              </div>
+            )}
               <Status value={report.status_name} />
             </div>
 

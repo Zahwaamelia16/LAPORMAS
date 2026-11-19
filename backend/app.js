@@ -3,10 +3,14 @@ require('dotenv').config();
 const express = require('express');
 const pool = require('./src/config/db');
 const reportRoutes = require('./src/routes/reportRoutes');
+const referenceRoutes = require('./src/routes/referenceRoutes');
+const statsRoutes = require('./src/routes/statsRoutes');
 
 const app = express();
 
 app.use(express.json());
+app.use('/api', referenceRoutes);
+app.use('/api/stats', statsRoutes);
 
 app.get('/', (req, res) => {
     res.json({
