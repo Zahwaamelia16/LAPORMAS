@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash TEXT NOT NULL,
     role VARCHAR(20) NOT NULL DEFAULT 'warga',
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_users_role CHECK (role IN ('warga', 'petugas', 'admin'))
+    CONSTRAINT chk_users_role CHECK (role IN ('warga', 'pengelola', 'admin'))
 );
 
 -- Email dibuat unik tanpa membedakan huruf besar/kecil.
@@ -167,7 +167,7 @@ ON CONFLICT (category_name) DO NOTHING;
 INSERT INTO report_statuses (status_name, description) VALUES
     ('Menunggu', 'Laporan sudah dikirim dan menunggu pemeriksaan.'),
     ('Diverifikasi', 'Laporan sudah diperiksa dan dinyatakan valid.'),
-    ('Diproses', 'Laporan sedang ditangani oleh petugas atau unit terkait.'),
+    ('Diproses', 'Laporan sedang ditangani oleh pengelola atau unit terkait.'),
     ('Selesai', 'Penanganan laporan telah selesai.')
 ON CONFLICT (status_name) DO NOTHING;
 
