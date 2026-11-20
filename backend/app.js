@@ -5,12 +5,14 @@ const pool = require('./src/config/db');
 const reportRoutes = require('./src/routes/reportRoutes');
 const referenceRoutes = require('./src/routes/referenceRoutes');
 const statsRoutes = require('./src/routes/statsRoutes');
+const authRoutes = require('./src/routes/authRoutes');
 
 const app = express();
 
 app.use(express.json());
 app.use('/api', referenceRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
     res.json({
@@ -23,6 +25,9 @@ app.get('/', (req, res) => {
             update: 'PUT /api/reports/:id',
             delete: 'DELETE /api/reports/:id',
             dbCheck: 'GET /api/db-check',
+            login: 'POST /api/auth/login',
+            me: 'GET /api/auth/me',
+            registerWarga: 'POST /api/auth/register/warga',
         },
     });
 });
