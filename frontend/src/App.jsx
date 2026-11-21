@@ -29,6 +29,7 @@ import {
   Building2,
   Check,
   CheckCircle2,
+  Construction,
   CircleHelp,
   Clock3,
   Droplets,
@@ -39,6 +40,7 @@ import {
   FilePlus2,
   Filter,
   HeartHandshake,
+  House,
   Lightbulb,
   LocateFixed,
   MapPin,
@@ -48,9 +50,11 @@ import {
   ShieldCheck,
   Trash2,
   Trees,
+  TreePine,
   UploadCloud,
   UserRound,
   Users,
+  Waves,
   X,
 } from 'lucide-react';
 import { api, formatDate, getPosition, imageUrl, IS_DEMO_MODE } from './api';
@@ -415,53 +419,63 @@ function ReportCards({ reports = [] }) {
     );
   }
 
+  const categoryIcons = {
+    'Sampah Menumpuk': Trash2,
+    'Jalan Rusak': Construction,
+    'Pohon Tumbang': TreePine,
+    'Lampu Jalan Mati': Lightbulb,
+    'Saluran Tersumbat': Waves,
+    'Banjir': Waves,
+    'Fasilitas Umum Rusak': House,
+    'Lainnya': MapPin,
+  };
+
   return (
     <div className="report-grid">
-      {reports.map((report, index) => {
-      const reportImage = report.images?.[0]?.image_url || report.image_url;
-
-      const categoryIcons = {
-        'Sampah Menumpuk': '🗑️',
-        'Jalan Rusak': '🛣️',
-        'Pohon Tumbang': '🌳',
-        'Lampu Jalan Mati': '💡',
-        'Saluran Tersumbat': '🚧',
-        'Banjir': '🌊',
-        'Fasilitas Umum Rusak': '🏚️',
-        'Lainnya': '📍',
-      };
-
-      const placeholderIcon = categoryIcons[report.category_name] || '📍';
+      {reports.map((report) => {
+        const reportImage = report.images?.[0]?.image_url || report.image_url;
+        const CategoryIcon = categoryIcons[report.category_name] || MapPin;
 
         return (
           <article className="report-card" key={report.report_id}>
             <div className="report-thumb">
-            {reportImage ? (
-              <img
-                src={imageUrl(reportImage)}
-                alt={`Foto laporan ${report.title}`}
-              />
-            ) : (
-              <div className="report-image-placeholder">
-                <span className="report-placeholder-icon">
-                  {placeholderIcon}
-                </span>
-                <span className="report-placeholder-text">
-                  Foto belum tersedia
-                </span>
-                <small>{report.category_name}</small>
-              </div>
-            )}
+              {reportImage ? (
+                <img
+                  src={imageUrl(reportImage)}
+                  alt={`Foto laporan ${report.title}`}
+                />
+              ) : (
+                <div className="report-image-placeholder">
+                  <div className="report-placeholder-icon">
+                    <CategoryIcon size={36} strokeWidth={1.8} />
+                  </div>
+
+                  <span className="report-placeholder-text">
+                    Foto belum tersedia
+                  </span>
+
+                  <small className="report-placeholder-category">
+                    {report.category_name}
+                  </small>
+                </div>
+              )}
+
               <Status value={report.status_name} />
             </div>
 
             <div className="report-card-body">
               <div className="report-location">
                 <MapPin size={13} aria-hidden="true" />
-                {[report.village_name, report.district_name].filter(Boolean).join(', ')}
+                {[report.village_name, report.district_name]
+                  .filter(Boolean)
+                  .join(', ')}
               </div>
+
               <h3>{report.title}</h3>
-              <p>{report.category_name} · {formatDate(report.created_at)}</p>
+              <p>
+                {report.category_name} · {formatDate(report.created_at)}
+              </p>
+
               <Link
                 to={`/laporan/${report.report_id}`}
                 className="btn btn-outline btn-small"
@@ -475,6 +489,7 @@ function ReportCards({ reports = [] }) {
     </div>
   );
 }
+
 function TrackSummary({ report }) {
   return <div className="track-result">
     <div><span className="eyebrow">{report.report_code}</span><Status value={report.status_name} /></div>
@@ -789,28 +804,58 @@ function LoginPage() {
     }
   };
   return <div className="auth-page">
-    <section className="auth-visual" style={{ backgroundImage: `linear-gradient(0deg,rgba(10,65,38,.88),rgba(11,88,44,.74)),url(${DEMO_PHOTOS.login})` }}>
-      <Link to="/" className="brand brand-light">LAPORMAS</Link>
-      <div className="auth-visual-copy">
-        <span className="auth-kicker">RUANG WARGA, PERUBAHAN NYATA</span>
-        <h1>Lingkungan sehat dimulai dari sini</h1>
-        <p>Platform pelaporan masalah lingkungan yang memudahkan warga dan pengelola bekerja sama menjaga kenyamanan bersama.</p>
+  <section className="auth-visual">
+    {/* Foto background */}
+    <div className="auth-visual-bg">
+      <img
+        src="/images/bg-login.jpg"
+        alt="Lingkungan LAPORMAS"
+      />
+    </div>
+
+    {/* Overlay gradient */}
+    <div className="auth-visual-overlay"></div>
+
+    {/* Logo khusus */}
+    <Link to="/" className="auth-logo">
+      <img
+        src="/images/logo.png"
+        alt="LAPORMAS"
+      />
+    </Link>
+
+    {/* Konten utama */}
+    <div className="auth-visual-copy">
+      <span className="auth-kicker">
+        RUANG WARGA, PERUBAHAN NYATA
+      </span>
+
+      <h1>Lingkungan sehat dimulai dari sini</h1>
+
+      <p>
+        Platform pelaporan masalah lingkungan yang memudahkan
+        warga dan pengelola bekerja sama menjaga kenyamanan bersama.
+      </p>
+    </div>
+
+    {/* Statistik */}
+    <div className="auth-stats">
+      <div>
+        <b>124</b>
+        <span>Laporan masuk</span>
       </div>
-      <div className="auth-stats">
-        <div>
-          <b>124</b>
-          <span>Laporan masuk</span>
-        </div>
-        <div>
-          <b>98</b>
-          <span>Terselesaikan</span>
-        </div>
-        <div>
-          <b>2.400</b>
-          <span>Warga terbantu</span>
-        </div>
+
+      <div>
+        <b>98</b>
+        <span>Terselesaikan</span>
       </div>
-    </section>
+
+      <div>
+        <b>2.400</b>
+        <span>Warga terbantu</span>
+      </div>
+    </div>
+  </section>
     <section className="auth-form-side">
       <div className="auth-form-wrap">
         <Link to="/" className="back-link"><ArrowLeft size={16} aria-hidden="true" /> Kembali ke beranda</Link>
