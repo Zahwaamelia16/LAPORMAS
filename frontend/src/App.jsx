@@ -223,7 +223,29 @@ function PublicNav() {
 }
 
 function PublicLayout({ children }) {
-  return <><PublicNav />{children}<Footer /></>;
+  const { user, loading } = useAuth();
+
+  // Memeriksa sesi akun
+  if (loading) {
+    return (
+      <div className="screen-loading">
+        Memeriksa akses...
+      </div>
+    );
+  }
+
+  // Admin hanya menggunakan portal administrator
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return (
+    <>
+      <PublicNav />
+      {children}
+      <Footer />
+    </>
+  );
 }
 function Protected({ roles, children }) {
   const { user, loading } = useAuth();

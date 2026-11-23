@@ -6,6 +6,7 @@ const reportRoutes = require('./src/routes/reportRoutes');
 const referenceRoutes = require('./src/routes/referenceRoutes');
 const statsRoutes = require('./src/routes/statsRoutes');
 const authRoutes = require('./src/routes/authRoutes');
+const adminRoutes = require('./src/routes/adminRoutes');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api', referenceRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/', (req, res) => {
     res.json({

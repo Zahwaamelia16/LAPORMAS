@@ -57,7 +57,7 @@ export default function StaffDashboardPage() {
         <span className="role-pill">Akun terverifikasi</span>
       </div>
 
-      <div className="stat-cards">
+      <div className="stat-cards admin-stat-cards">
         <StatCard label="Laporan area" value={reports.length} icon={ClipboardList} />
         <StatCard label="Perlu verifikasi" value={pending} icon={Clock3} />
         <StatCard label="Sedang ditangani" value={processing} icon={Settings} />

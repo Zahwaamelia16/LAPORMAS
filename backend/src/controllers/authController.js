@@ -18,6 +18,7 @@ async function findUserProfile(whereSql, params) {
             u.password_hash,
             u.role,
             u.created_at,
+            u.is_active,
             p.phone,
             p.address,
             p.area_id,
@@ -71,7 +72,24 @@ async function login(req, res) {
             [identifier]
         );
 
-        const passwordOk = user && await bcrypt.compare(password, user.password_hash);
+        if (!user) {
+        return res.status(401).json({
+            message: 'Email atau password salah.',
+        });
+        }
+
+        // CEK STATUS AKUN
+        if (user.is_active === false) {
+        return res.status(403).json({
+            message: 'Akun Anda sedang dinonaktifkan. Silakan hubungi administrator.',
+        });
+        }
+
+        // CEK PASSWORD
+        const isPasswordValid = await bcrypt.compare(
+        password,
+        user.password_hash
+        );
 
         if (!passwordOk) {
             return res.status(401).json({ message: 'Email atau kata sandi belum sesuai.' });

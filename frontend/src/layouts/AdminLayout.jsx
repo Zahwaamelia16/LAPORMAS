@@ -1,3 +1,5 @@
+
+import '../styles/admin.css';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -9,17 +11,18 @@ import {
 import { useAuth } from '../auth';
 
 const adminLinks = [
-  ['/admin', 'Ringkasan', LayoutDashboard],
-  ['/admin/laporan', 'Semua laporan', ClipboardList],
+  ['/admin', 'Dashboard', LayoutDashboard],
+  ['/admin/laporan', 'Manajemen laporan', ClipboardList],
   ['/admin/verifikasi', 'Verifikasi pengelola', ShieldCheck],
-  ['/admin/pengguna', 'Data pengguna', Users],
+  ['/admin/pengguna', 'Manajemen pengguna', Users],
 ];
 
 export default function AdminLayout({ title, subtitle, children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const userInitial = user?.name?.trim()?.charAt(0).toUpperCase() || 'A';
+  const userInitial =
+    user?.name?.trim()?.charAt(0).toUpperCase() || 'A';
 
   const handleLogout = () => {
     logout();
@@ -27,26 +30,36 @@ export default function AdminLayout({ title, subtitle, children }) {
   };
 
   return (
-    <div className="workspace">
+    <div className="workspace admin-workspace">
+
+      {/* SIDEBAR ADMIN */}
       <aside className="workspace-sidebar admin-sidebar">
+
         <Link to="/admin" className="brand">
           LAPORMAS
         </Link>
 
-        <div className="workspace-role">ADMINISTRATOR</div>
+        <div className="workspace-role">
+          PANEL ADMINISTRATOR
+        </div>
 
         <div className="workspace-user">
           <div className="avatar">{userInitial}</div>
+
           <div>
             <b>{user?.name || 'Admin LAPORMAS'}</b>
             <span>{user?.email || 'Administrator'}</span>
           </div>
         </div>
 
-        <nav>
+        <div className="admin-nav-label">
+          MENU UTAMA
+        </div>
+
+        <nav aria-label="Navigasi administrator">
           {adminLinks.map(([to, label, Icon]) => (
             <NavLink end to={to} key={to}>
-              <Icon size={17} aria-hidden="true" />
+              <Icon size={18} aria-hidden="true" />
               {label}
             </NavLink>
           ))}
@@ -58,37 +71,52 @@ export default function AdminLayout({ title, subtitle, children }) {
             Keluar
           </button>
         </div>
+
       </aside>
 
-      <main className="workspace-main">
+      {/* AREA UTAMA ADMIN */}
+      <main className="workspace-main admin-main">
+
         <header className="workspace-top admin-top">
+
           <div className="workspace-heading">
+
             <div className="workspace-breadcrumb">
               <span>LAPORMAS</span>
               <span className="breadcrumb-divider">/</span>
               <span>Administrator</span>
               <span className="breadcrumb-divider">/</span>
-              <span className="breadcrumb-current">{title}</span>
+              <span className="breadcrumb-current">
+                {title}
+              </span>
             </div>
 
             <h1>{title}</h1>
             <p>{subtitle}</p>
+
           </div>
 
-          <div className="workspace-top-account">
+          <div className="workspace-top-account admin-account">
+
             <div className="workspace-top-account-info">
               <b>{user?.name || 'Admin LAPORMAS'}</b>
               <span>Administrator</span>
             </div>
 
-            <div className="top-avatar">{userInitial}</div>
+            <div className="top-avatar">
+              {userInitial}
+            </div>
+
           </div>
+
         </header>
 
-        <div className="workspace-content">
+        <div className="workspace-content admin-content">
           {children}
         </div>
+
       </main>
+
     </div>
   );
 }

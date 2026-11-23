@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   ShieldCheck,
   Users,
+  BarChart3,
 } from 'lucide-react';
 
 import { api, formatDate, imageUrl } from '../../api';
@@ -32,7 +33,7 @@ function Notice({ children }) {
 // Kartu statistik
 function StatCard({ label, value, icon: Icon }) {
   return (
-    <div className="stat-card">
+    <div className="stat-card admin-stat-card">
       <div className="stat-card-icon">
         <Icon size={20} />
       </div>
@@ -55,7 +56,7 @@ function AdminRecentReports({ reports = [] }) {
   }
 
   return (
-    <div className="table-wrap">
+    <div className="table-wrap admin-table-wrap">
       <table>
         <thead>
           <tr>
@@ -101,6 +102,202 @@ function AdminRecentReports({ reports = [] }) {
   );
 }
 
+
+function AdminReportTrendChart({ data = [] }) {
+  const width = 900;
+  const height = 290;
+
+  const left = 50;
+  const right = 25;
+  const top = 25;
+  const bottom = 52;
+
+  const plotWidth = width - left - right;
+  const plotHeight = height - top - bottom;
+  const plotBottom = height - bottom;
+
+  const values = data.map((item) => Number(item.total) || 0);
+
+  const total = values.reduce((sum, value) => sum + value, 0);
+  const peak = Math.max(0, ...values);
+  const average = data.length
+    ? (total / data.length).toFixed(1)
+    : '0';
+
+  const maxY = Math.max(4, Math.ceil(peak / 4) * 4);
+
+  const points = data.map((item, index) => {
+    const x = data.length <= 1
+      ? left + plotWidth / 2
+      : left + (index / (data.length - 1)) * plotWidth;
+
+    const y = plotBottom - (
+      (Number(item.total) || 0) / maxY
+    ) * plotHeight;
+
+    return { x, y, item };
+  });
+
+  const linePoints = points
+    .map((point) => `${point.x},${point.y}`)
+    .join(' ');
+
+  const areaPath = points.length
+    ? `M ${points[0].x} ${plotBottom}
+       L ${points.map((p) => `${p.x} ${p.y}`).join(' L ')}
+       L ${points[points.length - 1].x} ${plotBottom} Z`
+    : '';
+
+  const labelCount = Math.min(7, data.length);
+
+  const labelIndexes = Array.from(
+    { length: labelCount },
+    (_, index) => Math.round(
+      index * (data.length - 1) /
+      Math.max(labelCount - 1, 1)
+    )
+  );
+
+  return (
+    <div className="admin-chart-content">
+
+      {/* Ringkasan grafik */}
+      <div className="admin-chart-metrics">
+
+        <div>
+          <span>Total laporan</span>
+          <strong>{total.toLocaleString('id-ID')}</strong>
+        </div>
+
+        <div>
+          <span>Rata-rata per periode</span>
+          <strong>{average}</strong>
+        </div>
+
+        <div>
+          <span>Laporan tertinggi</span>
+          <strong>{peak}</strong>
+        </div>
+
+      </div>
+
+      {data.length === 0 ? (
+        <div className="empty-state compact">
+          <BarChart3 />
+          <b>Belum ada data grafik</b>
+          <span>Data akan muncul setelah tersedia.</span>
+        </div>
+      ) : (
+        <div className="admin-chart-svg-wrap">
+
+          <svg
+            viewBox={`0 0 ${width} ${height}`}
+            role="img"
+            aria-label="Grafik jumlah laporan berdasarkan periode"
+            className="admin-chart-svg"
+          >
+
+            <defs>
+              <linearGradient
+                id="admin-chart-gradient"
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1"
+              >
+                <stop offset="0%" stopColor="#23834D" stopOpacity=".23" />
+                <stop offset="100%" stopColor="#23834D" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+
+            {/* Garis grid dan label sumbu Y */}
+            {Array.from({ length: 5 }, (_, index) => {
+              const y = top + (index / 4) * plotHeight;
+              const value = Math.round(maxY * (1 - index / 4));
+
+              return (
+                <g key={index}>
+                  <line
+                    x1={left}
+                    y1={y}
+                    x2={width - right}
+                    y2={y}
+                    stroke="#E6EEE8"
+                    strokeDasharray="4 5"
+                  />
+
+                  <text
+                    x={left - 12}
+                    y={y + 4}
+                    textAnchor="end"
+                    fontSize="12"
+                    fill="#829487"
+                  >
+                    {value}
+                  </text>
+                </g>
+              );
+            })}
+
+            {/* Area di bawah garis */}
+            <path
+              d={areaPath}
+              fill="url(#admin-chart-gradient)"
+            />
+
+            {/* Garis utama */}
+            <polyline
+              points={linePoints}
+              fill="none"
+              stroke="#23834D"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+
+            {/* Titik data */}
+            {points.map((point, index) => (
+              <circle
+                key={index}
+                cx={point.x}
+                cy={point.y}
+                r="4"
+                fill="#FFFFFF"
+                stroke="#23834D"
+                strokeWidth="2.5"
+              >
+                <title>
+                  {point.item.label}: {point.item.total} laporan
+                </title>
+              </circle>
+            ))}
+
+            {/* Label sumbu X */}
+            {labelIndexes.map((index) => {
+              const point = points[index];
+
+              return (
+                <text
+                  key={index}
+                  x={point.x}
+                  y={height - 15}
+                  textAnchor="middle"
+                  fontSize="11"
+                  fill="#829487"
+                >
+                  {point.item.label}
+                </text>
+              );
+            })}
+
+          </svg>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
 // Dashboard Admin
 export default function AdminDashboardPage() {
   const [summary, setSummary] = useState(null);
@@ -108,19 +305,23 @@ export default function AdminDashboardPage() {
   const [reports, setReports] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [trendPeriod, setTrendPeriod] = useState('month');
+  const [trend, setTrend] = useState([]);
+  const [trendLoading, setTrendLoading] = useState(true);
+  const [trendError, setTrendError] = useState('');
 
   const reload = () => {
     return Promise.all([
       api('/admin/summary'),
       api('/admin/staff-requests?status=pending'),
-      api('/reports'),
+      api('/admin/reports'),
     ])
-      .then(([summaryData, requestData, reportData]) => {
-        setSummary(summaryData.summary);
-        setRequests(requestData.requests);
-        setReports(reportData.reports);
-        setError('');
-      })
+    .then(([summaryData, requestData, reportData]) => {
+      setSummary(summaryData.summary || {});
+      setRequests(requestData.requests || []);
+      setReports(reportData.reports || []);
+      setError('');
+    })
       .catch((requestError) => {
         setError(requestError.message);
       })
@@ -132,6 +333,34 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     reload();
   }, []);
+
+useEffect(() => {
+  let active = true;
+
+  setTrendLoading(true);
+  setTrendError('');
+
+  api(`/admin/report-trends?period=${trendPeriod}`)
+    .then((data) => {
+      if (active) {
+        setTrend(data.trend || []);
+      }
+    })
+    .catch((err) => {
+      if (active) {
+        setTrendError(err.message);
+      }
+    })
+    .finally(() => {
+      if (active) {
+        setTrendLoading(false);
+      }
+    });
+
+  return () => {
+    active = false;
+  };
+}, [trendPeriod]);
 
   const decide = async (id, decision) => {
     const note =
@@ -169,7 +398,7 @@ export default function AdminDashboardPage() {
       ) : (
         <>
           {/* Statistik */}
-          <div className="stat-cards">
+          <div className="stat-cards admin-stat-cards">
             <StatCard
               label="Total laporan"
               value={summary?.total || 0}
@@ -207,8 +436,86 @@ export default function AdminDashboardPage() {
             />
           </div>
 
+          {/* GRAFIK TREN LAPORAN */}
+          <div className="panel admin-panel admin-trend-panel">
+
+            <div className="panel-heading admin-trend-heading">
+              <div>
+                <h2>
+                  <BarChart3 size={19} />
+                  Tren laporan
+                </h2>
+
+                <p>
+                  Perkembangan jumlah laporan yang masuk ke LAPORMAS.
+                </p>
+              </div>
+
+              <div className="admin-chart-filters">
+                {[
+                  { value: 'week', label: '7 Hari' },
+                  { value: 'month', label: '30 Hari' },
+                  { value: 'year', label: '12 Bulan' },
+                ].map((item) => (
+                  <button
+                    type="button"
+                    key={item.value}
+                    className={
+                      trendPeriod === item.value ? 'active' : ''
+                    }
+                    onClick={() => setTrendPeriod(item.value)}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {trend.length > 0 ? (
+              <div
+                className="admin-chart-stage"
+                aria-busy={trendLoading}
+              >
+                {/* Indikator update tanpa menghilangkan grafik */}
+                <div className="admin-chart-status" aria-live="polite">
+                  {trendLoading && (
+                    <span className="admin-chart-updating">
+                      <span className="admin-chart-spinner" />
+                      Memperbarui grafik...
+                    </span>
+                  )}
+
+                  {!trendLoading && trendError && (
+                    <span className="admin-chart-error">
+                      Gagal memperbarui grafik. Data sebelumnya tetap ditampilkan.
+                    </span>
+                  )}
+                </div>
+
+                {/* Grafik lama tetap terlihat sampai data baru tersedia */}
+                <div
+                  className="admin-chart-transition"
+                  key={JSON.stringify(trend)}
+                >
+                  <AdminReportTrendChart data={trend} />
+                </div>
+              </div>
+            ) : trendError ? (
+              <div className="notice error">
+                <AlertTriangle size={18} />
+                <span>{trendError}</span>
+              </div>
+            ) : (
+              <div className="admin-chart-initial-loading">
+                <span className="admin-chart-spinner" />
+                Memuat grafik laporan...
+              </div>
+            )}
+
+          </div>
+
           {/* Pengajuan pengelola */}
-          <div className="panel">
+          <div className="panel admin-panel">
             <div className="panel-heading">
               <div>
                 <h2>Pengajuan pengelola</h2>
@@ -233,7 +540,7 @@ export default function AdminDashboardPage() {
                     key={request.request_id}
                   >
                     <div className="request-avatar">
-                      {request.name.slice(0, 1)}
+                      {request.name?.trim()?.charAt(0).toUpperCase() || 'P'}
                     </div>
 
                     <div className="request-info">
@@ -292,7 +599,7 @@ export default function AdminDashboardPage() {
           </div>
 
           {/* Laporan terbaru */}
-          <div className="panel">
+          <div className="panel admin-panel">
             <div className="panel-heading">
               <div>
                 <h2>Laporan terbaru seluruh wilayah</h2>
