@@ -1546,3 +1546,696 @@ tbody tr:hover {background: #f8fbf8;}
   position: relative;
   z-index: 2;
 }
+
+/* =====================================================
+   LAPORMAS - HOMEPAGE FINAL FIGMA REFINEMENT
+   ===================================================== */
+
+/* HEADER */
+
+.site-header {
+  height: 58px;
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .035);
+}
+
+.brand-mark {
+  width: 145px;
+  height: 45px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.nav-links {
+  gap: 28px;
+}
+
+.nav-links a {
+  font-size: 10px;
+  font-weight: 700;
+  color: #244c36;
+}
+
+.nav-links a.active {
+  color: #17643a;
+}
+
+.nav-actions {
+  gap: 12px;
+}
+
+/* HERO */
+
+.home-page .hero {
+  position: relative;
+  min-height: 395px;
+  padding: 0;
+  margin-bottom: 72px;
+  overflow: visible;
+  background: #103b29;
+}
+
+.home-page .hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.home-page .hero-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-page .hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    rgba(7, 48, 27, .88) 0%,
+    rgba(9, 57, 32, .76) 55%,
+    rgba(8, 48, 27, .55) 100%
+  );
+}
+
+.home-page .hero-inner {
+  position: relative;
+  z-index: 2;
+  min-height: 395px;
+  display: flex;
+  align-items: center;
+}
+
+.home-page .hero-copy {
+  max-width: 780px;
+  color: #ffffff;
+}
+
+.home-page .hero-copy h1 {
+  max-width: 760px;
+  margin-bottom: 12px;
+  color: #ffffff;
+  font-size: clamp(34px, 4.3vw, 53px);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+
+.home-page .hero-copy > p {
+  max-width: 660px;
+  margin-bottom: 19px;
+  color: #edf4ee;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.home-page .hero-actions {
+  gap: 13px;
+  margin-bottom: 0;
+}
+
+.home-page .hero-actions .btn {
+  min-height: 39px;
+  padding: 10px 19px;
+  border-radius: 30px;
+  font-size: 11px;
+}
+
+.home-page .hero-actions .btn-primary,
+.home-page .hero-actions .btn-outline {
+  color: #ffffff;
+  background: #c5830e;
+  border-color: #c5830e;
+  box-shadow: none;
+}
+
+.home-page .hero-actions .btn:hover {
+  background: #a96d06;
+  border-color: #a96d06;
+}
+
+/* STATISTIK PUTIH OVERLAPPING */
+
+.home-page .home-stats-wrap {
+  position: absolute;
+  z-index: 4;
+  right: 0;
+  bottom: -55px;
+  left: 0;
+}
+
+.home-stats-card {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  min-height: 108px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #d6d6d6;
+  border-radius: 12px;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, .10);
+}
+
+.home-stat {
+  min-width: 0;
+  min-height: 66px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-right: 1px solid #d6d6d6;
+  text-align: center;
+}
+
+.home-stat:last-child {
+  border-right: 0;
+}
+
+.home-stat span {
+  color: #53665a;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.home-stat strong {
+  color: #111111;
+  font-family: Manrope, sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+/* JUDUL SECTION */
+
+.home-section-heading {
+  margin-bottom: 23px;
+  text-align: center;
+}
+
+.home-section-heading h2 {
+  margin: 0 0 7px;
+  color: #143b2a;
+  font-size: clamp(21px, 2.5vw, 28px);
+  line-height: 1.25;
+}
+
+.home-section-heading p {
+  margin: 0;
+  font-size: 12px;
+  color: #607668;
+}
+
+/* KATEGORI */
+
+.home-page .category-section {
+  padding-top: 25px;
+  padding-bottom: 58px;
+}
+
+.home-page .category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.home-page .category-card {
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 112px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 11px;
+  background: #103b29;
+  color: #ffffff;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.category-photo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-position: center;
+  background-size: cover;
+  transition: transform .35s ease;
+}
+
+.category-shade {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: linear-gradient(
+    90deg,
+    rgba(4, 43, 23, .90),
+    rgba(4, 43, 23, .46)
+  );
+}
+
+.category-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 5px;
+  padding: 15px 16px;
+  color: #ffffff;
+}
+
+.category-content b {
+  color: #ffffff;
+  font-size: 15px;
+  font-family: Manrope, sans-serif;
+  font-weight: 800;
+}
+
+.category-content > span {
+  color: #edf5ef;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.home-page .category-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .18);
+}
+
+.home-page .category-card:hover .category-photo {
+  transform: scale(1.06);
+}
+
+/* LANGKAH MELAPOR */
+
+.home-page + .footer {
+  margin-top: 0;
+}
+
+.home-page .steps-section {
+  padding: 0 0 48px;
+  background: #ffffff;
+}
+
+.home-page .steps-section .home-section-heading {
+  margin-bottom: 20px;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.step-row {
+  display: grid;
+  grid-template-columns: 43px 1fr;
+  align-items: center;
+  gap: 14px;
+  min-height: 60px;
+  padding: 11px 25px;
+  border-radius: 10px;
+  background: #f0f5f1;
+}
+
+.step-number {
+  display: grid;
+  width: 36px;
+  height: 34px;
+  place-items: center;
+  border-radius: 5px;
+  background: #17643a;
+  color: #ffffff;
+  font-family: Manrope, sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.step-row b {
+  display: block;
+  margin-bottom: 4px;
+  color: #173b2a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.step-row p {
+  margin: 0;
+  color: #667c6d;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* LACAK LAPORAN */
+
+.home-page .track-section {
+  padding: 12px 0 42px;
+  background: #ffffff;
+}
+
+.home-page .track-heading {
+  margin-bottom: 13px;
+}
+
+.home-page .track-heading h2 {
+  margin-bottom: 5px;
+  font-size: 25px;
+}
+
+.home-page .track-heading p {
+  margin: 0;
+  font-size: 12px;
+}
+
+.home-page .track-panel {
+  padding: 17px 23px;
+  border-radius: 10px;
+  background: #f0f5f1;
+}
+
+.home-page .track-form label {
+  display: block;
+  margin-bottom: 9px;
+  color: #173b2a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.home-page .track-form > div {
+  display: flex;
+  gap: 13px;
+}
+
+.home-page .track-form input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 10px 13px;
+  border: 1px solid #c9d8cc;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 11px;
+}
+
+.home-page .track-form .btn {
+  min-width: 93px;
+  min-height: 40px;
+  border-radius: 7px;
+  background: #c5830e;
+  border-color: #c5830e;
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.home-page .track-form .btn:hover {
+  background: #a96d06;
+}
+
+.home-page .track-result {
+  margin-top: 14px;
+}
+
+/* FAQ */
+
+.home-page .home-faq {
+  display: grid;
+  grid-template-columns: .78fr 1.22fr;
+  align-items: start;
+  gap: 48px;
+  padding-top: 26px;
+  padding-bottom: 55px;
+}
+
+.home-faq-intro {
+  max-width: 290px;
+}
+
+.home-faq-intro h2 {
+  margin: 0;
+  color: #143b2a;
+  font-size: 27px;
+  line-height: 1.2;
+  letter-spacing: -.04em;
+}
+
+.home-page .faq-list {
+  border-top: 1px solid #dce5dd;
+}
+
+.home-page .faq-item {
+  width: 100%;
+  min-height: 43px;
+  padding: 13px 12px;
+  align-items: flex-start;
+  border-bottom: 1px solid #dce5dd;
+  background: #ffffff;
+}
+
+.home-page .faq-item b {
+  color: #173b2a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.home-page .faq-item p {
+  margin: 8px 0 0;
+  color: #6b8172;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.faq-toggle {
+  flex: 0 0 auto;
+  color: #17643a;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* FOOTER */
+
+.footer {
+  padding: 35px 0 26px;
+  background: #103b29;
+}
+
+.footer-grid {
+  grid-template-columns: 1.8fr 1fr 1fr;
+  gap: 55px;
+}
+
+.footer-grid > div > b {
+  font-size: 11px;
+}
+
+.footer-grid > div > a:not(.brand) {
+  font-size: 10px;
+}
+
+.footer p {
+  font-size: 10px;
+}
+
+.footer small {
+  font-size: 9px;
+}
+
+/* =====================================================
+   RESPONSIVE HOMEPAGE
+   ===================================================== */
+
+@media (max-width: 760px) {
+
+  .brand-mark {
+    width: 120px;
+  }
+
+  .home-page .hero {
+    min-height: 390px;
+    margin-bottom: 100px;
+  }
+
+  .home-page .hero-inner {
+    min-height: 390px;
+    padding-top: 25px;
+    padding-bottom: 45px;
+  }
+
+  .home-page .hero-copy h1 {
+    font-size: 36px;
+  }
+
+  .home-page .hero-copy > p {
+    font-size: 12px;
+  }
+
+  .home-page .home-stats-wrap {
+    bottom: -85px;
+  }
+
+  .home-stats-card {
+    grid-template-columns: repeat(2, 1fr);
+    min-height: 150px;
+  }
+
+  .home-stat {
+    min-height: 65px;
+  }
+
+  .home-stat:nth-child(2) {
+    border-right: 0;
+  }
+
+  .home-stat:nth-child(1),
+  .home-stat:nth-child(2) {
+    border-bottom: 1px solid #d6d6d6;
+  }
+
+  .home-stat strong {
+    font-size: 23px;
+  }
+
+  .home-page .category-section {
+    padding-top: 25px;
+    padding-bottom: 45px;
+  }
+
+  .home-page .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .home-page .category-card {
+    min-height: 115px;
+  }
+
+  .category-content b {
+    font-size: 13px;
+  }
+
+  .category-content > span {
+    font-size: 9px;
+  }
+
+  .home-page .steps-section {
+    padding-bottom: 40px;
+  }
+
+  .home-page .home-section-heading h2 {
+    font-size: 21px;
+  }
+
+  .step-row {
+    padding: 11px 14px;
+    gap: 10px;
+  }
+
+  .step-row b {
+    font-size: 11px;
+  }
+
+  .step-row p {
+    font-size: 9px;
+  }
+
+  .home-page .track-section {
+    padding-top: 12px;
+  }
+
+  .home-page .track-panel {
+    padding: 15px;
+  }
+
+  .home-page .home-faq {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding-top: 28px;
+  }
+
+  .home-faq-intro {
+    max-width: 350px;
+  }
+
+  .home-faq-intro h2 {
+    font-size: 25px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+  }
+
+  .footer-grid > div:first-child {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 460px) {
+
+  .home-page .hero {
+    min-height: 370px;
+  }
+
+  .home-page .hero-inner {
+    min-height: 370px;
+  }
+
+  .home-page .hero-copy h1 {
+    font-size: 31px;
+  }
+
+  .home-page .hero-actions {
+    flex-wrap: wrap;
+  }
+
+  .home-page .hero-actions .btn {
+    font-size: 10px;
+    padding: 9px 13px;
+  }
+
+  .home-stat span {
+    font-size: 9px;
+  }
+
+  .home-stat strong {
+    font-size: 21px;
+  }
+
+  .home-page .track-form > div {
+    flex-wrap: wrap;
+  }
+
+  .home-page .track-form .btn {
+    flex: 0 0 100%;
+  }
+
+  .footer-grid {
+    gap: 22px;
+  }
+
+}
+
+/* HERO FULL SCREEN - LAPTOP */
+@media (min-width: 761px) {
+  .home-page .hero {
+    min-height: calc(93vh - 58px);
+    min-height: calc(93svh - 58px);
+  }
+
+  .home-page .hero-inner {
+    min-height: calc(93vh - 58px);
+    min-height: calc(93svh - 58px);
+    align-items: center;
+  }
+}

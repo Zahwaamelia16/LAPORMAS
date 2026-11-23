@@ -10,6 +10,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const app = express();
 
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 app.use('/api', referenceRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/auth', authRoutes);
@@ -57,10 +58,39 @@ app.use((req, res) => {
 // Error handler (misal body JSON tidak valid di Postman)
 app.use((err, req, res, next) => {
     if (err.type === 'entity.parse.failed') {
-        return res.status(400).json({ message: 'Format JSON pada body tidak valid' });
+        return res.status(400).json({
+            message: 'Format JSON pada body tidak valid',
+        });
     }
+
+    if (err instanceof require('multer').MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(400).json({
+                message: 'Ukuran foto maksimal 5 MB',
+            });
+        }
+
+        if (err.code === 'LIMIT_FILE_COUNT') {
+            return res.status(400).json({
+                message: 'Maksimal 5 foto dalam satu upload',
+            });
+        }
+
+        return res.status(400).json({
+            message: err.message,
+        });
+    }
+
+    if (err.message === 'Format foto harus JPG, PNG, atau WEBP') {
+        return res.status(400).json({
+            message: err.message,
+        });
+    }
+
     console.error(err);
-    res.status(500).json({ message: 'Terjadi kesalahan pada server' });
+    res.status(500).json({
+        message: 'Terjadi kesalahan pada server',
+    });
 });
 
 const PORT = process.env.PORT || 3000;

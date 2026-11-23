@@ -61,11 +61,12 @@ import { api, formatDate, getPosition, imageUrl, IS_DEMO_MODE } from './api';
 import { useAuth } from './auth';
 
 const DEMO_PHOTOS = {
-  hero: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1400&q=85',
-  road: 'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=80',
-  trash: 'https://images.unsplash.com/photo-1605600659873-d808a13e4d9a?auto=format&fit=crop&w=900&q=80',
-  light: 'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=80',
-  login: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1600&q=85',
+  hero: '/images/hero.png',
+  road: '/images/infrastruktur.png',
+  trash: '/images/kebersihan.png',
+  light: '/images/penerangan.png',
+  drain: '/images/drainase.png',
+  login: '/images/bg-login.jpg',
 };
 
 function Notice({ type = 'info', children, onClose }) {
@@ -110,8 +111,8 @@ function Footer() {
       <div>
         <Link to="/" className="brand brand-light">LAPORMAS</Link>
         <p>Layanan Pelaporan & Resolusi Masalah Area</p>
-        <p className="muted-light">Dari kepedulian warga, untuk area yang lebih baik.</p>
-        <small>© 2026 LAPORMAS · Konsep final project · Bukan layanan darurat</small>
+        <p className="muted-light">Dari kepedulian warga, untuk area yang lebih baik</p>
+        <small>© 2026 LAPORMAS</small>
       </div>
       <div>
         <b>Jelajahi</b>
@@ -143,8 +144,9 @@ function PublicNav() {
   return (
     <header className="site-header">
       <div className="container nav-inner">
-        <Link to="/" className="brand">
-          LAPORMAS
+
+        <Link to="/" className="brand brand-mark">
+          <img src="/images/logo utama.png" alt="LAPORMAS" />
         </Link>
 
         <button
@@ -161,14 +163,17 @@ function PublicNav() {
           <NavLink to="/" end onClick={() => setOpen(false)}>
             Beranda
           </NavLink>
-          <NavLink to="/laporan" onClick={() => setOpen(false)}>
-            Laporan publik
-          </NavLink>
-          <NavLink to="/cara-melapor" onClick={() => setOpen(false)}>
-            Cara melapor
-          </NavLink>
+
           <NavLink to="/tentang" onClick={() => setOpen(false)}>
-            Tentang kami
+            Tentang Kami
+          </NavLink>
+
+          <NavLink to="/laporan" onClick={() => setOpen(false)}>
+            Laporan Publik
+          </NavLink>
+
+          <NavLink to="/cara-melapor" onClick={() => setOpen(false)}>
+            Cara Melapor
           </NavLink>
         </nav>
 
@@ -176,13 +181,16 @@ function PublicNav() {
           {user ? (
             <>
               <Link className="nav-user" to={dashboardPath}>
-                <UserRound size={16} aria-hidden="true" />
+                <UserRound size={15} />
                 {user.name?.split(' ')[0] || 'Akun'}
               </Link>
 
               {user.role === 'warga' && (
-                <Link to="/laporan/buat" className="btn btn-primary btn-small">
-                  Buat laporan
+                <Link
+                  to="/laporan/buat"
+                  className="btn btn-primary btn-small"
+                >
+                  Buat Laporan
                 </Link>
               )}
 
@@ -197,10 +205,14 @@ function PublicNav() {
           ) : (
             <>
               <Link to="/masuk" className="nav-login">
-                Masuk
+                Login
               </Link>
-              <Link to="/laporan/buat" className="btn btn-primary btn-small">
-                Buat laporan
+
+              <Link
+                to="/laporan/buat"
+                className="btn btn-primary btn-small"
+              >
+                Buat Laporan
               </Link>
             </>
           )}
@@ -209,6 +221,7 @@ function PublicNav() {
     </header>
   );
 }
+
 function PublicLayout({ children }) {
   return <><PublicNav />{children}<Footer /></>;
 }
@@ -222,190 +235,366 @@ function Protected({ roles, children }) {
 }
 
 function HomePage() {
-  const [stats, setStats] = useState({ total: 0, completed: 0, rate: 0, areas: 0 });
-  const [reports, setReports] = useState([]);
-  const [status, setStatus] = useState('Semua laporan');
+  const [stats, setStats] = useState({
+    total: 0,
+    completed: 0,
+    rate: 0,
+    areas: 0
+  });
+
   const [code, setCode] = useState('');
   const [tracked, setTracked] = useState(null);
   const [trackError, setTrackError] = useState('');
   const [faq, setFaq] = useState(0);
+
   useEffect(() => {
-    api('/stats').then((d) => setStats(d.stats)).catch(() => { });
-    api('/reports').then((d) => setReports(d.reports)).catch(() => { });
+    api('/stats')
+      .then((d) => setStats(d.stats))
+      .catch(() => {});
   }, []);
-  const displayed = (status === 'Semua laporan' ? reports : reports.filter((r) => r.status_name === status)).slice(0, 3);
+
   const track = async (e) => {
     e.preventDefault();
+
     setTrackError('');
     setTracked(null);
-    if (!code.trim()) return setTrackError('Masukkan nomor laporan terlebih dahulu.');
-    try {
-      const d = await api(`/reports/track/${encodeURIComponent(code.trim())}`);
-      setTracked(d.report);
+
+    if (!code.trim()) {
+      return setTrackError(
+        'Masukkan nomor laporan terlebih dahulu.'
+      );
     }
-    catch (err) {
+
+    try {
+      const d = await api(
+        `/reports/track/${encodeURIComponent(code.trim())}`
+      );
+
+      setTracked(d.report);
+    } catch (err) {
       setTrackError(err.message);
     }
   };
-  const faqs = [
-    ['Masalah apa saja yang bisa dilaporkan?', 'Kamu bisa melaporkan masalah infrastruktur, kebersihan, penerangan, drainase, pohon tumbang, dan kerusakan fasilitas umum di wilayah yang terdaftar.'],
-    ['Apakah identitas pelapor ditampilkan ke publik?', 'Tidak. Nama, nomor telepon, dan email pelapor tidak ditampilkan pada halaman laporan publik.'],
-    ['Bagaimana cara memantau laporan saya?', 'Gunakan nomor laporan yang diterima setelah pengiriman. Kamu juga dapat melihat riwayat penanganan melalui dashboard akun.'],
-    ['Apakah LAPORMAS untuk keadaan darurat?', 'Bukan. Untuk kondisi yang mengancam keselamatan, segera hubungi layanan darurat atau instansi setempat.'],
+
+  const categories = [
+    {
+      title: 'Infrastruktur',
+      description: 'Jalan, trotoar, dan fasilitas umum',
+      photo: DEMO_PHOTOS.road,
+    },
+    {
+      title: 'Kebersihan',
+      description: 'Sampah dan kebersihan area',
+      photo: DEMO_PHOTOS.trash,
+    },
+    {
+      title: 'Penerangan',
+      description: 'Lampu jalan dan area publik',
+      photo: DEMO_PHOTOS.light,
+    },
+    {
+      title: 'Drainase',
+      description: 'Saluran air dan genangan',
+      photo: DEMO_PHOTOS.drain,
+    },
   ];
-  return <PublicLayout>
-    <main>
-      <section className="hero">
-        <div className="container hero-grid">
-          <div className="hero-copy">
-            <span className="eyebrow">RUANG WARGA, PERUBAHAN NYATA</span>
-            <h1>Lingkungan lebih baik, dimulai dari laporanmu.</h1>
-            <p>Sampaikan masalah di sekitarmu. LAPORMAS membantu meneruskan laporan ke pihak terkait dan memantau penyelesaiannya secara terbuka.</p>
-            <div className="hero-actions">
-              <Link to="/laporan/buat" className="btn btn-primary">Buat laporan <ArrowRight size={17} /></Link>
-              <a href="#lacak" className="btn btn-outline">Lacak laporan</a>
-            </div>
-            <small>Mudah dilaporkan. Transparan dipantau.</small>
+
+  const steps = [
+    {
+      number: '1',
+      title: 'Ceritakan masalahnya',
+      description:
+        'Isi detail kejadian, pilih lokasi, dan sertakan foto pendukung.',
+    },
+    {
+      number: '2',
+      title: 'Laporan diarahkan',
+      description:
+        'Sistem dan petugas memeriksa lalu meneruskan laporan ke unit yang bertanggung jawab.',
+    },
+    {
+      number: '3',
+      title: 'Pantau sampai selesai',
+      description:
+        'Cek status menunggu, diverifikasi, diproses, hingga selesai dari satu halaman.',
+    },
+  ];
+
+  const faqs = [
+    [
+      'Masalah apa saja yang bisa dilaporkan?',
+      'Kamu bisa melaporkan masalah infrastruktur, kebersihan, penerangan, drainase, pohon tumbang, dan kerusakan fasilitas umum di area tempat tinggalmu.',
+    ],
+    [
+      'Apakah identitas pelapor ditampilkan ke publik?',
+      'Tidak. Nama, nomor telepon, dan email pelapor tidak ditampilkan pada halaman laporan publik.',
+    ],
+    [
+      'Bagaimana cara memantau laporan saya?',
+      'Gunakan nomor laporan yang diterima setelah pengiriman. Kamu juga dapat melihat riwayat penanganan melalui dashboard akun.',
+    ],
+    [
+      'Apakah LAPORMAS untuk keadaan darurat?',
+      'Bukan. Untuk kondisi yang mengancam keselamatan, segera hubungi layanan darurat atau instansi setempat.',
+    ],
+  ];
+
+  return (
+    <PublicLayout>
+      <main className="home-page">
+
+        {/* HERO */}
+        <section className="hero">
+
+          <div className="hero-background">
+            <img
+              src={DEMO_PHOTOS.hero}
+              alt="Lingkungan permukiman"
+            />
           </div>
-          <div className="hero-visual"><img src={DEMO_PHOTOS.hero} alt="Lingkungan permukiman hijau" /><div className="hero-caption"><span className="tiny-label">SELESAI</span><b>Perubahan kecil. Dampak bersama.</b><small>Lingkungan yang nyaman adalah hak setiap warga.</small></div></div>
-        </div>
-      </section>
-      <section className="stats-band">
-        <div className="container">
-          <div className="eyebrow light-eyebrow">BERSAMA WARGA, UNTUK LINGKUNGAN · DATA TERKINI</div>
-          <div className="stats-grid">
-            <div>
-              <strong>{stats.total.toLocaleString('id-ID')}</strong>
-              <span>Laporan diterima</span>
-            </div>
-            <div>
-              <strong>{stats.completed.toLocaleString('id-ID')}</strong>
-              <span>Laporan diselesaikan</span>
-            </div>
-            <div>
-              <strong>{stats.rate}%</strong>
-              <span>Tingkat penyelesaian</span>
-            </div>
-            <div>
-              <strong>{stats.areas}</strong>
-              <span>Area terjangkau</span>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section className="section container">
-        <div className="section-heading">
-          <div>
-            <span className="eyebrow">KENALI KATEGORINYA</span>
-            <h2>Apa yang ingin kamu laporkan?</h2>
-            <p>Pilih kategori yang paling sesuai dengan masalah di sekitarmu.</p>
-          </div>
-        </div>
-        <div className="category-grid">{[
-          {
-            number: '01 /',
-            title: 'Infrastruktur',
-            description: 'Jalan, trotoar, dan fasilitas umum',
-            Icon: Building2,
-          },
-          {
-            number: '02 /',
-            title: 'Kebersihan',
-            description: 'Sampah dan kebersihan area',
-            Icon: Trash2,
-          },
-          {
-            number: '03 /',
-            title: 'Penerangan',
-            description: 'Lampu jalan dan area publik',
-            Icon: Lightbulb,
-          },
-          {
-            number: '04 /',
-            title: 'Drainase',
-            description: 'Saluran air dan genangan',
-            Icon: Droplets,
-          },
-        ].map(({ number, title, description, Icon }) => (
-          <Link
-            to={`/laporan/buat?category=${encodeURIComponent(title)}`}
-            className="category-card"
-            key={title}
-          >
-            <span>{number}</span>
-            <div className="category-icon">
-              <Icon size={25} strokeWidth={1.9} aria-hidden="true" />
-            </div>
-            <h3>{title}</h3>
-            <p>{description}</p>
-            <b>
-              Laporkan <ArrowUpRight size={14} aria-hidden="true" />
-            </b>
-          </Link>
-        ))}</div>
-      </section>
-      <section className="steps-section">
-        <div className="container">
-          <span className="eyebrow">PROSES YANG TRANSPARAN</span>
-          <h2>Dari laporan menjadi tindakan nyata</h2>
-          <p>Tiga langkah sederhana untuk ikut merawat lingkungan.</p>
-          <div className="steps-grid">
-            <div>
-              <strong>01</strong>
-              <h3>Ceritakan masalahnya</h3>
-              <p>Isi detail kejadian, deteksi lokasi, dan sertakan foto pendukung.</p>
-            </div>
-            <div>
-              <strong>02</strong>
-              <h3>Kami teruskan laporannya</h3>
-              <p>Laporan diverifikasi dan diteruskan ke pihak yang menangani.</p>
-            </div>
-            <div>
-              <strong>03</strong>
-              <h3>Pantau sampai selesai</h3>
-              <p>Lihat perkembangan dan tanggapi hasil penanganan laporanmu.</p>
+
+          <div className="hero-overlay" />
+
+          <div className="container hero-inner">
+            <div className="hero-copy">
+
+              <h1>
+                Lingkungan lebih baik,
+                <br />
+                dimulai dari laporanmu
+              </h1>
+
+              <p>
+                Sampaikan masalah di sekitarmu, LAPORMAS membantu
+                meneruskan laporan ke pihak terkait dan memantau
+                penyelesaiannya secara terbuka.
+              </p>
+
+              <div className="hero-actions">
+                <Link
+                  to="/laporan/buat"
+                  className="btn btn-primary"
+                >
+                  Buat Laporan
+                </Link>
+
+                <a
+                  href="#lacak"
+                  className="btn btn-outline"
+                >
+                  Lacak Laporan
+                </a>
+              </div>
+
             </div>
           </div>
-        </div>
-      </section>
-      <section className="section container"><div className="section-heading split"><div><span className="eyebrow">SUARA DARI LINGKUNGAN</span><h2>Laporan terbaru dari warga</h2><p>Setiap laporan adalah langkah menuju lingkungan yang lebih nyaman.</p></div><Link to="/laporan" className="text-link">Lihat semua <ArrowRight size={15} /></Link></div><div className="filter-pills">{['Semua laporan', 'Diterima', 'Diproses', 'Selesai'].map((s) => <button key={s} className={status === s ? 'active' : ''} onClick={() => setStatus(s)}>{s}</button>)}</div><ReportCards reports={displayed} /><p className="caption-note">Contoh laporan dan data akan mengikuti laporan yang tersimpan di database.</p></section>
-      <section className="track-section" id="lacak">
-        <div className="container track-grid">
-          <div>
-            <span className="eyebrow">PANTAU PERKEMBANGAN</span>
-            <h2>Sudah membuat laporan?</h2>
-            <p>Masukkan nomor laporan untuk melihat status dan riwayat penanganannya.</p>
+
+          {/* STATISTIK */}
+          <div className="container home-stats-wrap">
+            <div className="home-stats-card">
+
+              <div className="home-stat">
+                <span>Laporan diterima</span>
+                <strong>
+                  {stats.total.toLocaleString('id-ID')}
+                </strong>
+              </div>
+
+              <div className="home-stat">
+                <span>Laporan diselesaikan</span>
+                <strong>
+                  {stats.completed.toLocaleString('id-ID')}
+                </strong>
+              </div>
+
+              <div className="home-stat">
+                <span>Tingkat Penyelesaian</span>
+                <strong>{stats.rate}%</strong>
+              </div>
+
+              <div className="home-stat">
+                <span>Area terjangkau</span>
+                <strong>{stats.areas}</strong>
+              </div>
+
+            </div>
           </div>
-          <div>
-            <form className="track-form" onSubmit={track}>
-              <label htmlFor="track-code">Nomor laporan</label>
-              <div><input id="track-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Contoh: LPM-2026-001248" /><button className="btn btn-primary" type="submit">Lacak</button></div>
-            </form>
-            {trackError && <p className="form-error">{trackError}</p>}
-            {tracked && <TrackSummary report={tracked} />}
+
+        </section>
+
+        {/* KATEGORI */}
+        <section className="section container category-section">
+
+          <div className="home-section-heading">
+            <h2>
+              Masalah di sekitar kita layak mendapat perhatian
+            </h2>
+
+            <p>
+              Pilih kategori yang sesuai agar laporanmu segera sampai
+              kepada pihak yang tepat.
+            </p>
           </div>
-        </div>
-      </section>
-      <section className="section container faq-section">
-        <div>
-          <span className="eyebrow">PUSAT BANTUAN</span>
-          <h2>Ada yang ingin kamu tanyakan?</h2>
-          <p>Temukan jawaban sebelum membuat laporan pertamamu.</p>
-          <a href="mailto:bantuan@lapormas.id" className="text-link">Hubungi bantuan <ArrowRight size={15} /></a>
-        </div>
-        <div className="faq-list">{faqs.map((f, i) => <button key={f[0]} className={faq === i ? 'faq-item open' : 'faq-item'} onClick={() => setFaq(faq === i ? -1 : i)}><span><b>{f[0]}</b>{faq === i && <p>{f[1]}</p>}</span>{faq === i ? <X size={17} /> : <Plus size={17} />}</button>)}</div>
-      </section>
-      <section className="cta-strip">
-        <div className="container">
-          <div>
-            <h2>Jangan biarkan masalah terlewat.</h2>
-            <p>Satu laporanmu bisa membawa perubahan untuk banyak orang.</p>
+
+          <div className="category-grid">
+
+            {categories.map((category) => (
+              <Link
+                key={category.title}
+                to={`/laporan/buat?category=${encodeURIComponent(category.title)}`}
+                className="category-card"
+              >
+
+                <span
+                  className="category-photo"
+                  style={{
+                    backgroundImage: `url("${category.photo}")`
+                  }}
+                />
+
+                <span className="category-shade" />
+
+                <span className="category-content">
+                  <b>{category.title}</b>
+                  <span>{category.description}</span>
+                </span>
+
+              </Link>
+            ))}
+
           </div>
-          <Link to="/laporan/buat" className="btn btn-primary">Mulai laporkan <ArrowRight size={16} /></Link>
-        </div>
-      </section>
-    </main>
-  </PublicLayout>;
+        </section>
+
+        {/* CARA MELAPOR */}
+        <section className="steps-section">
+          <div className="container">
+
+            <div className="home-section-heading">
+              <h2>
+                Tiga langkah sederhana untuk ikut merawat lingkungan
+              </h2>
+            </div>
+
+            <div className="steps-list">
+
+              {steps.map((step) => (
+                <div className="step-row" key={step.number}>
+
+                  <span className="step-number">
+                    {step.number}
+                  </span>
+
+                  <div>
+                    <b>{step.title}</b>
+                    <p>{step.description}</p>
+                  </div>
+
+                </div>
+              ))}
+
+            </div>
+          </div>
+        </section>
+
+        {/* LACAK LAPORAN */}
+        <section className="track-section" id="lacak">
+          <div className="container">
+
+            <div className="track-heading">
+              <h2>Lacak laporanmu</h2>
+
+              <p>
+                Masukkan nomor laporan untuk melihat status dan
+                riwayat penanganannya.
+              </p>
+            </div>
+
+            <div className="track-panel">
+
+              <form
+                className="track-form"
+                onSubmit={track}
+              >
+
+                <label htmlFor="track-code">
+                  Nomor laporan
+                </label>
+
+                <div>
+                  <input
+                    id="track-code"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="Contoh: LPM-2026-0824"
+                  />
+
+                  <button
+                    className="btn btn-primary"
+                    type="submit"
+                  >
+                    Lacak
+                  </button>
+                </div>
+
+              </form>
+
+              {trackError && (
+                <p className="form-error">{trackError}</p>
+              )}
+
+              {tracked && (
+                <TrackSummary report={tracked} />
+              )}
+
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="section container home-faq">
+
+          <div className="home-faq-intro">
+
+            <h2>
+              Temukan jawaban sebelum membuat laporan pertamamu
+            </h2>
+
+          </div>
+
+          <div className="faq-list">
+
+            {faqs.map((item, i) => (
+              <button
+                key={item[0]}
+                className={
+                  faq === i
+                    ? 'faq-item open'
+                    : 'faq-item'
+                }
+                onClick={() => setFaq(faq === i ? -1 : i)}
+              >
+
+                <span>
+                  <b>{item[0]}</b>
+
+                  {faq === i && (
+                    <p>{item[1]}</p>
+                  )}
+                </span>
+
+                <span className="faq-toggle">
+                  {faq === i ? '−' : '+'}
+                </span>
+
+              </button>
+            ))}
+
+          </div>
+        </section>
+
+      </main>
+    </PublicLayout>
+  );
 }
 
 function ReportCards({ reports = [] }) {
@@ -768,150 +957,322 @@ function AboutPage() {
     </PublicLayout>
   );
 }
+
 function LoginPage() {
+  // Statistik dari database
+  const [stats, setStats] = useState({
+    total: 0,
+    completed: 0,
+    areas: 0,
+  });
+
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
   const requestedRole = new URLSearchParams(location.search).get('role');
-  const [role, setRole] = useState(requestedRole === 'admin' ? 'admin' : requestedRole === 'pengelola' ? 'pengelola' : 'warga');
+
+  const [role, setRole] = useState(
+    requestedRole === 'admin'
+      ? 'admin'
+      : requestedRole === 'pengelola'
+        ? 'pengelola'
+        : 'warga'
+  );
+
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+
+  // Ambil statistik dari API/database
   useEffect(() => {
-    if (user) navigate(getDashboardPath(user.role), { replace: true });
+    api('/stats')
+      .then((d) => {
+        const data = d.stats || {};
+
+        setStats({
+          total: data.total ?? 0,
+          completed: data.completed ?? 0,
+          areas: data.areas ?? 0,
+        });
+      })
+      .catch((err) => {
+        console.error('Gagal memuat statistik login:', err);
+      });
+  }, []);
+
+  // Redirect jika pengguna sudah login
+  useEffect(() => {
+    if (user) {
+      navigate(getDashboardPath(user.role), { replace: true });
+    }
   }, [user, navigate]);
+
   const chooseRole = (nextRole) => {
     setRole(nextRole);
     setError('');
     setPassword('');
   };
+
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true);
     setError('');
+
     try {
-      const data = await login({ identifier: identifier.trim(), password, role });
+      const data = await login({
+        identifier: identifier.trim(),
+        password,
+        role,
+      });
+
       const defaultPath = getDashboardPath(data.user.role);
       const requestedPath = location.state?.from;
-      navigate(requestedPath && data.user.role === 'warga' && requestedPath.startsWith('/laporan') ? requestedPath : defaultPath, { replace: true });
+
+      navigate(
+        requestedPath &&
+        data.user.role === 'warga' &&
+        requestedPath.startsWith('/laporan')
+          ? requestedPath
+          : defaultPath,
+        { replace: true }
+      );
     } catch (err) {
       setError(err.message || 'Email atau kata sandi belum sesuai.');
-    }
-    finally {
+    } finally {
       setBusy(false);
     }
   };
-  return <div className="auth-page">
-  <section className="auth-visual">
-    {/* Foto background */}
-    <div className="auth-visual-bg">
-      <img
-        src="/images/bg-login.jpg"
-        alt="Lingkungan LAPORMAS"
-      />
-    </div>
 
-    {/* Overlay gradient */}
-    <div className="auth-visual-overlay"></div>
+  return (
+    <div className="auth-page">
 
-    {/* Logo khusus */}
-    <Link to="/" className="auth-logo">
-      <img
-        src="/images/logo.png"
-        alt="LAPORMAS"
-      />
-    </Link>
+      <section className="auth-visual">
 
-    {/* Konten utama */}
-    <div className="auth-visual-copy">
-      <span className="auth-kicker">
-        RUANG WARGA, PERUBAHAN NYATA
-      </span>
+        {/* Foto background */}
+        <div className="auth-visual-bg">
+          <img
+            src="/images/bg-login.jpg"
+            alt="Lingkungan LAPORMAS"
+          />
+        </div>
 
-      <h1>Lingkungan sehat dimulai dari sini</h1>
+        {/* Overlay gradient */}
+        <div className="auth-visual-overlay"></div>
 
-      <p>
-        Platform pelaporan masalah lingkungan yang memudahkan
-        warga dan pengelola bekerja sama menjaga kenyamanan bersama.
-      </p>
-    </div>
+        {/* Logo */}
+        <Link to="/" className="auth-logo">
+          <img
+            src="/images/logo.png"
+            alt="LAPORMAS"
+          />
+        </Link>
 
-    {/* Statistik */}
-    <div className="auth-stats">
-      <div>
-        <b>124</b>
-        <span>Laporan masuk</span>
-      </div>
+        {/* Konten utama */}
+        <div className="auth-visual-copy">
+          <span className="auth-kicker">
+            RUANG WARGA, PERUBAHAN NYATA
+          </span>
 
-      <div>
-        <b>98</b>
-        <span>Terselesaikan</span>
-      </div>
+          <h1>Lingkungan sehat dimulai dari sini</h1>
 
-      <div>
-        <b>2.400</b>
-        <span>Warga terbantu</span>
-      </div>
-    </div>
-  </section>
-    <section className="auth-form-side">
-      <div className="auth-form-wrap">
-        <Link to="/" className="back-link"><ArrowLeft size={16} aria-hidden="true" /> Kembali ke beranda</Link>
-        <span className="eyebrow">AKSES LAPORMAS</span>
-        <h2>Selamat Datang</h2>
-        <p>Laporkan masalah di lingkunganmu dan pantau penyelesaiannya.</p>
-        {role === 'admin' ? (
-          <div className="admin-login-label">
-            <ShieldCheck size={17} aria-hidden="true" />
-            <span>Masuk sebagai Administrator</span>
-            <button type="button" onClick={() => chooseRole('warga')}>
-              Ganti role
-            </button>
+          <p>
+            Platform pelaporan masalah lingkungan yang memudahkan
+            warga dan pengelola bekerja sama menjaga kenyamanan bersama.
+          </p>
+        </div>
+
+        {/* Statistik dari database */}
+        <div className="auth-stats">
+
+          <div>
+            <b>{stats.total.toLocaleString('id-ID')}</b>
+            <span>Laporan diterima</span>
           </div>
-        ) : (
-          <div className="role-switch" aria-label="Pilih jenis akun">
-            {[
-              { value: 'warga', label: 'Warga', Icon: UserRound },
-              { value: 'pengelola', label: 'Pengelola', Icon: Users },
-            ].map(({ value, label, Icon }) => (
+
+          <div>
+            <b>{stats.completed.toLocaleString('id-ID')}</b>
+            <span>Laporan diselesaikan</span>
+          </div>
+
+          <div>
+            <b>{stats.areas.toLocaleString('id-ID')}</b>
+            <span>Area terjangkau</span>
+          </div>
+
+        </div>
+      </section>
+
+      <section className="auth-form-side">
+        <div className="auth-form-wrap">
+
+          <Link to="/" className="back-link">
+            <ArrowLeft size={16} aria-hidden="true" />
+            Kembali ke beranda
+          </Link>
+
+          <span className="eyebrow">AKSES LAPORMAS</span>
+
+          <h2>Selamat Datang</h2>
+
+          <p>
+            Laporkan masalah di lingkunganmu dan pantau penyelesaiannya.
+          </p>
+
+          {role === 'admin' ? (
+            <div className="admin-login-label">
+              <ShieldCheck size={17} aria-hidden="true" />
+
+              <span>Masuk sebagai Administrator</span>
+
               <button
                 type="button"
-                key={value}
-                className={role === value ? 'active' : ''}
-                onClick={() => chooseRole(value)}
-                aria-pressed={role === value}
+                onClick={() => chooseRole('warga')}
               >
-                <Icon size={18} strokeWidth={2} aria-hidden="true" />
-                <span>{label}</span>
+                Ganti role
               </button>
-            ))}
+            </div>
+          ) : (
+            <div className="role-switch" aria-label="Pilih jenis akun">
+              {[
+                { value: 'warga', label: 'Warga', Icon: UserRound },
+                { value: 'pengelola', label: 'Pengelola', Icon: Users },
+              ].map(({ value, label, Icon }) => (
+                <button
+                  type="button"
+                  key={value}
+                  className={role === value ? 'active' : ''}
+                  onClick={() => chooseRole(value)}
+                  aria-pressed={role === value}
+                >
+                  <Icon size={18} strokeWidth={2} aria-hidden="true" />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <form onSubmit={submit} className="form-stack">
+
+            <label>
+              Email / No. Telepon
+              <input
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder={
+                  role === 'pengelola'
+                    ? 'pengelola@lapormas.id'
+                    : 'nama@email.com'
+                }
+                autoComplete="username"
+                required
+              />
+            </label>
+
+            <label>
+              Kata Sandi
+
+              <div className="password-field">
+                <input
+                  type={show ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Masukkan kata sandi"
+                  autoComplete="current-password"
+                  required
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShow(!show)}
+                  aria-label={
+                    show
+                      ? 'Sembunyikan kata sandi'
+                      : 'Tampilkan kata sandi'
+                  }
+                >
+                  {show
+                    ? <EyeOff size={17} />
+                    : <Eye size={17} />
+                  }
+                </button>
+              </div>
+            </label>
+
+            <div className="form-between">
+              <span></span>
+
+              <button
+                type="button"
+                className="plain-link"
+                onClick={() =>
+                  setError(
+                    'Fitur pemulihan kata sandi belum dihubungkan. Silakan hubungi administrator LAPORMAS untuk bantuan akun.'
+                  )
+                }
+              >
+                Lupa kata sandi?
+              </button>
+            </div>
+
+            {error && <Notice type="error">{error}</Notice>}
+
+            <button
+              className="btn btn-primary btn-block"
+              disabled={busy}
+            >
+              {busy ? 'Memproses...' : 'Masuk'}
+            </button>
+
+          </form>
+
+          {role === 'warga' ? (
+            <div className="auth-signup">
+              Belum punya akun? <Link to="/daftar">Daftar sebagai warga</Link>
+            </div>
+          ) : role === 'pengelola' ? (
+            <div className="auth-signup">
+              Belum punya akun pengelola?{' '}
+              <Link to="/daftar-pengelola">Ajukan pendaftaran</Link>
+            </div>
+          ) : (
+            <div className="auth-signup">
+              Akun admin dibuat khusus dan tidak tersedia melalui pendaftaran publik.
+            </div>
+          )}
+
+          {IS_DEMO_MODE && (
+            <div className="demo-credentials">
+              <b>Akun pratinjau</b>
+              <span>Warga: warga@lapormas.id</span>
+              <span>Pengelola: pengelola@lapormas.id</span>
+              <span>Admin: admin@lapormas.id</span>
+              <small>
+                Gunakan kata sandi apa saja untuk mencoba tampilan demo.
+              </small>
+            </div>
+          )}
+
+          {role !== 'admin' && (
+            <button
+              type="button"
+              className="admin-entry"
+              onClick={() => chooseRole('admin')}
+            >
+              Masuk sebagai admin
+            </button>
+          )}
+
+          <div className="auth-footnote">
+            Dengan masuk, kamu menyetujui kebijakan privasi LAPORMAS.
           </div>
-        )}
-        <form onSubmit={submit} className="form-stack">
-          <label>Email / No. Telepon<input value={identifier} onChange={e => setIdentifier(e.target.value)} placeholder={role === 'pengelola' ? 'pengelola@lapormas.id' : 'nama@email.com'} autoComplete="username" required /></label>
-          <label>Kata Sandi<div className="password-field"><input type={show ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Masukkan kata sandi" autoComplete="current-password" required /><button type="button" onClick={() => setShow(!show)} aria-label={show ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}>{show ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></label>
-          <div className="form-between">
-            <span></span>
-            <button type="button" className="plain-link" onClick={() => setError('Fitur pemulihan kata sandi belum dihubungkan. Silakan hubungi administrator LAPORMAS untuk bantuan akun.')}>Lupa kata sandi?</button>
-          </div>
-          {error && <Notice type="error">{error}</Notice>}
-          <button className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Memproses...' : 'Masuk'}</button>
-        </form>
-        {role === 'warga' ? <div className="auth-signup">Belum punya akun? <Link to="/daftar">Daftar sebagai warga</Link></div> : role === 'pengelola' ? <div className="auth-signup">Belum punya akun pengelola? <Link to="/daftar-pengelola">Ajukan pendaftaran</Link></div> : <div className="auth-signup">Akun admin dibuat khusus dan tidak tersedia melalui pendaftaran publik.</div>}
-        {IS_DEMO_MODE && <div className="demo-credentials">
-          <b>Akun pratinjau</b>
-          <span>Warga: warga@lapormas.id</span>
-          <span>Pengelola: pengelola@lapormas.id</span>
-          <span>Admin: admin@lapormas.id</span>
-          <small>Gunakan kata sandi apa saja untuk mencoba tampilan demo.</small>
-        </div>}
-        {role !== 'admin' && <button type="button" className="admin-entry" onClick={() => chooseRole('admin')}>Masuk sebagai admin</button>}
-        <div className="auth-footnote">Dengan masuk, kamu menyetujui kebijakan privasi LAPORMAS.</div>
-      </div>
-    </section>
-  </div>;
+
+        </div>
+      </section>
+    </div>
+  );
 }
 
 function RegisterCitizen() {

@@ -3,9 +3,7 @@ const pool = require('../config/db');
 
 // Kolom yang wajib diisi ketika membuat laporan
 const REQUIRED_FIELDS = [
-    'user_id',
     'category_id',
-    'status_id',
     'area_id',
     'title',
     'description',
@@ -272,7 +270,7 @@ async function getReportsByTitle(req, res) {
 }
 
 // POST /api/reports
-// Membuat laporan baru
+// Membuat laporan baru dengan user login dan status awal Menunggu
 async function createReport(req, res) {
     const body = req.body || {};
 
@@ -291,9 +289,7 @@ async function createReport(req, res) {
     }
 
     const {
-        user_id,
         category_id,
-        status_id,
         area_id,
         title,
         description,
@@ -301,6 +297,12 @@ async function createReport(req, res) {
         latitude = null,
         longitude = null,
     } = body;
+
+    // User ID diambil dari token login
+    const user_id = req.user.user_id;
+
+    // Status awal laporan: Menunggu (status_id = 1)
+    const status_id = 1;
 
     try {
         const insert = await pool.query(
@@ -463,6 +465,72 @@ async function deleteReport(req, res) {
     }
 }
 
+async function uploadReportImages(req, res) {
+    try {
+        const reportId = req.params.id;
+        const userId = req.user.user_id;
+
+        // Memastikan laporan milik pengguna yang sedang login
+        const reportCheck = await pool.query(
+            'SELECT report_id FROM reports WHERE report_id = $1 AND user_id = $2',
+            [reportId, userId]
+        );
+
+        if (reportCheck.rows.length === 0) {
+            return res.status(404).json({
+                message: 'Laporan tidak ditemukan atau bukan milik Anda',
+            });
+        }
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({
+                message: 'Tidak ada foto yang diunggah',
+            });
+        }
+
+        // Memeriksa jumlah foto yang sudah tersimpan
+        const existingImages = await pool.query(
+            'SELECT COUNT(*) FROM report_images WHERE report_id = $1',
+            [reportId]
+        );
+
+        const existingCount = parseInt(existingImages.rows[0].count, 10);
+
+        if (existingCount + req.files.length > 5) {
+            return res.status(400).json({
+                message: 'Maksimal 5 foto untuk setiap laporan',
+            });
+        }
+
+        // Menyimpan informasi foto ke database
+        const uploadedImages = [];
+
+        for (const file of req.files) {
+            const imageUrl = `/uploads/reports/${file.filename}`;
+
+            const result = await pool.query(
+                `INSERT INTO report_images (report_id, image_url)
+                 VALUES ($1, $2)
+                 RETURNING *`,
+                [reportId, imageUrl]
+            );
+
+            uploadedImages.push(result.rows[0]);
+        }
+
+        res.status(201).json({
+            message: 'Foto laporan berhasil diunggah',
+            images: uploadedImages,
+        });
+    } catch (error) {
+        console.error('Upload report images error:', error.message);
+
+        res.status(500).json({
+            message: 'Gagal mengunggah foto laporan',
+        });
+    }
+}
+
 // Ekspor seluruh fungsi controller
 module.exports = {
     getAllReports,
@@ -471,4 +539,5 @@ module.exports = {
     createReport,
     updateReport,
     deleteReport,
+    uploadReportImages,
 };
