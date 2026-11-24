@@ -30,4 +30,4 @@ router.post(
 router.put('/:id', requireAuth, reportController.updateReport);  // PUT perbarui data
 router.delete('/:id', requireAuth, reportController.deleteReport); // DELETE hapus data
 
-module.exports = router;
+module.exports = router;
