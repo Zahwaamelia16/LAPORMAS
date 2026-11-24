@@ -17,9 +17,13 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL,
     password_hash TEXT NOT NULL,
     role VARCHAR(20) NOT NULL DEFAULT 'warga',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_users_role CHECK (role IN ('warga', 'pengelola', 'admin'))
 );
+
+-- Untuk database yang sudah dibuat sebelum kolom is_active ada
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE;
 
 -- Email dibuat unik tanpa membedakan huruf besar/kecil.
 CREATE UNIQUE INDEX IF NOT EXISTS uq_users_email_lower ON users (LOWER(email));
@@ -173,4 +177,4 @@ ON CONFLICT (status_name) DO NOTHING;
 
 -- Cek hasil pembuatan tabel:
 -- SELECT table_name FROM information_schema.tables
--- WHERE table_schema = 'public' ORDER BY table_name;
+-- WHERE table_schema = 'public' ORDER BY table_name;

@@ -226,6 +226,38 @@ export async function demoApi(path, options = {}) {
     return createResponse({ token: `demo-${normalizedRole}-token`, user });
   }
 
+  // Profil warga (mode pratinjau)
+  if (pathname === '/auth/me' && method === 'PATCH') {
+    const user = currentUser();
+    if (!user) throw new Error('Sesi pratinjau tidak ditemukan. Silakan masuk kembali.');
+    const body = options.body || {};
+    if (!String(body.name || '').trim()) throw new Error('Nama lengkap wajib diisi.');
+    const area = areas.find((item) => Number(item.area_id) === Number(body.area_id));
+    const updated = {
+      ...user,
+      name: String(body.name).trim(),
+      citizen_phone: body.phone || '',
+      phone: body.phone || '',
+      address: body.address || '',
+      ...(user.role === 'warga' ? {
+        citizen_area_id: area?.area_id || null,
+        area_id: area?.area_id || null,
+        village_name: area?.village_name || '',
+        district_name: area?.district_name || '',
+        regency_name: area?.regency_name || '',
+      } : {}),
+    };
+    write(STORAGE.currentUser, updated);
+    write(STORAGE.users, getUsers().map((item) => (item.user_id === updated.user_id ? updated : item)));
+    return createResponse({ message: 'Profil berhasil diperbarui.', user: updated });
+  }
+
+  if (pathname === '/auth/me/password' && method === 'PATCH') {
+    const body = options.body || {};
+    if (String(body.new_password || '').length < 8) throw new Error('Kata sandi baru minimal 8 karakter.');
+    return createResponse({ message: 'Kata sandi berhasil diganti (mode pratinjau).' });
+  }
+
   if (pathname === '/auth/me') {
     const user = currentUser();
     if (!user) throw new Error('Sesi pratinjau tidak ditemukan. Silakan masuk kembali.');

@@ -1,0 +1,12 @@
+/* Halaman Profil Warga */
+.profile-card .notice {margin-bottom: 16px;}
+.profile-card .notice.info {margin-bottom: 0;}
+.profile-actions {margin-bottom: 18px;}
+.profile-actions .btn {display: inline-flex; align-items: center; gap: 7px;}
+.profile-form {padding: 18px 0; border-top: 1px solid var(--line); margin-bottom: 18px;}
+.profile-form input:disabled {background: #f3f6f3; color: #6d8474; cursor: not-allowed;}
+.profile-password {margin-top: 20px;}
+.profile-password h3 {display: flex; align-items: center; gap: 8px; font-size: 17px; margin-bottom: 16px; color: var(--green-dark, #173f2a);}
+@media (max-width: 700px) {
+  .profile-card .field-grid {grid-template-columns: 1fr;}
+}
