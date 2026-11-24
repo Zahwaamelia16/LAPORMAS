@@ -383,6 +383,12 @@ export async function demoApi(path, options = {}) {
     return createResponse({ report });
   }
 
+  // Detail laporan wilayah tugas pengelola (mode pratinjau)
+  const assignedDetailMatch = pathname.match(/^\/reports\/assigned\/(\d+)$/);
+  if (assignedDetailMatch) {
+    return demoApi(`/reports/${assignedDetailMatch[1]}`, { method: 'GET' });
+  }
+
   const detailMatch = pathname.match(/^\/reports\/(\d+)$/);
   if (detailMatch && method === 'GET') {
     const report = getReports().find((item) => item.report_id === Number(detailMatch[1]));

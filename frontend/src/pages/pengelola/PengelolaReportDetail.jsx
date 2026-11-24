@@ -1,14 +1,15 @@
 
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AlertTriangle, ArrowLeft } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 import { api, formatDate, imageUrl } from '../../api';
 import AdminLayout from '../../layouts/AdminLayout';
 import StaffLayout from '../../layouts/PengelolaLayout';
 import { StatusBadge } from './PengelolaReports';
 
-const STATUS_OPTIONS = ['Diterima', 'Diverifikasi', 'Diproses', 'Selesai', 'Ditolak'];
+// Cadangan jika daftar status dari server belum termuat (sama dengan tabel report_statuses)
+const DEFAULT_STATUS_OPTIONS = ['Menunggu', 'Diverifikasi', 'Diproses', 'Selesai'];
 
 // Halaman Detail Penanganan.
 // Dipakai pengelola (/pengelola/laporan/:id) dan admin (/admin/laporan/:id lewat prop `admin`).
@@ -20,10 +21,13 @@ export default function StaffReportDetailPage({ admin = false }) {
   const [status, setStatus] = useState('');
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [statusOptions, setStatusOptions] = useState(DEFAULT_STATUS_OPTIONS);
 
   const Layout = admin ? AdminLayout : StaffLayout;
 
-  const load = () => api(`/reports/${id}`)
+  // Detail laporan + riwayat penanganan (hanya laporan di wilayah tugas)
+  const load = () => api(`/reports/assigned/${id}`)
     .then((data) => {
       setReport(data.report);
       setStatus(data.report.status_name);
@@ -32,15 +36,30 @@ export default function StaffReportDetailPage({ admin = false }) {
 
   useEffect(() => {
     load();
+
+    // Pilihan status diambil dari database
+    api('/statuses')
+      .then((data) => {
+        const names = (data.statuses || []).map((s) => s.status_name);
+        if (names.length) setStatusOptions(names);
+      })
+      .catch(() => { });
   }, [id]);
 
   const save = async () => {
     setBusy(true);
     setError('');
+    setSuccess('');
     try {
-      await api(`/reports/${id}/status`, { method: 'PATCH', body: { status_name: status, notes } });
-      await load();
+      const data = await api(`/reports/${id}/status`, { method: 'PATCH', body: { status_name: status, notes } });
+      if (data?.report) {
+        setReport(data.report);
+        setStatus(data.report.status_name);
+      } else {
+        await load();
+      }
       setNotes('');
+      setSuccess(data?.message || 'Status laporan berhasil diperbarui.');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -109,10 +128,17 @@ export default function StaffReportDetailPage({ admin = false }) {
           <aside className="panel update-panel">
             <h3>Perbarui penanganan</h3>
 
+            {success && (
+              <div className="notice success" role="status">
+                <CheckCircle2 size={18} />
+                <span>{success}</span>
+              </div>
+            )}
+
             <label>
               Status terbaru
               <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                {STATUS_OPTIONS.map((s) => <option key={s}>{s}</option>)}
+                {statusOptions.map((s) => <option key={s}>{s}</option>)}
               </select>
             </label>
 
@@ -120,6 +146,7 @@ export default function StaffReportDetailPage({ admin = false }) {
               Catatan penanganan
               <textarea
                 rows="5"
+                maxLength={1000}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Tuliskan hasil verifikasi atau perkembangan..."
@@ -131,13 +158,19 @@ export default function StaffReportDetailPage({ admin = false }) {
             </button>
 
             <div className="timeline compact-timeline">
-              <b>Riwayat sebelumnya</b>
+              <b>Riwayat penanganan</b>
+              {!(report.updates || []).length && (
+                <small>Belum ada pembaruan. Laporan masih berstatus awal.</small>
+              )}
               {(report.updates || []).map((u, i) => (
                 <div className="timeline-item" key={i}>
                   <span className="timeline-dot" />
                   <div>
                     <b>{u.new_status}</b>
-                    <small>{formatDate(u.updated_at)}</small>
+                    <small>
+                      {formatDate(u.updated_at)}
+                      {u.updated_by_name ? ` · ${u.updated_by_name}` : ''}
+                    </small>
                     {u.notes && <p>{u.notes}</p>}
                   </div>
                 </div>

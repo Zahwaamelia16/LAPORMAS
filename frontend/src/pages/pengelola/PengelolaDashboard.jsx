@@ -40,7 +40,7 @@ export default function StaffDashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const pending = reports.filter((r) => ['Diterima', 'Diverifikasi'].includes(r.status_name)).length;
+  const pending = reports.filter((r) => ['Menunggu', 'Diterima', 'Diverifikasi'].includes(r.status_name)).length;
   const processing = reports.filter((r) => r.status_name === 'Diproses').length;
   const complete = reports.filter((r) => r.status_name === 'Selesai').length;
 

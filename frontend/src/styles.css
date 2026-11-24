@@ -1210,6 +1210,7 @@ textarea {min-height: 120px; line-height: 1.65; resize: vertical;}
 .status {display: inline-flex; align-items: center; width: max-content; min-height: 23px; padding: 4px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .015em;}
 
 .status-diterima {background: #fff4df; color: #916019;}
+.status-menunggu {background: #fff4df; color: #916019;}
 
 .status-diverifikasi {background: #e9f0ff; color: #375c9b;}
 
@@ -2238,4 +2239,4 @@ tbody tr:hover {background: #f8fbf8;}
     min-height: calc(93svh - 58px);
     align-items: center;
   }
-}
+}
