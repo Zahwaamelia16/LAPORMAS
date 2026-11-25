@@ -13,13 +13,22 @@ async function getStats(req, res) {
                     FROM reports r
                     JOIN report_statuses s
                         ON s.status_id = r.status_id
-                    WHERE LOWER(s.status_name) = 'selesai'
+                    WHERE LOWER(TRIM(s.status_name)) = 'diproses'
+                )::int AS processing,
+
+                (
+                    SELECT COUNT(*)
+                    FROM reports r
+                    JOIN report_statuses s
+                        ON s.status_id = r.status_id
+                    WHERE LOWER(TRIM(s.status_name)) = 'selesai'
                 )::int AS completed,
 
                 (SELECT COUNT(*) FROM areas)::int AS areas
         `);
 
         const total = Number(result.rows[0].total);
+        const processing = Number(result.rows[0].processing);
         const completed = Number(result.rows[0].completed);
         const areas = Number(result.rows[0].areas);
 
@@ -31,6 +40,7 @@ async function getStats(req, res) {
             message: 'Berhasil mengambil statistik LAPORMAS',
             stats: {
                 total,
+                processing,
                 completed,
                 rate,
                 areas,

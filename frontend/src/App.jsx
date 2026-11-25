@@ -203,18 +203,21 @@ function PublicNav() {
               </button>
             </>
           ) : (
-            <>
-              <Link to="/masuk" className="nav-login">
-                Login
-              </Link>
+          <>
+            <Link
+              to="/laporan/buat"
+              className="btn btn-primary btn-small"
+            >
+              Buat Laporan
+            </Link>
 
-              <Link
-                to="/laporan/buat"
-                className="btn btn-primary btn-small"
-              >
-                Buat Laporan
-              </Link>
-            </>
+            <Link
+              to="/masuk"
+              className="btn btn-primary btn-small nav-login-button"
+            >
+              Login
+            </Link>
+          </>
           )}
         </div>
       </div>
@@ -454,7 +457,7 @@ function HomePage() {
 
             <p>
               Pilih kategori yang sesuai agar laporanmu segera sampai
-              kepada pihak yang tepat.
+              kepada pihak yang tepat
             </p>
           </div>
 
@@ -527,7 +530,7 @@ function HomePage() {
 
               <p>
                 Masukkan nomor laporan untuk melihat status dan
-                riwayat penanganannya.
+                riwayat penanganannya
               </p>
             </div>
 
@@ -619,13 +622,16 @@ function HomePage() {
   );
 }
 
+
 function ReportCards({ reports = [] }) {
   if (!reports.length) {
     return (
-      <div className="empty-state compact">
-        <FileCheck2 size={28} />
+      <div className="public-report-empty">
+        <FileCheck2 size={34} />
         <b>Belum ada laporan yang ditampilkan</b>
-        <span>Laporan akan muncul di sini setelah tersedia.</span>
+        <span>
+          Laporan akan muncul di sini setelah tersedia
+        </span>
       </div>
     );
   }
@@ -636,63 +642,111 @@ function ReportCards({ reports = [] }) {
     'Pohon Tumbang': TreePine,
     'Lampu Jalan Mati': Lightbulb,
     'Saluran Tersumbat': Waves,
-    'Banjir': Waves,
+    Banjir: Waves,
     'Fasilitas Umum Rusak': House,
-    'Lainnya': MapPin,
+    Lainnya: MapPin,
   };
 
   return (
-    <div className="report-grid">
+    <div className="public-report-list">
       {reports.map((report) => {
-        const reportImage = report.images?.[0]?.image_url || report.image_url;
-        const CategoryIcon = categoryIcons[report.category_name] || MapPin;
+        const reportImage =
+          report.images?.[0]?.image_url || report.image_url;
+
+        const CategoryIcon =
+          categoryIcons[report.category_name] || MapPin;
+
+        const attachmentCount =
+          report.images?.length || (reportImage ? 1 : 0);
+
+        const reportCode =
+          report.report_code ||
+          `LPM-${String(report.report_id).padStart(5, '0')}`;
+
+        const location = [
+          report.village_name
+            ? `Desa ${report.village_name}`
+            : '',
+          report.district_name
+            ? `Kec. ${report.district_name}`
+            : '',
+        ]
+          .filter(Boolean)
+          .join(', ');
 
         return (
-          <article className="report-card" key={report.report_id}>
-            <div className="report-thumb">
+          <article
+            className="public-report-card"
+            key={report.report_id}
+          >
+            {/* FOTO LAPORAN */}
+            <div className="public-report-media">
               {reportImage ? (
                 <img
                   src={imageUrl(reportImage)}
                   alt={`Foto laporan ${report.title}`}
+                  loading="lazy"
                 />
               ) : (
-                <div className="report-image-placeholder">
-                  <div className="report-placeholder-icon">
-                    <CategoryIcon size={36} strokeWidth={1.8} />
-                  </div>
-
-                  <span className="report-placeholder-text">
-                    Foto belum tersedia
-                  </span>
-
-                  <small className="report-placeholder-category">
-                    {report.category_name}
-                  </small>
+                <div className="public-report-placeholder">
+                  <CategoryIcon size={37} />
+                  <span>Foto belum tersedia</span>
+                  <small>{report.category_name}</small>
                 </div>
               )}
 
-              <Status value={report.status_name} />
+              <div className="public-report-attachment">
+                <FileImage size={13} />
+                {attachmentCount} foto lampiran
+              </div>
             </div>
 
-            <div className="report-card-body">
-              <div className="report-location">
-                <MapPin size={13} aria-hidden="true" />
-                {[report.village_name, report.district_name]
-                  .filter(Boolean)
-                  .join(', ')}
+            {/* INFORMASI LAPORAN */}
+            <div className="public-report-content">
+
+              <div className="public-report-topline">
+                <div className="public-report-identity">
+                  <span className="public-report-category">
+                    {report.category_name}
+                  </span>
+
+                  <span className="public-report-code">
+                    {reportCode}
+                  </span>
+                </div>
+
+                <Status value={report.status_name} />
               </div>
 
-              <h3>{report.title}</h3>
-              <p>
-                {report.category_name} · {formatDate(report.created_at)}
+              <h3>
+                <Link to={`/laporan/${report.report_id}`}>
+                  {report.title}
+                </Link>
+              </h3>
+
+              <p className="public-report-description">
+                {report.description || 'Tidak ada deskripsi laporan.'}
               </p>
+
+              <div className="public-report-meta">
+                <span>
+                  <MapPin size={14} />
+                  {location || report.location || 'Lokasi belum dicantumkan'}
+                </span>
+
+                <span>
+                  Dilaporkan {formatDate(report.created_at)}
+                </span>
+              </div>
 
               <Link
                 to={`/laporan/${report.report_id}`}
-                className="btn btn-outline btn-small"
+                className="public-report-detail"
               >
-                Lihat detail <ArrowRight size={14} aria-hidden="true" />
+                Lihat detail
+                <ArrowRight size={14} />
               </Link>
+
             </div>
           </article>
         );
@@ -700,6 +754,7 @@ function ReportCards({ reports = [] }) {
     </div>
   );
 }
+
 
 function TrackSummary({ report }) {
   return <div className="track-result">
@@ -710,28 +765,152 @@ function TrackSummary({ report }) {
   </div>;
 }
 
+
 function PublicReportsPage() {
-  const { reports, areas, categories, statuses, filters, setFilters, resetFilters, loading } = usePublicReports();
-  return <PublicLayout>
-    <PageIntro eyebrow="TRANSPARANSI LAPORAN" title="Laporan publik" subtitle="Pantau masalah dan proses penanganannya di berbagai wilayah.">
-      <div className="intro-meta">
-        <span><ShieldCheck size={15} /> Identitas pelapor dirahasiakan</span>
-        <span><GlobeIcon /> Semua wilayah</span>
-      </div>
-    </PageIntro>
-    <main className="container section public-listing">
-      <PublicReportFilters areas={areas} categories={categories} statuses={statuses} filters={filters} setFilters={setFilters} onReset={resetFilters} />
-      <div className="listing-heading">
-        <div>
-          <h2>Daftar laporan</h2>
-          <p>{reports.length} laporan ditemukan</p>
-        </div>
-        <Link to="/laporan/buat" className="btn btn-primary">Buat laporan <Plus size={16} /></Link>
-      </div>
-      {loading ? <div className="screen-loading">Memuat laporan...</div> : <ReportCards reports={reports} />}
-    </main>
-  </PublicLayout>;
+  const {
+    reports,
+    areas,
+    categories,
+    statuses,
+    filters,
+    setFilters,
+    loading,
+  } = usePublicReports();
+
+  const [stats, setStats] = useState({
+    total: 0,
+    processing: 0,
+    completed: 0,
+  });
+
+  const [visibleCount, setVisibleCount] = useState(3);
+
+  // Ambil statistik keseluruhan dari database
+  useEffect(() => {
+    let active = true;
+
+    api('/stats')
+      .then((data) => {
+        if (!active) return;
+
+        const result = data.stats || {};
+
+        setStats({
+          total: Number(result.total || 0),
+          processing: Number(result.processing || 0),
+          completed: Number(result.completed || 0),
+        });
+      })
+      .catch((error) => {
+        console.error('Gagal memuat statistik laporan:', error);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Kembali ke tiga laporan pertama saat filter berubah
+  useEffect(() => {
+    setVisibleCount(3);
+  }, [filters]);
+
+  const visibleReports = reports.slice(0, visibleCount);
+  const hasMore = visibleCount < reports.length;
+
+  return (
+    <PublicLayout>
+      <main className="public-reports-page">
+
+        {/* HERO DAN STATISTIK */}
+        <section className="public-report-hero">
+          <div className="container public-report-hero-inner">
+
+            <div className="public-report-hero-copy">
+              <span>TRANSPARANSI LAPORAN</span>
+
+              <h1>Laporan Publik</h1>
+
+              <p>
+                Pantau masalah lingkungan dan proses
+                penanganannya di berbagai wilayah
+              </p>
+            </div>
+
+            <div className="public-report-stats">
+
+              <div>
+                <span>Total</span>
+                <strong>
+                  {stats.total.toLocaleString('id-ID')}
+                </strong>
+              </div>
+
+              <div>
+                <span>Diproses</span>
+                <strong>
+                  {stats.processing.toLocaleString('id-ID')}
+                </strong>
+              </div>
+
+              <div>
+                <span>Selesai</span>
+                <strong>
+                  {stats.completed.toLocaleString('id-ID')}
+                </strong>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* PENCARIAN, FILTER, DAN DAFTAR LAPORAN */}
+        <section className="container public-listing-v2">
+
+          <PublicReportFilters
+            areas={areas}
+            categories={categories}
+            statuses={statuses}
+            filters={filters}
+            setFilters={setFilters}
+          />
+
+          <div className="public-report-results-heading">
+            <span>
+              Menampilkan {visibleReports.length} laporan
+            </span>
+          </div>
+
+          {loading ? (
+            <div className="screen-loading">
+              Memuat laporan...
+            </div>
+          ) : (
+            <>
+              <ReportCards reports={visibleReports} />
+
+              {hasMore && (
+                <div className="public-report-load-more">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setVisibleCount((current) => current + 3)
+                    }
+                  >
+                    Muat lebih banyak
+                    <ArrowRight size={15} />
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+        </section>
+      </main>
+    </PublicLayout>
+  );
 }
+
 function GlobeIcon() {
   return <MapPin size={15} />;
 }
@@ -871,123 +1050,255 @@ function PublicReportDetail({ track = false, manager = false }) {
     </Layout>
   );
 }
+
 function HowPage() {
+  const steps = [
+    {
+      number: '1',
+      title: 'Pilih kategori dan jelaskan masalah',
+      description:
+        'Tentukan jenis masalah, tulis judul singkat, lalu jelaskan kondisi yang kamu temukan dengan jelas',
+    },
+    {
+      number: '2',
+      title: 'Lengkapi bukti dan lokasi',
+      description:
+        'Tambahkan foto yang terlihat jelas serta tuliskan alamat atau patokan lokasi kejadian',
+    },
+    {
+      number: '3',
+      title: 'Periksa lalu kirim laporan',
+      description:
+        'Pastikan seluruh informasi sudah benar. Setelah dikirim, kamu akan menerima nomor referensi',
+    },
+    {
+      number: '4',
+      title: 'Pantau perkembangan',
+      description:
+        'Gunakan nomor referensi untuk mengikuti status dan catatan petugas hingga laporan selesai',
+    },
+  ];
+
+  const checklist = [
+    'Judul singkat dan spesifik',
+    'Lokasi atau patokan jelas',
+    'Foto sesuai kondisi terkini',
+    'Deskripsi faktual dan sopan',
+    'Kategori masalah sesuai',
+    'Tidak memuat data pribadi',
+  ];
+
   return (
     <PublicLayout>
-      <PageIntro
-        eyebrow="PANDUAN LAPORAN"
-        title="Cara melapor"
-        subtitle="Ikuti tiga langkah sederhana untuk menyampaikan masalah di lingkunganmu."
-      />
+      <main className="how-page-v2">
 
-      <main className="container section">
-        <div className="how-cards">
-          <div>
-            <span>01</span>
-            <FilePlus2 />
-            <h2>Buat laporan</h2>
-            <p>
-              Masuk sebagai warga, isi judul, kategori, deskripsi, dan alamat kejadian.
-              Lokasi kejadian akan dideteksi melalui GPS perangkat.
-            </p>
-          </div>
-          <div>
-            <span>02</span>
-            <ShieldCheck />
-            <h2>Verifikasi laporan</h2>
-            <p>
-              Laporan masuk ke sistem untuk diverifikasi. Pengelola sesuai area kejadian
-              dapat melihat dan menindaklanjutinya.
-            </p>
-          </div>
-          <div>
-            <span>03</span>
-            <Clock3 />
-            <h2>Pantau perkembangan</h2>
-            <p>
-              Gunakan nomor laporan atau dashboard akun untuk mengikuti perubahan
-              status sampai penanganan selesai.
-            </p>
-          </div>
-        </div>
+        {/* JUDUL DAN PENGANTAR */}
+        <section className="container how-intro-v2">
+          <h1>Cara melapor di LAPORMAS</h1>
 
-        <div className="notice info">
-          <AlertTriangle aria-hidden="true" />
-          <span>
-            LAPORMAS bukan layanan darurat. Untuk kondisi yang mengancam keselamatan,
-            hubungi layanan darurat atau instansi setempat.
-          </span>
-        </div>
-
-        <Link className="btn btn-primary" to="/laporan/buat">
-          Mulai buat laporan <ArrowRight size={16} aria-hidden="true" />
-        </Link>
-      </main>
-    </PublicLayout>
-  );
-}
-function AboutPage() {
-  return (
-    <PublicLayout>
-      <PageIntro
-        eyebrow="TENTANG KAMI"
-        title="Ruang warga, perubahan nyata"
-        subtitle="LAPORMAS adalah konsep layanan digital untuk membantu warga menyampaikan masalah lingkungan dan membantu pengelola menanganinya berdasarkan wilayah."
-      />
-
-      <main className="container section about-grid">
-        <div className="about-visual">
-          <Trees size={76} />
-          <span>LAPORMAS</span>
-          <small>Layanan Pelaporan & Resolusi Masalah Area</small>
-        </div>
-
-        <div>
-          <span className="eyebrow">TUJUAN KAMI</span>
-          <h2>Lingkungan yang nyaman dimulai dari kepedulian bersama.</h2>
           <p>
-            Warga dapat melaporkan masalah di berbagai wilayah, memantau progres
-            penanganan, dan melihat laporan publik. Pengelola menangani laporan
-            sesuai area tugasnya, sedangkan admin memantau keseluruhan sistem.
+            Ikuti empat langkah sederhana berikut untuk menyampaikan
+            masalah di lingkunganmu, agar laporanmu lengkap, mudah
+            diverifikasi, dan segera diteruskan ke pihak yang tepat
           </p>
+        </section>
 
-          <div className="value-row">
-            <HeartHandshake />
-            <div>
-              <b>Terbuka dan kolaboratif</b>
-              <span>Informasi laporan dapat dipantau tanpa membuka data pribadi pelapor.</span>
-            </div>
+        {/* EMPAT LANGKAH PELAPORAN */}
+        <section
+          className="container how-steps-v2"
+          aria-label="Empat langkah melapor"
+        >
+          {steps.map((step) => (
+            <article className="how-step-item" key={step.number}>
+              <span className="how-step-number">
+                {step.number}
+              </span>
+
+              <div className="how-step-content">
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        {/* TIPS MEMBUAT LAPORAN */}
+        <section className="container how-guidance-v2">
+
+          <div className="how-guidance-heading">
+            <h2>
+              Laporan yang baik mempercepat penanganan
+            </h2>
+
+            <p>
+              Sebelum dikirim, pastikan laporanmu memenuhi
+              beberapa hal sederhana ini
+            </p>
           </div>
 
-          <div className="value-row">
-            <MapPin />
-            <div>
-              <b>Berbasis wilayah</b>
-              <span>Lokasi kejadian digunakan untuk menentukan area dan pengelola yang menangani.</span>
-            </div>
-          </div>
+          <div className="how-guidance-media">
 
-          <div className="value-row">
-            <ShieldCheck />
-            <div>
-              <b>Menjaga privasi</b>
-              <span>Identitas dan kontak pelapor tidak ditampilkan pada laporan publik.</span>
+            <img
+              src="/images/cara%20melapor.png"
+              alt="Pemandangan lingkungan permukiman dan area sekitar warga"
+            />
+
+            <div className="how-checklist">
+              {checklist.map((item) => (
+                <div className="how-check-item" key={item}>
+                  <CheckCircle2
+                    size={17}
+                    aria-hidden="true"
+                  />
+
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
+
           </div>
-        </div>
+        </section>
+
       </main>
     </PublicLayout>
   );
 }
+
+function AboutPage() {
+  const aboutSteps = [
+    {
+      number: '1',
+      title: 'Pelaporan yang mudah',
+      description:
+        'Formulir sederhana dan terarah agar laporan bisa dikirim tanpa kebingungan.',
+    },
+    {
+      number: '2',
+      title: 'Bukti yang lengkap',
+      description:
+        'Sertakan foto dan lokasi kejadian untuk membantu proses pemeriksaan.',
+    },
+    {
+      number: '3',
+      title: 'Pantau perkembangannya',
+      description:
+        'Ikuti setiap perubahan status dan catatan penanganan secara transparan.',
+    },
+    {
+      number: '4',
+      title: 'Ditangani pihak tepat',
+      description:
+        'Laporan diarahkan ke unit bertanggung jawab berdasarkan kategori dan wilayah.',
+    },
+  ];
+
+  return (
+    <PublicLayout>
+      <main className="about-page">
+
+        {/* PEMBUKA DAN TAHAPAN LAPORMAS */}
+        <section className="about-intro">
+          <div className="container">
+            <h1>Satu tempat untuk setiap suara warga</h1>
+
+            <p>
+              Bukan sekadar tempat mengirim pengaduan. LAPORMAS
+              memastikan warga tahu apa yang terjadi setelah
+              laporannya dikirim.
+            </p>
+
+            <div className="about-steps">
+              {aboutSteps.map((step) => (
+                <article className="about-step-card" key={step.number}>
+                  <span className="about-step-number">
+                    {step.number}
+                  </span>
+
+                  <h3>{step.title}</h3>
+
+                  <p>{step.description}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* TUJUAN LAPORMAS */}
+        <section className="container about-story">
+
+          <div className="about-photo">
+            <img
+              src="/images/tentang kami.png"
+              alt="Warga dan petugas bekerja sama membersihkan lingkungan"
+            />
+          </div>
+
+          <div className="about-copy">
+            <h2>
+              Lingkungan yang nyaman dimulai dari kepedulian bersama
+            </h2>
+
+            <p>
+              Warga dapat melaporkan masalah di berbagai wilayah,
+              memantau progres penanganan dan melihat laporan publik.
+              Pengelola menangani laporan sesuai area tugasnya,
+              sedangkan admin memantau keseluruhan sistem
+            </p>
+
+            <div className="about-feature">
+              <HeartHandshake
+                size={25}
+                aria-hidden="true"
+              />
+
+              <div>
+                <b>Terbuka dan kolaboratif</b>
+                <span>
+                  Informasi laporan yang dapat dipantau tanpa membuka
+                  data pribadi pelapor
+                </span>
+              </div>
+            </div>
+
+            <div className="about-feature">
+              <MapPin
+                size={25}
+                aria-hidden="true"
+              />
+
+              <div>
+                <b>Berbasis wilayah</b>
+                <span>
+                  Lokasi kejadian digunakan untuk menentukan area
+                  dan pengelola yang menangani
+                </span>
+              </div>
+            </div>
+
+            <div className="about-feature">
+              <ShieldCheck
+                size={25}
+                aria-hidden="true"
+              />
+
+              <div>
+                <b>Menjaga privasi</b>
+                <span>
+                  Identitas dan kontak pelapor tidak ditampilkan
+                  pada laporan publik
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </main>
+    </PublicLayout>
+  );
+}
+
 
 function LoginPage() {
-  // Statistik dari database
-  const [stats, setStats] = useState({
-    total: 0,
-    completed: 0,
-    areas: 0,
-  });
-
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -997,9 +1308,9 @@ function LoginPage() {
   const [role, setRole] = useState(
     requestedRole === 'admin'
       ? 'admin'
-      : requestedRole === 'pengelola'
-        ? 'pengelola'
-        : 'warga'
+      : requestedRole === 'warga'
+        ? 'warga'
+        : 'pengelola'
   );
 
   const [identifier, setIdentifier] = useState('');
@@ -1008,23 +1319,6 @@ function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  // Ambil statistik dari API/database
-  useEffect(() => {
-    api('/stats')
-      .then((d) => {
-        const data = d.stats || {};
-
-        setStats({
-          total: data.total ?? 0,
-          completed: data.completed ?? 0,
-          areas: data.areas ?? 0,
-        });
-      })
-      .catch((err) => {
-        console.error('Gagal memuat statistik login:', err);
-      });
-  }, []);
-
   // Redirect jika pengguna sudah login
   useEffect(() => {
     if (user) {
@@ -1032,14 +1326,17 @@ function LoginPage() {
     }
   }, [user, navigate]);
 
+  // Ganti role login
   const chooseRole = (nextRole) => {
     setRole(nextRole);
     setError('');
     setPassword('');
   };
 
+  // Proses login tetap menggunakan autentikasi yang sudah ada
   const submit = async (e) => {
     e.preventDefault();
+
     setBusy(true);
     setError('');
 
@@ -1069,19 +1366,20 @@ function LoginPage() {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page auth-page-v2">
 
+      {/* PANEL KIRI */}
       <section className="auth-visual">
 
-        {/* Foto background */}
+        {/* Background foto */}
         <div className="auth-visual-bg">
           <img
-            src="/images/bg-login.jpg"
-            alt="Lingkungan LAPORMAS"
+            src="/images/bg%20login.png"
+            alt="Pemandangan lingkungan LAPORMAS"
           />
         </div>
 
-        {/* Overlay gradient */}
+        {/* Overlay hijau */}
         <div className="auth-visual-overlay"></div>
 
         {/* Logo */}
@@ -1092,58 +1390,39 @@ function LoginPage() {
           />
         </Link>
 
-        {/* Konten utama */}
+        {/* Teks utama */}
         <div className="auth-visual-copy">
-          <span className="auth-kicker">
-            RUANG WARGA, PERUBAHAN NYATA
-          </span>
 
-          <h1>Lingkungan sehat dimulai dari sini</h1>
+          <h1>
+            Lingkungan lebih baik,
+            <br />
+            dimulai dari laporanmu
+          </h1>
 
           <p>
-            Platform pelaporan masalah lingkungan yang memudahkan
-            warga dan pengelola bekerja sama menjaga kenyamanan bersama.
+            Platform pelaporan masalah lingkungan yang
+            memudahkan warga dan pengelola bekerja sama
+            menjaga kenyamanan bersama.
           </p>
-        </div>
-
-        {/* Statistik dari database */}
-        <div className="auth-stats">
-
-          <div>
-            <b>{stats.total.toLocaleString('id-ID')}</b>
-            <span>Laporan diterima</span>
-          </div>
-
-          <div>
-            <b>{stats.completed.toLocaleString('id-ID')}</b>
-            <span>Laporan diselesaikan</span>
-          </div>
-
-          <div>
-            <b>{stats.areas.toLocaleString('id-ID')}</b>
-            <span>Area terjangkau</span>
-          </div>
 
         </div>
+
       </section>
 
+      {/* PANEL KANAN */}
       <section className="auth-form-side">
+
         <div className="auth-form-wrap">
 
-          <Link to="/" className="back-link">
-            <ArrowLeft size={16} aria-hidden="true" />
-            Kembali ke beranda
-          </Link>
+          <h2>selamat datang kembali</h2>
 
-          <span className="eyebrow">AKSES LAPORMAS</span>
-
-          <h2>Selamat Datang</h2>
-
-          <p>
+          <p className="auth-welcome-description">
             Laporkan masalah di lingkunganmu dan pantau penyelesaiannya.
           </p>
 
+          {/* PILIH ROLE */}
           {role === 'admin' ? (
+
             <div className="admin-login-label">
               <ShieldCheck size={17} aria-hidden="true" />
 
@@ -1151,17 +1430,21 @@ function LoginPage() {
 
               <button
                 type="button"
-                onClick={() => chooseRole('warga')}
+                onClick={() => chooseRole('pengelola')}
               >
                 Ganti role
               </button>
             </div>
+
           ) : (
+
             <div className="role-switch" aria-label="Pilih jenis akun">
+
               {[
-                { value: 'warga', label: 'Warga', Icon: UserRound },
-                { value: 'pengelola', label: 'Pengelola', Icon: Users },
-              ].map(({ value, label, Icon }) => (
+                { value: 'warga', label: 'Warga' },
+                { value: 'pengelola', label: 'Pengelola' },
+              ].map(({ value, label }) => (
+
                 <button
                   type="button"
                   key={value}
@@ -1169,24 +1452,28 @@ function LoginPage() {
                   onClick={() => chooseRole(value)}
                   aria-pressed={role === value}
                 >
-                  <Icon size={18} strokeWidth={2} aria-hidden="true" />
-                  <span>{label}</span>
+                  {label}
                 </button>
+
               ))}
+
             </div>
+
           )}
 
-          <form onSubmit={submit} className="form-stack">
+          {/* FORM LOGIN */}
+          <form onSubmit={submit} className="form-stack auth-login-form">
 
             <label>
-              Email / No. Telepon
+              Email / No. telepon
+
               <input
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder={
                   role === 'pengelola'
-                    ? 'pengelola@lapormas.id'
-                    : 'nama@email.com'
+                    ? 'Contoh: pengelola@lapormas.id / 082345679854'
+                    : 'Contoh: warga@lapormas.id / 082345679854'
                 }
                 autoComplete="username"
                 required
@@ -1194,14 +1481,14 @@ function LoginPage() {
             </label>
 
             <label>
-              Kata Sandi
+              Kata sandi
 
               <div className="password-field">
                 <input
                   type={show ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan kata sandi"
+                  placeholder="Masukkan kata sandimu disini"
                   autoComplete="current-password"
                   required
                 />
@@ -1223,26 +1510,13 @@ function LoginPage() {
               </div>
             </label>
 
-            <div className="form-between">
-              <span></span>
-
-              <button
-                type="button"
-                className="plain-link"
-                onClick={() =>
-                  setError(
-                    'Fitur pemulihan kata sandi belum dihubungkan. Silakan hubungi administrator LAPORMAS untuk bantuan akun.'
-                  )
-                }
-              >
-                Lupa kata sandi?
-              </button>
-            </div>
-
+            {/* PESAN ERROR */}
             {error && <Notice type="error">{error}</Notice>}
 
+            {/* TOMBOL MASUK */}
             <button
-              className="btn btn-primary btn-block"
+              type="submit"
+              className="btn btn-primary btn-block auth-login-submit"
               disabled={busy}
             >
               {busy ? 'Memproses...' : 'Masuk'}
@@ -1250,33 +1524,30 @@ function LoginPage() {
 
           </form>
 
+          {/* SIGN UP */}
           {role === 'warga' ? (
+
             <div className="auth-signup">
-              Belum punya akun? <Link to="/daftar">Daftar sebagai warga</Link>
+              Belum punya akun? Silahkan{' '}
+              <Link to="/daftar">Sign Up</Link>
             </div>
+
           ) : role === 'pengelola' ? (
+
             <div className="auth-signup">
-              Belum punya akun pengelola?{' '}
-              <Link to="/daftar-pengelola">Ajukan pendaftaran</Link>
+              Belum punya akun? Silahkan{' '}
+              <Link to="/daftar-pengelola">Sign Up</Link>
             </div>
+
           ) : (
+
             <div className="auth-signup">
-              Akun admin dibuat khusus dan tidak tersedia melalui pendaftaran publik.
+              Akun administrator dibuat khusus oleh sistem.
             </div>
+
           )}
 
-          {IS_DEMO_MODE && (
-            <div className="demo-credentials">
-              <b>Akun pratinjau</b>
-              <span>Warga: warga@lapormas.id</span>
-              <span>Pengelola: pengelola@lapormas.id</span>
-              <span>Admin: admin@lapormas.id</span>
-              <small>
-                Gunakan kata sandi apa saja untuk mencoba tampilan demo.
-              </small>
-            </div>
-          )}
-
+          {/* AKSES ADMIN TETAP TERSEDIA */}
           {role !== 'admin' && (
             <button
               type="button"
@@ -1287,12 +1558,10 @@ function LoginPage() {
             </button>
           )}
 
-          <div className="auth-footnote">
-            Dengan masuk, kamu menyetujui kebijakan privasi LAPORMAS.
-          </div>
-
         </div>
+
       </section>
+
     </div>
   );
 }

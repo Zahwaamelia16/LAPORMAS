@@ -14,6 +14,7 @@ const REQUIRED_FIELDS = [
 const BASE_SELECT = `
     SELECT
         r.report_id,
+        'LPM-' || LPAD(r.report_id::text, 5, '0') AS report_code,
         r.user_id,
         u.name AS reporter_name,
         r.category_id,
