@@ -133,6 +133,7 @@ async function me(req, res) {
 
 // POST /api/auth/register/warga
 // Body: { name, email, phone, address, password, latitude?, longitude? }
+
 async function registerWarga(req, res) {
     const name = String(req.body?.name || '').trim();
     const email = String(req.body?.email || '').trim().toLowerCase();
@@ -140,16 +141,82 @@ async function registerWarga(req, res) {
     const address = String(req.body?.address || '').trim();
     const password = String(req.body?.password || '');
 
-    if (!name || !email || !phone || !address || !password) {
-        return res.status(400).json({ message: 'Lengkapi nama, email, nomor telepon, alamat, dan kata sandi.' });
+    const villageName = String(
+        req.body?.village_name || ''
+    ).trim();
+
+    const rawAreaId = req.body?.area_id;
+
+    const hasLatitude =
+        req.body?.latitude !== undefined &&
+        req.body?.latitude !== null &&
+        req.body?.latitude !== '';
+
+    const hasLongitude =
+        req.body?.longitude !== undefined &&
+        req.body?.longitude !== null &&
+        req.body?.longitude !== '';
+
+    let latitude = null;
+    let longitude = null;
+    let areaId = null;
+
+    if (
+        !name ||
+        !email ||
+        !phone ||
+        !address ||
+        !password
+    ) {
+        return res.status(400).json({
+            message: 'Lengkapi nama, email, nomor telepon, alamat, dan kata sandi.',
+        });
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return res.status(400).json({ message: 'Format email belum benar.' });
+        return res.status(400).json({
+            message: 'Format email belum benar.',
+        });
     }
 
     if (password.length < 8) {
-        return res.status(400).json({ message: 'Kata sandi minimal 8 karakter.' });
+        return res.status(400).json({
+            message: 'Kata sandi minimal 8 karakter.',
+        });
+    }
+
+    if (hasLatitude !== hasLongitude) {
+        return res.status(400).json({
+            message: 'Latitude dan longitude harus diisi bersamaan.',
+        });
+    }
+
+    if (hasLatitude && hasLongitude) {
+        latitude = Number(req.body.latitude);
+        longitude = Number(req.body.longitude);
+
+        if (
+            !Number.isFinite(latitude) ||
+            !Number.isFinite(longitude) ||
+            latitude < -90 ||
+            latitude > 90 ||
+            longitude < -180 ||
+            longitude > 180
+        ) {
+            return res.status(400).json({
+                message: 'Koordinat lokasi tidak valid.',
+            });
+        }
+    }
+
+    if (rawAreaId !== undefined && rawAreaId !== null && rawAreaId !== '') {
+        areaId = Number(rawAreaId);
+
+        if (!Number.isInteger(areaId) || areaId <= 0) {
+            return res.status(400).json({
+                message: 'Wilayah tempat tinggal tidak valid.',
+            });
+        }
     }
 
     const client = await pool.connect();
@@ -157,40 +224,101 @@ async function registerWarga(req, res) {
     try {
         await client.query('BEGIN');
 
+        let finalVillageName = villageName || null;
+
+        // Pastikan area_id benar-benar ada di database.
+        if (areaId !== null) {
+            const areaResult = await client.query(
+                `SELECT area_id, village_name
+                 FROM areas
+                 WHERE area_id = $1`,
+                [areaId]
+            );
+
+            if (!areaResult.rows.length) {
+                await client.query('ROLLBACK');
+
+                return res.status(400).json({
+                    message: 'Wilayah tidak ditemukan dalam data LAPORMAS.',
+                });
+            }
+
+            finalVillageName =
+                areaResult.rows[0].village_name;
+        }
+
         const passwordHash = await bcrypt.hash(password, 10);
 
         const userResult = await client.query(`
-            INSERT INTO users (name, email, password_hash, role)
+            INSERT INTO users (
+                name,
+                email,
+                password_hash,
+                role
+            )
             VALUES ($1, $2, $3, 'warga')
             RETURNING user_id
-        `, [name, email, passwordHash]);
+        `, [
+            name,
+            email,
+            passwordHash,
+        ]);
 
         await client.query(`
-            INSERT INTO user_profiles (user_id, phone, address)
-            VALUES ($1, $2, $3)
-        `, [userResult.rows[0].user_id, phone, address]);
+            INSERT INTO user_profiles (
+                user_id,
+                phone,
+                address,
+                village_name,
+                area_id,
+                latitude,
+                longitude
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `, [
+            userResult.rows[0].user_id,
+            phone,
+            address,
+            finalVillageName,
+            areaId,
+            latitude,
+            longitude,
+        ]);
 
         await client.query('COMMIT');
 
-        return res.status(201).json({ message: 'Akun warga berhasil dibuat. Silakan masuk.' });
+        return res.status(201).json({
+            message: areaId
+                ? 'Akun warga berhasil dibuat. Wilayah menunggu verifikasi admin'
+                : 'Akun warga berhasil dibuat. Wilayah tempat tinggal menunggu verifikasi admin',
+        });
+
     } catch (error) {
         await client.query('ROLLBACK');
 
         if (error.code === '23505') {
-            return res.status(409).json({ message: 'Email sudah terdaftar. Silakan masuk atau gunakan email lain.' });
+            return res.status(409).json({
+                message: 'Email sudah terdaftar. Silakan masuk atau gunakan email lain',
+            });
         }
 
-        console.error('Gagal mendaftar warga:', error.message);
-        return res.status(500).json({ message: 'Gagal membuat akun warga.' });
+        console.error(
+            'Gagal mendaftar warga:',
+            error.message
+        );
+
+        return res.status(500).json({
+            message: 'Gagal membuat akun warga, Silakan coba lagi',
+        });
+
     } finally {
         client.release();
     }
 }
 
-
 // PATCH /api/auth/me  (wajib login)
 // Body: { name, phone, address, area_id? }
-// area_id hanya bisa diubah oleh warga (area tugas pengelola diatur admin).
+// area_id hanya bisa diubah oleh warga (area tugas pengelola diatur admin)
 async function updateMe(req, res) {
     const name = String(req.body?.name || '').trim();
     // undefined = field tidak dikirim, nilai lama dipertahankan
@@ -199,15 +327,15 @@ async function updateMe(req, res) {
     const rawAreaId = req.body?.area_id;
 
     if (!name) {
-        return res.status(400).json({ message: 'Nama lengkap wajib diisi.' });
+        return res.status(400).json({ message: 'Nama lengkap wajib diisi' });
     }
 
     if (name.length > 150) {
-        return res.status(400).json({ message: 'Nama lengkap maksimal 150 karakter.' });
+        return res.status(400).json({ message: 'Nama lengkap maksimal 150 karakter' });
     }
 
     if (phone && !/^[0-9+\s-]{8,20}$/.test(phone)) {
-        return res.status(400).json({ message: 'Nomor telepon hanya boleh berisi angka, spasi, +, atau - (8-20 karakter).' });
+        return res.status(400).json({ message: 'Nomor telepon hanya boleh berisi angka, spasi, +, atau - (8-20 karakter)' });
     }
 
     let areaId;
@@ -217,7 +345,7 @@ async function updateMe(req, res) {
         } else {
             areaId = Number(rawAreaId);
             if (!Number.isInteger(areaId) || areaId <= 0) {
-                return res.status(400).json({ message: 'Area tempat tinggal tidak valid.' });
+                return res.status(400).json({ message: 'Area tempat tinggal tidak valid' });
             }
         }
     }
@@ -231,7 +359,7 @@ async function updateMe(req, res) {
             const area = await client.query('SELECT village_name FROM areas WHERE area_id = $1', [areaId]);
             if (!area.rows.length) {
                 await client.query('ROLLBACK');
-                return res.status(400).json({ message: 'Area tempat tinggal tidak ditemukan.' });
+                return res.status(400).json({ message: 'Area tempat tinggal tidak ditemukan' });
             }
         }
 
@@ -266,7 +394,7 @@ async function updateMe(req, res) {
     } catch (error) {
         await client.query('ROLLBACK');
         console.error('Gagal memperbarui profil:', error.message);
-        return res.status(500).json({ message: 'Gagal memperbarui profil.' });
+        return res.status(500).json({ message: 'Gagal memperbarui profil' });
     } finally {
         client.release();
     }
@@ -279,15 +407,15 @@ async function changePassword(req, res) {
     const newPassword = String(req.body?.new_password || '');
 
     if (!currentPassword || !newPassword) {
-        return res.status(400).json({ message: 'Isi kata sandi lama dan kata sandi baru.' });
+        return res.status(400).json({ message: 'Isi kata sandi lama dan kata sandi baru' });
     }
 
     if (newPassword.length < 8) {
-        return res.status(400).json({ message: 'Kata sandi baru minimal 8 karakter.' });
+        return res.status(400).json({ message: 'Kata sandi baru minimal 8 karakter' });
     }
 
     if (newPassword === currentPassword) {
-        return res.status(400).json({ message: 'Kata sandi baru harus berbeda dari kata sandi lama.' });
+        return res.status(400).json({ message: 'Kata sandi baru harus berbeda dari kata sandi lama' });
     }
 
     try {
@@ -295,16 +423,16 @@ async function changePassword(req, res) {
         const row = result.rows[0];
 
         if (!row || !(await bcrypt.compare(currentPassword, row.password_hash))) {
-            return res.status(400).json({ message: 'Kata sandi lama belum sesuai.' });
+            return res.status(400).json({ message: 'Kata sandi lama belum sesuai' });
         }
 
         const passwordHash = await bcrypt.hash(newPassword, 10);
         await pool.query('UPDATE users SET password_hash = $1 WHERE user_id = $2', [passwordHash, req.user.user_id]);
 
-        return res.status(200).json({ message: 'Kata sandi berhasil diganti.' });
+        return res.status(200).json({ message: 'Kata sandi berhasil diganti' });
     } catch (error) {
         console.error('Gagal mengganti kata sandi:', error.message);
-        return res.status(500).json({ message: 'Gagal mengganti kata sandi.' });
+        return res.status(500).json({ message: 'Gagal mengganti kata sandi' });
     }
 }
 

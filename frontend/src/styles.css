@@ -4246,3 +4246,624 @@ tbody tr:hover {background: #f8fbf8;}
 .auth-page-v2 .admin-entry {
   display: none !important;
 }
+
+/* =====================================================
+   AUTH LAYOUT - PANEL KIRI TETAP, PANEL KANAN SCROLL
+   ===================================================== */
+
+.auth-page-v2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.auth-page-v2 .auth-visual {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.auth-page-v2 .auth-form-side {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #b9cdbd #f5f8f5;
+}
+
+.auth-page-v2 .auth-form-side::-webkit-scrollbar {
+  width: 7px;
+}
+
+.auth-page-v2 .auth-form-side::-webkit-scrollbar-track {
+  background: #f5f8f5;
+}
+
+.auth-page-v2 .auth-form-side::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #b9cdbd;
+}
+
+/* Khusus halaman daftar */
+
+.auth-page-v2 .auth-register-side {
+  display: block;
+  padding: 28px 38px 35px;
+}
+
+.auth-register-wrap {
+  width: min(100%, 460px);
+  margin: 0 auto;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 760px) {
+  .auth-page-v2 {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .auth-page-v2 .auth-visual {
+    width: 100%;
+    height: 320px;
+    min-height: 320px;
+    flex: 0 0 320px;
+  }
+
+  .auth-page-v2 .auth-form-side {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .auth-page-v2 .auth-register-side {
+    padding: 30px 23px 40px;
+  }
+}
+
+/* =====================================================
+   REGISTER PAGE - FIGMA REFINEMENT
+   ===================================================== */
+
+.auth-register-side {
+  background: #ffffff;
+}
+
+.auth-register-title {
+  margin-bottom: 19px;
+}
+
+.auth-register-title h2 {
+  margin: 0 0 6px;
+  color: #111111;
+  font-family: Manrope, sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.auth-register-title p {
+  margin: 0;
+  color: #66736a;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+/* ROLE SWITCH */
+
+.auth-register-role-switch {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 22px;
+  border-radius: 11px;
+  background: #17643a;
+}
+
+.auth-register-role-switch a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 35px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-register-role-switch a.active {
+  background: #ffffff;
+  color: #17643a;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.12);
+}
+
+/* BAGIAN FORM */
+
+.auth-register-form {
+  gap: 16px;
+}
+
+.auth-register-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-register-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #dce5de;
+}
+
+.auth-register-section-heading h3 {
+  margin: 0;
+  color: #17643a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.auth-register-section-heading > span {
+  color: #84958a;
+  font-size: 9px;
+}
+
+.auth-register-hint {
+  margin: -3px 0 2px;
+  color: #84958a;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* FIELD GRID */
+
+.auth-register-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 10px;
+}
+
+.auth-register-grid label,
+.auth-register-form > label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  color: #29362d;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.auth-register-grid input,
+.auth-register-form > label > input,
+.auth-register-grid select {
+  width: 100%;
+  min-width: 0;
+  min-height: 39px;
+  padding: 9px 11px;
+  border: 1px solid #d5ddd7;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #183d2b;
+  font-size: 10px;
+  font-weight: 400;
+  outline: none;
+  box-shadow: none;
+}
+
+.auth-register-grid input:focus,
+.auth-register-form > label > input:focus,
+.auth-register-grid select:focus {
+  border-color: #73a17c;
+  box-shadow: 0 0 0 3px rgba(42, 125, 66, 0.08);
+}
+
+.auth-register-grid input::placeholder {
+  color: #a0aaa3;
+}
+
+.auth-register-full {
+  grid-column: 1 / -1;
+}
+
+/* PETA LOKASI */
+
+.registration-location-picker {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #e0ebe2;
+  border-radius: 10px;
+  background: #f1f7f2;
+}
+
+.registration-map-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+  min-height: 42px;
+  padding: 7px 10px;
+  background: #eaf4ec;
+}
+
+.registration-map-toolbar > span,
+.registration-map-toolbar > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #315a3f;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.registration-map-toolbar > button {
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 20px;
+  background: #17643a;
+  color: #ffffff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.registration-map-toolbar > button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.registration-map-canvas {
+  width: 100%;
+  height: 185px;
+  background: #e4f0e6;
+}
+
+.registration-map-canvas .leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.registration-map-coordinate {
+  padding: 7px 10px;
+  color: #63786a;
+  background: #ffffff;
+  font-size: 9px;
+}
+
+/* FEEDBACK GPS */
+
+.auth-location-feedback {
+  margin-top: -7px;
+  color: #688071;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.auth-location-feedback.done {
+  color: #17643a;
+}
+
+.auth-location-feedback.error {
+  color: #b44b40;
+}
+
+/* KOORDINAT DAN WILAYAH */
+
+.auth-coordinate-grid {
+  margin-top: 2px;
+}
+
+.auth-area-heading {
+  margin-top: 5px;
+}
+
+.auth-area-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.auth-area-grid input:disabled {
+  min-height: 36px;
+  padding: 8px;
+  background: #f1f4f1;
+  color: #859389;
+  opacity: 1;
+}
+
+.auth-area-grid input:disabled::placeholder {
+  color: #8e9d91;
+  font-size: 9px;
+}
+
+.auth-register-privacy {
+  margin-top: 3px;
+  padding: 10px;
+  font-size: 9px;
+}
+
+/* PERSETUJUAN */
+
+.auth-register-consent {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 8px !important;
+  margin: 2px 0;
+  color: #526457 !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.auth-register-consent input {
+  width: 14px;
+  height: 14px;
+  min-height: 14px;
+  flex: 0 0 14px;
+  margin: 1px 0 0;
+  accent-color: #17643a;
+}
+
+/* TOMBOL DAFTAR */
+
+.auth-register-submit {
+  min-height: 43px;
+  margin-top: 1px;
+  border-radius: 8px;
+  background: #c5820d;
+  border-color: #c5820d;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.auth-register-submit:hover:not(:disabled) {
+  background: #aa6f07;
+  border-color: #aa6f07;
+}
+
+/* LINK LOGIN */
+
+.auth-register-login {
+  margin: 18px 0 5px;
+  color: #59675e;
+  font-size: 10px;
+  text-align: center;
+}
+
+.auth-register-login a {
+  color: #4778c5;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-register-login a:hover {
+  text-decoration: underline;
+}
+
+/* FORM PENGELOLA */
+
+.auth-register-form .upload-field {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.auth-register-form .upload-field > span {
+  min-width: 0;
+  flex: 1;
+}
+
+.auth-register-form .upload-field small {
+  overflow-wrap: anywhere;
+}
+
+/* =====================================================
+   REGISTER RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 760px) {
+  .auth-register-wrap {
+    width: 100%;
+  }
+
+  .auth-register-side {
+    padding: 28px 22px 38px;
+  }
+}
+
+@media (max-width: 460px) {
+  .auth-register-title h2 {
+    font-size: 23px;
+  }
+
+  .auth-register-grid {
+    gap: 11px 8px;
+  }
+
+  .auth-register-grid input,
+  .auth-register-form > label > input,
+  .auth-register-grid select {
+    font-size: 10px;
+    padding: 9px;
+  }
+
+  .auth-area-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .registration-map-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .registration-map-canvas {
+    height: 180px;
+  }
+}
+
+/* FIX REGISTER: POSISI ATAS DAN SCROLL MANDIRI */
+
+.auth-page-v2 .auth-register-side {
+  display: block !important;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding: 28px 38px 38px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #b9cdbd #f5f8f5;
+}
+
+.auth-page-v2 .auth-register-wrap {
+  width: min(100%, 460px);
+  margin: 0 auto;
+}
+
+/* CHECKBOX PERSETUJUAN */
+
+.auth-page-v2 .auth-register-consent input[type="checkbox"] {
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  display: inline-block;
+  width: 14px !important;
+  height: 14px !important;
+  min-width: 14px !important;
+  min-height: 14px !important;
+  flex: 0 0 14px;
+  padding: 0 !important;
+  margin: 2px 0 0 !important;
+  border-radius: 3px;
+  box-shadow: none !important;
+  accent-color: #17643a;
+}
+
+/* JARAK ANTARFIELD */
+
+.auth-page-v2 .auth-register-form {
+  gap: 14px;
+}
+
+.auth-page-v2 .auth-register-section {
+  gap: 10px;
+}
+
+/* MOBILE */
+
+@media (max-width: 760px) {
+  .auth-page-v2 .auth-register-side {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: 28px 22px 38px;
+  }
+}
+
+/* =====================================================
+   FINAL FIX REGISTER PAGE
+   ===================================================== */
+
+/* PANEL KANAN: MULAI DARI ATAS DAN SCROLL SENDIRI */
+
+.auth-page-v2 .auth-register-side {
+  display: block !important;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  padding: 26px 38px 35px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #b9cdbd #f5f8f5;
+}
+
+.auth-page-v2 .auth-register-wrap {
+  width: min(100%, 460px);
+  margin: 0 auto;
+}
+
+/* CHECKBOX NORMAL */
+
+.auth-page-v2 .auth-register-consent {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  cursor: pointer;
+}
+
+.auth-page-v2 .auth-register-consent input[type="checkbox"] {
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  display: inline-block !important;
+  width: 14px !important;
+  min-width: 14px !important;
+  max-width: 14px !important;
+  height: 14px !important;
+  min-height: 14px !important;
+  max-height: 14px !important;
+  flex: 0 0 14px !important;
+  padding: 0 !important;
+  margin: 2px 0 0 !important;
+  border-radius: 3px !important;
+  box-shadow: none !important;
+  accent-color: #17643a;
+}
+
+/* ATRIBUSI MAP */
+
+.registration-map-attribution {
+  margin-top: -7px;
+  color: #87958b;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.registration-map-attribution a {
+  color: #477354;
+  text-decoration: underline;
+}
+
+/* WILAYAH OTOMATIS */
+
+.auth-page-v2 .auth-area-grid input {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 760px) {
+  .auth-page-v2 .auth-register-side {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: 28px 22px 38px;
+  }
+
+  .auth-page-v2 .auth-register-wrap {
+    width: 100%;
+  }
+}

@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     address TEXT,
     village_name VARCHAR(150),
     area_id BIGINT,
+    latitude NUMERIC(10, 7),
+    longitude NUMERIC(10, 7),
     area_verification_status VARCHAR(20) NOT NULL DEFAULT 'menunggu',
     location_check_status VARCHAR(20) NOT NULL DEFAULT 'belum_diperiksa',
     location_checked_at TIMESTAMPTZ,
@@ -177,4 +179,4 @@ ON CONFLICT (status_name) DO NOTHING;
 
 -- Cek hasil pembuatan tabel:
 -- SELECT table_name FROM information_schema.tables
--- WHERE table_schema = 'public' ORDER BY table_name;
+-- WHERE table_schema = 'public' ORDER BY table_name;

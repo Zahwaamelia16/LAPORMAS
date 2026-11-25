@@ -8,6 +8,7 @@ import CitizenDashboardPage from './pages/warga/WargaDashboard';
 import CitizenReportsPage from './pages/warga/WargaReports';
 import NewReportPageModule from './pages/warga/NewReportPage';
 import ProfilePageModule from './pages/warga/ProfilePage';
+import RegistrationLocationPicker from './components/RegistrationLocationPicker';
 
 import StaffDashboardPage from './pages/pengelola/PengelolaDashboard';
 import StaffReportsPage from './pages/pengelola/PengelolaReports';
@@ -1298,6 +1299,38 @@ function AboutPage() {
 }
 
 
+function AuthVisualPanel() {
+  return (
+    <section className="auth-visual">
+      <div className="auth-visual-bg">
+        <img
+          src="/images/bg%20login.png"
+          alt="Pemandangan lingkungan LAPORMAS"
+        />
+      </div>
+
+      <div className="auth-visual-overlay"></div>
+
+      <Link to="/" className="auth-logo">
+        <img src="/images/logo.png" alt="LAPORMAS" />
+      </Link>
+
+      <div className="auth-visual-copy">
+        <h1>
+          Lingkungan lebih baik,
+          <br />
+          dimulai dari laporanmu
+        </h1>
+
+        <p>
+          Platform pelaporan masalah lingkungan yang memudahkan
+          warga dan pengelola bekerja sama menjaga kenyamanan bersama.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function LoginPage() {
   const { login, user } = useAuth();
   const navigate = useNavigate();
@@ -1369,45 +1402,7 @@ function LoginPage() {
     <div className="auth-page auth-page-v2">
 
       {/* PANEL KIRI */}
-      <section className="auth-visual">
-
-        {/* Background foto */}
-        <div className="auth-visual-bg">
-          <img
-            src="/images/bg%20login.png"
-            alt="Pemandangan lingkungan LAPORMAS"
-          />
-        </div>
-
-        {/* Overlay hijau */}
-        <div className="auth-visual-overlay"></div>
-
-        {/* Logo */}
-        <Link to="/" className="auth-logo">
-          <img
-            src="/images/logo.png"
-            alt="LAPORMAS"
-          />
-        </Link>
-
-        {/* Teks utama */}
-        <div className="auth-visual-copy">
-
-          <h1>
-            Lingkungan lebih baik,
-            <br />
-            dimulai dari laporanmu
-          </h1>
-
-          <p>
-            Platform pelaporan masalah lingkungan yang
-            memudahkan warga dan pengelola bekerja sama
-            menjaga kenyamanan bersama.
-          </p>
-
-        </div>
-
-      </section>
+      <AuthVisualPanel />
 
       {/* PANEL KANAN */}
       <section className="auth-form-side">
@@ -1566,144 +1561,851 @@ function LoginPage() {
   );
 }
 
+
+
 function RegisterCitizen() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', password: '' });
+
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    password: '',
+  });
+
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [accepted, setAccepted] = useState(false);
+
   const [position, setPosition] = useState(null);
-  const [locState, setLocState] = useState('idle');
-  const [locMessage, setLocMessage] = useState('Lokasi wajib dideteksi melalui GPS perangkat.');
+  const [gpsBusy, setGpsBusy] = useState(false);
+
+  const [locationResult, setLocationResult] = useState(null);
+  const [lookupStatus, setLookupStatus] = useState('idle');
+  const [lookupMessage, setLookupMessage] = useState(
+    'Tentukan lokasi rumahmu melalui peta atau GPS.'
+  );
+
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const update = (k, v) => setForm(o => ({ ...o, [k]: v }));
-  const detect = async () => {
-    setLocState('loading');
-    setLocMessage('Sedang mendeteksi lokasi GPS...');
+
+  const latitude = position?.latitude ?? null;
+  const longitude = position?.longitude ?? null;
+
+  const update = (key, value) => {
+    setForm((current) => ({
+      ...current,
+      [key]: value,
+    }));
+  };
+
+  // Cari alamat setiap kali titik peta berubah.
+  useEffect(() => {
+    if (latitude === null || longitude === null) {
+      return undefined;
+    }
+
+    let active = true;
+
+    setLocationResult(null);
+    setLookupStatus('loading');
+    setLookupMessage('Sedang mencari alamat dan wilayah...');
+
+    // Debounce agar tidak mengirim permintaan saat pin
+    // masih sering dipindahkan.
+    const timer = setTimeout(async () => {
+      try {
+        const data = await api('/auth/reverse-geocode', {
+          method: 'POST',
+          body: {
+            latitude,
+            longitude,
+          },
+        });
+
+        if (!active) return;
+
+        setLocationResult(data);
+
+        // Alamat otomatis mengisi kolom tempat tinggal.
+        if (data.displayAddress) {
+          setForm((current) => ({
+            ...current,
+            address: data.displayAddress,
+          }));
+        }
+
+        if (data.matchedArea) {
+          const area = data.matchedArea;
+
+          setLookupStatus('matched');
+
+          setLookupMessage(
+            `Wilayah ditemukan: Desa ${area.village_name}, Kec. ${area.district_name}, ${area.regency_name}.`
+          );
+        } else {
+          setLookupStatus('unmatched');
+
+          setLookupMessage(
+            'Alamat ditemukan, tetapi wilayah belum cocok dengan data wilayah LAPORMAS. Data akan menunggu verifikasi admin.'
+          );
+        }
+
+      } catch (err) {
+        if (!active) return;
+
+        setLookupStatus('error');
+        setLookupMessage(
+          `${err.message} Silakan isi alamat secara manual jika diperlukan.`
+        );
+      }
+    }, 1200);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [latitude, longitude]);
+
+  // Perubahan lokasi dari GPS atau peta.
+  const choosePosition = (point) => {
+    setPosition({
+      latitude: Number(point.latitude),
+      longitude: Number(point.longitude),
+      accuracy: point.accuracy ?? null,
+    });
+
+    setLocationResult(null);
+    setForm((current) => ({
+      ...current,
+      address: '',
+    }));
+
     setError('');
+  };
+
+  // Deteksi GPS perangkat.
+  const detect = async () => {
+    setGpsBusy(true);
+    setError('');
+
     try {
-      const p = await getPosition();
-      setPosition(p);
-      setLocState('done');
-      setLocMessage(`Lokasi berhasil dideteksi (akurasi ±${Math.round(p.accuracy)} meter).`);
-    } catch (e) {
-      setPosition(null);
-      setLocState('error');
-      setLocMessage(e.message);
+      const point = await getPosition();
+
+      choosePosition(point);
+    } catch (err) {
+      setLookupStatus('error');
+      setLookupMessage(err.message);
+    } finally {
+      setGpsBusy(false);
     }
   };
-  const submit = async (e) => {
-    e.preventDefault();
+
+  // Submit pendaftaran.
+  const submit = async (event) => {
+    event.preventDefault();
+
     setError('');
     setSuccess('');
-    if (!position) return setError('Deteksi lokasi GPS terlebih dahulu sebelum mendaftar.');
+
+    if (form.password.length < 8) {
+      return setError('Kata sandi minimal 8 karakter.');
+    }
+
+    if (form.password !== confirmPassword) {
+      return setError('Konfirmasi kata sandi tidak sama.');
+    }
+
+    if (!position) {
+      return setError('Tentukan lokasi rumahmu terlebih dahulu.');
+    }
+
+    if (lookupStatus === 'loading') {
+      return setError('Tunggu sampai pencarian alamat selesai.');
+    }
+
+    if (!form.address.trim()) {
+      return setError('Alamat tempat tinggal wajib diisi.');
+    }
+
+    if (!accepted) {
+      return setError(
+        'Setujui Syarat & Ketentuan dan Kebijakan Privasi terlebih dahulu.'
+      );
+    }
+
     setBusy(true);
+
     try {
-      const d = await api('/auth/register/warga', { method: 'POST', body: { ...form, ...position } });
-      setSuccess(d.message);
-      setTimeout(() => navigate('/masuk'), 1800);
-    } catch (e) {
-      setError(e.message);
+      const data = await api('/auth/register/warga', {
+        method: 'POST',
+
+        body: {
+          ...form,
+          latitude: position.latitude,
+          longitude: position.longitude,
+
+          area_id:
+            locationResult?.matchedArea?.area_id || null,
+
+          village_name:
+            locationResult?.matchedArea?.village_name ||
+            locationResult?.administrative?.village ||
+            '',
+        },
+      });
+
+      setSuccess(data.message);
+
+      setTimeout(() => {
+        navigate('/masuk?role=warga');
+      }, 1800);
+
+    } catch (err) {
+      setError(err.message);
     } finally {
       setBusy(false);
     }
   };
-  return <div className="auth-simple">
-    <Link to="/" className="brand">LAPORMAS</Link>
-    <div className="auth-card register-card">
-      <Link to="/masuk" className="back-link"><ArrowLeft size={16} aria-hidden="true" /> Kembali ke masuk</Link>
-      <span className="eyebrow">AKUN WARGA</span>
-      <h1>Buat akun warga</h1>
-      <p>Daftarkan dirimu agar bisa melaporkan masalah lingkungan di berbagai wilayah.</p>
-      <form onSubmit={submit} className="form-stack">
-        <div className="field-grid">
-          <label>Nama lengkap<input value={form.name} onChange={e => update('name', e.target.value)} required /></label>
-          <label>Email<input type="email" value={form.email} onChange={e => update('email', e.target.value)} required /></label>
-          <label>Nomor telepon<input type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} required /></label>
-          <label>Alamat tempat tinggal<input value={form.address} onChange={e => update('address', e.target.value)} required /></label>
+
+  const area = locationResult?.matchedArea;
+  const administrative = locationResult?.administrative || {};
+
+  return (
+    <div className="auth-page auth-page-v2 auth-register-page">
+
+      <AuthVisualPanel />
+
+      <section className="auth-form-side auth-register-side">
+
+        <div className="auth-register-wrap">
+
+          {/* HEADER PENDAFTARAN */}
+          <div className="auth-register-title">
+            <h2>Buat akun warga</h2>
+
+            <p>
+              Daftar untuk melapor dan memantau penyelesaian
+              masalah di wilayahmu.
+            </p>
+          </div>
+
+          {/* PILIH ROLE */}
+          <div className="auth-register-role-switch">
+            <Link to="/daftar" className="active">
+              Warga
+            </Link>
+
+            <Link to="/daftar-pengelola">
+              Pengelola
+            </Link>
+          </div>
+
+          <form
+            onSubmit={submit}
+            className="form-stack auth-register-form"
+          >
+
+            {/* DATA AKUN */}
+            <section className="auth-register-section">
+
+              <div className="auth-register-section-heading">
+                <h3>Data akun</h3>
+              </div>
+
+              <label>
+                Nama lengkap
+
+                <input
+                  value={form.name}
+                  onChange={(event) =>
+                    update('name', event.target.value)
+                  }
+                  placeholder="Masukkan nama lengkapmu"
+                  autoComplete="name"
+                  required
+                />
+              </label>
+
+              <div className="auth-register-grid">
+
+                <label>
+                  Email
+
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(event) =>
+                      update('email', event.target.value)
+                    }
+                    placeholder="nama@gmail.com"
+                    autoComplete="email"
+                    required
+                  />
+                </label>
+
+                <label>
+                  No. telepon
+
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(event) =>
+                      update('phone', event.target.value)
+                    }
+                    placeholder="082345679854"
+                    autoComplete="tel"
+                    required
+                  />
+                </label>
+
+                <label>
+                  Kata sandi
+
+                  <input
+                    type="password"
+                    minLength="8"
+                    value={form.password}
+                    onChange={(event) =>
+                      update('password', event.target.value)
+                    }
+                    placeholder="Minimal 8 karakter"
+                    autoComplete="new-password"
+                    required
+                  />
+                </label>
+
+                <label>
+                  Konfirmasi kata sandi
+
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(event) =>
+                      setConfirmPassword(event.target.value)
+                    }
+                    placeholder="Ulangi kata sandi"
+                    autoComplete="new-password"
+                    required
+                  />
+                </label>
+
+              </div>
+
+            </section>
+
+            {/* LOKASI TEMPAT TINGGAL */}
+            <section className="auth-register-section">
+
+              <div className="auth-register-section-heading">
+                <h3>Lokasi tempat tinggal</h3>
+              </div>
+
+              <p className="auth-register-hint">
+                Tandai titik koordinat rumahmu agar laporanmu
+                otomatis diarahkan ke wilayah yang tepat
+              </p>
+
+              <label>
+                Alamat tempat tinggal
+
+                <input
+                  value={form.address}
+                  onChange={(event) =>
+                    update('address', event.target.value)
+                  }
+                  placeholder="Alamat akan terisi setelah lokasi terdeteksi"
+                  autoComplete="street-address"
+                  required
+                />
+              </label>
+
+              <RegistrationLocationPicker
+                position={position}
+                onChange={choosePosition}
+                onUseMyLocation={detect}
+                detecting={gpsBusy}
+              />
+
+              <div
+                className={`auth-location-feedback ${lookupStatus}`}
+              >
+                {lookupMessage}
+              </div>
+
+              {/* SUMBER DATA ALAMAT */}
+              <div className="registration-map-attribution">
+                Data alamat:
+                {' '}
+                <a
+                  href="https://www.openstreetmap.org/copyright"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  © OpenStreetMap contributors
+                </a>
+              </div>
+
+              {/* KOORDINAT */}
+              <div className="auth-register-grid auth-coordinate-grid">
+
+                <label>
+                  Latitude
+
+                  <input
+                    value={
+                      position
+                        ? position.latitude.toFixed(6)
+                        : ''
+                    }
+                    placeholder="Contoh: -7.257500"
+                    readOnly
+                  />
+                </label>
+
+                <label>
+                  Longitude
+
+                  <input
+                    value={
+                      position
+                        ? position.longitude.toFixed(6)
+                        : ''
+                    }
+                    placeholder="Contoh: 112.752100"
+                    readOnly
+                  />
+                </label>
+
+              </div>
+
+              {/* WILAYAH OTOMATIS */}
+              <div className="auth-register-section-heading auth-area-heading">
+                <h3>Wilayah tempat tinggal</h3>
+
+                <span>
+                  {lookupStatus === 'matched'
+                    ? 'Berhasil dicocokkan'
+                    : lookupStatus === 'loading'
+                      ? 'Mendeteksi...'
+                      : 'Hasil deteksi lokasi'}
+                </span>
+              </div>
+
+              <div className="auth-register-grid auth-area-grid">
+
+                <label>
+                  Kabupaten/Kota
+
+                  <input
+                    value={
+                      area?.regency_name ||
+                      administrative.regency ||
+                      ''
+                    }
+                    placeholder="Terisi otomatis"
+                    readOnly
+                  />
+                </label>
+
+                <label>
+                  Kecamatan
+
+                  <input
+                    value={
+                      area?.district_name ||
+                      administrative.district ||
+                      ''
+                    }
+                    placeholder="Terisi otomatis"
+                    readOnly
+                  />
+                </label>
+
+                <label className="auth-area-village">
+                  Desa/Kelurahan
+
+                  <input
+                    value={
+                      area?.village_name ||
+                      administrative.village ||
+                      ''
+                    }
+                    placeholder="Terisi otomatis"
+                    readOnly
+                  />
+                </label>
+
+              </div>
+
+              {lookupStatus === 'unmatched' && (
+                <Notice type="info">
+                  Nama wilayah berhasil dideteksi, tetapi belum
+                  terdaftar di master wilayah LAPORMAS. Akun akan
+                  menunggu verifikasi wilayah oleh admin.
+                </Notice>
+              )}
+
+              <div className="notice info auth-register-privacy">
+                <ShieldCheck size={16} aria-hidden="true" />
+
+                <span>
+                  Koordinat digunakan untuk membantu menentukan
+                  wilayah tempat tinggal dan tidak ditampilkan
+                  pada laporan publik.
+                </span>
+              </div>
+
+            </section>
+
+            {/* PERSETUJUAN */}
+            <label className="auth-register-consent">
+
+              <input
+                type="checkbox"
+                checked={accepted}
+                onChange={(event) =>
+                  setAccepted(event.target.checked)
+                }
+                required
+              />
+
+              <span>
+                Saya menyetujui Syarat &amp; Ketentuan dan
+                Kebijakan Privasi LAPORMAS.
+              </span>
+
+            </label>
+
+            {error && <Notice type="error">{error}</Notice>}
+            {success && <Notice type="success">{success}</Notice>}
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-block auth-register-submit"
+              disabled={busy || gpsBusy || lookupStatus === 'loading'}
+            >
+              {busy
+                ? 'Membuat akun...'
+                : lookupStatus === 'loading'
+                  ? 'Mendeteksi lokasi...'
+                  : 'Daftar'}
+            </button>
+
+          </form>
+
+          <div className="auth-register-login">
+            Sudah punya akun?
+            {' '}
+            <Link to="/masuk?role=warga">
+              Masuk
+            </Link>
+          </div>
+
         </div>
-        <div className={`location-box ${locState}`}>
-          <div><LocateFixed /><div><b>Lokasi pendaftaran</b><span>{locMessage}</span>{position && <small>Lat {position.latitude.toFixed(6)} · Long {position.longitude.toFixed(6)}</small>}</div></div>
-          <button type="button" className="btn btn-outline btn-small" onClick={detect} disabled={locState === 'loading'}>{locState === 'loading' ? 'Mendeteksi...' : 'Deteksi lokasi'}</button>
-        </div>
-        <label>Kata sandi<input type="password" minLength="8" value={form.password} onChange={e => update('password', e.target.value)} placeholder="Minimal 8 karakter" required /></label>
-        {error && <Notice type="error">{error}</Notice>}
-        {success && <Notice type="success">{success}</Notice>}
-        <button className="btn btn-primary btn-block" disabled={busy || !position}>{busy ? 'Membuat akun...' : 'Daftar sebagai warga'}</button>
-      </form>
-      <div className="auth-signup">Sudah punya akun? <Link to="/masuk">Masuk</Link></div>
+
+      </section>
+
     </div>
-  </div>;
+  );
 }
 
 function RegisterStaff() {
   const [areas, setAreas] = useState([]);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', agency: '', unit_name: '', office_address: '', area_id: '', password: '' });
+
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    agency: '',
+    unit_name: '',
+    office_address: '',
+    area_id: '',
+    password: '',
+  });
+
   const [proof, setProof] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
   useEffect(() => {
-    api('/areas').then(d => setAreas(d.areas)).catch(() => { });
+    api('/areas')
+      .then((data) => setAreas(data.areas || []))
+      .catch(() => {});
   }, []);
-  const update = (k, v) => setForm(o => ({ ...o, [k]: v }));
-  const submit = async (e) => {
-    e.preventDefault();
+
+  const update = (key, value) => {
+    setForm((current) => ({
+      ...current,
+      [key]: value,
+    }));
+  };
+
+  const submit = async (event) => {
+    event.preventDefault();
+
     setError('');
     setSuccess('');
-    if (!proof) return setError('Unggah bukti penugasan terlebih dahulu.');
+
+    if (!proof) {
+      return setError('Unggah bukti penugasan terlebih dahulu.');
+    }
+
     const body = new FormData();
-    Object.entries(form).forEach(([k, v]) => body.append(k, v));
+
+    Object.entries(form).forEach(([key, value]) => {
+      body.append(key, value);
+    });
+
     body.append('proof', proof);
+
     setBusy(true);
+
     try {
-      const d = await api('/auth/register/petugas', { method: 'POST', body });
-      setSuccess(d.message);
-      setForm({ name: '', email: '', phone: '', agency: '', unit_name: '', office_address: '', area_id: '', password: '' });
+      const data = await api('/auth/register/petugas', {
+        method: 'POST',
+        body,
+      });
+
+      setSuccess(data.message);
+
+      setForm({
+        name: '',
+        email: '',
+        phone: '',
+        agency: '',
+        unit_name: '',
+        office_address: '',
+        area_id: '',
+        password: '',
+      });
+
       setProof(null);
-    } catch (e) {
-      setError(e.message);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setBusy(false);
     }
   };
-  return <div className="auth-simple">
-    <Link to="/" className="brand">LAPORMAS</Link>
-    <div className="auth-card register-card wide">
-      <Link to="/masuk?role=pengelola" className="back-link"><ArrowLeft size={16} aria-hidden="true" /> Kembali ke masuk</Link>
-      <span className="eyebrow">PENGAJUAN AKUN</span>
-      <h1>Daftar sebagai pengelola</h1>
-      <p>Pengajuan akan diperiksa admin. Akses pengelola diberikan setelah penugasan disetujui.</p>
-      <form onSubmit={submit} className="form-stack">
-        <div className="field-grid">
-          <label>Nama lengkap<input value={form.name} onChange={e => update('name', e.target.value)} required /></label>
-          <label>Email dinas<input type="email" value={form.email} onChange={e => update('email', e.target.value)} required /></label>
-          <label>Nomor telepon<input value={form.phone} onChange={e => update('phone', e.target.value)} required /></label>
-          <label>Instansi<input value={form.agency} onChange={e => update('agency', e.target.value)} required /></label>
-          <label>Unit kerja<input value={form.unit_name} onChange={e => update('unit_name', e.target.value)} required /></label>
-          <label>Wilayah tugas<select value={form.area_id} onChange={e => update('area_id', e.target.value)} required><option value="">Pilih desa/kelurahan</option>{areas.map(a => <option key={a.area_id} value={a.area_id}>{a.village_name} · {a.district_name} · {a.regency_name}</option>)}</select></label>
-          <label className="span-two">Alamat kantor<input value={form.office_address} onChange={e => update('office_address', e.target.value)} required /></label>
-          <label className="span-two">Kata sandi<input type="password" minLength="8" value={form.password} onChange={e => update('password', e.target.value)} required /></label>
-        </div>
-        <label className="upload-field"><UploadCloud /><span><b>Bukti penugasan</b><small>{proof ? proof.name : 'Unggah surat tugas atau dokumen resmi (JPG/PNG/WEBP, maks. 5 MB)'}</small></span><input type="file" accept="image/jpeg,image/png,image/webp" onChange={e => {
-          const file = e.target.files?.[0] || null;
-          if (file && file.size > 5 * 1024 * 1024) {
-            setError('Ukuran bukti penugasan maksimal 5 MB.');
-            e.target.value = '';
-            setProof(null);
-            return;
-          }
-          setError('');
-          setProof(file);
-        }} required /></label>
-        {error && <Notice type="error">{error}</Notice>}
-        {success && <Notice type="success">{success}</Notice>}
-        <button className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Mengirim pengajuan...' : 'Kirim pengajuan'}</button>
-      </form>
-      <div className="auth-signup">Sudah disetujui? <Link to="/masuk?role=pengelola">Masuk sebagai pengelola</Link></div>
-    </div>
-  </div>;
-}
 
+  return (
+    <div className="auth-page auth-page-v2 auth-register-page">
+
+      <AuthVisualPanel />
+
+      <section className="auth-form-side auth-register-side">
+        <div className="auth-register-wrap">
+
+          <div className="auth-register-title">
+            <h2>Pengajuan akun pengelola</h2>
+            <p>
+              Daftarkan instansi dan wilayah tugas untuk
+              membantu penanganan laporan warga.
+            </p>
+          </div>
+
+          {/* PILIH ROLE */}
+          <div className="auth-register-role-switch">
+            <Link to="/daftar">
+              Warga
+            </Link>
+
+            <Link to="/daftar-pengelola" className="active">
+              Pengelola
+            </Link>
+          </div>
+
+          <div className="auth-register-section-heading">
+            <h3>Data pengelola</h3>
+          </div>
+
+          <form
+            onSubmit={submit}
+            className="form-stack auth-register-form"
+          >
+
+            <div className="auth-register-grid">
+
+              <label>
+                Nama lengkap
+                <input
+                  value={form.name}
+                  onChange={(event) =>
+                    update('name', event.target.value)
+                  }
+                  placeholder="Nama lengkap"
+                  required
+                />
+              </label>
+
+              <label>
+                Email dinas
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(event) =>
+                    update('email', event.target.value)
+                  }
+                  placeholder="nama@instansi.go.id"
+                  required
+                />
+              </label>
+
+              <label>
+                Nomor telepon
+                <input
+                  type="tel"
+                  value={form.phone}
+                  onChange={(event) =>
+                    update('phone', event.target.value)
+                  }
+                  placeholder="Nomor telepon"
+                  required
+                />
+              </label>
+
+              <label>
+                Instansi
+                <input
+                  value={form.agency}
+                  onChange={(event) =>
+                    update('agency', event.target.value)
+                  }
+                  placeholder="Nama instansi"
+                  required
+                />
+              </label>
+
+              <label>
+                Unit kerja
+                <input
+                  value={form.unit_name}
+                  onChange={(event) =>
+                    update('unit_name', event.target.value)
+                  }
+                  placeholder="Nama unit kerja"
+                  required
+                />
+              </label>
+
+              <label>
+                Wilayah tugas
+                <select
+                  value={form.area_id}
+                  onChange={(event) =>
+                    update('area_id', event.target.value)
+                  }
+                  required
+                >
+                  <option value="">Pilih desa/kelurahan</option>
+
+                  {areas.map((area) => (
+                    <option
+                      key={area.area_id}
+                      value={area.area_id}
+                    >
+                      {area.village_name} · {area.district_name} · {area.regency_name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="auth-register-full">
+                Alamat kantor
+                <input
+                  value={form.office_address}
+                  onChange={(event) =>
+                    update('office_address', event.target.value)
+                  }
+                  placeholder="Alamat lengkap kantor"
+                  required
+                />
+              </label>
+
+              <label className="auth-register-full">
+                Kata sandi
+                <input
+                  type="password"
+                  minLength="8"
+                  value={form.password}
+                  onChange={(event) =>
+                    update('password', event.target.value)
+                  }
+                  placeholder="Minimal 8 karakter"
+                  required
+                />
+              </label>
+
+            </div>
+
+            <label className="upload-field">
+              <UploadCloud />
+
+              <span>
+                <b>Bukti penugasan</b>
+                <small>
+                  {proof
+                    ? proof.name
+                    : 'Unggah surat tugas atau dokumen resmi (JPG/PNG/WEBP, maksimal 5 MB)'}
+                </small>
+              </span>
+
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] || null;
+
+                  if (file && file.size > 5 * 1024 * 1024) {
+                    setError('Ukuran bukti penugasan maksimal 5 MB.');
+                    event.target.value = '';
+                    setProof(null);
+                    return;
+                  }
+
+                  setError('');
+                  setProof(file);
+                }}
+                required
+              />
+            </label>
+
+            <div className="notice info">
+              <ShieldCheck size={16} />
+              <span>
+                Pengajuan akan diperiksa admin. Akses pengelola
+                diberikan setelah penugasan disetujui.
+              </span>
+            </div>
+
+            {error && <Notice type="error">{error}</Notice>}
+            {success && <Notice type="success">{success}</Notice>}
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-block auth-register-submit"
+              disabled={busy}
+            >
+              {busy ? 'Mengirim pengajuan...' : 'Kirim pengajuan'}
+            </button>
+
+          </form>
+
+          <div className="auth-register-login">
+            Sudah punya akun?
+            {' '}
+            <Link to="/masuk?role=pengelola">
+              Masuk sebagai pengelola
+            </Link>
+          </div>
+
+        </div>
+      </section>
+    </div>
+  );
+}
 
 function SubmittedPage() {
   const { code } = useParams();
