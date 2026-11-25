@@ -1,5 +1,9 @@
+const fs = require('fs');
 const multer = require('multer');
 const path = require('path');
+
+// Pastikan folder penyimpanan foto sudah ada
+fs.mkdirSync(path.join('uploads', 'reports'), { recursive: true });
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {

@@ -356,4 +356,35 @@ async function reverseGeocode(req, res) {
     }
 }
 
-module.exports = { reverseGeocode };
+// Dipakai saat warga mengirim laporan: mencari area LAPORMAS
+// berdasarkan koordinat GPS lokasi kejadian.
+// Hasil: { matchedArea, displayAddress, administrative }
+async function findAreaByCoordinates(latitude, longitude) {
+    const result = await getNominatimResult(latitude, longitude);
+
+    if (!result || !result.display_name) {
+        return { matchedArea: null, displayAddress: '', administrative: null };
+    }
+
+    const address = result.address || {};
+    const candidates = candidateNames(address);
+
+    const areaResult = await pool.query(`
+        SELECT area_id, village_name, district_name, regency_name
+        FROM areas
+    `);
+
+    const matchedArea = areaResult.rows.find((area) =>
+        candidates.villages.includes(normalizeName(area.village_name)) &&
+        candidates.districts.includes(normalizeName(area.district_name)) &&
+        candidates.regencies.includes(normalizeName(area.regency_name))
+    ) || null;
+
+    return {
+        matchedArea,
+        displayAddress: result.display_name,
+        administrative: extractAdministrative(address),
+    };
+}
+
+module.exports = { reverseGeocode, findAreaByCoordinates };

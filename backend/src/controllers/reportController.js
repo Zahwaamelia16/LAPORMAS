@@ -230,9 +230,27 @@ async function getReportById(req, res) {
             });
         }
 
+        // Riwayat penanganan untuk halaman detail publik
+        const updates = await pool.query(
+            `SELECT
+                old_s.status_name AS old_status,
+                new_s.status_name AS new_status,
+                ru.notes,
+                ru.updated_at
+            FROM report_updates ru
+            LEFT JOIN report_statuses old_s ON old_s.status_id = ru.old_status_id
+            JOIN report_statuses new_s ON new_s.status_id = ru.new_status_id
+            WHERE ru.report_id = $1
+            ORDER BY ru.updated_at DESC, ru.update_id DESC`,
+            [id]
+        );
+
+        const report = { ...result.rows[0], updates: updates.rows };
+
         res.status(200).json({
             message: 'Berhasil mengambil data laporan',
-            data: result.rows[0],
+            report,
+            data: report,
         });
 
     } catch (error) {
