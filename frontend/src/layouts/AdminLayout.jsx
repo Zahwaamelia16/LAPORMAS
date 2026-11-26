@@ -1,12 +1,14 @@
-
-import '../styles/admin.css';
+import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   ClipboardList,
   ShieldCheck,
   Users,
+  UserRound,
   LogOut,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../auth';
 
@@ -20,9 +22,30 @@ const adminLinks = [
 export default function AdminLayout({ title, subtitle, children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('lapormas-admin-sidebar') === 'collapsed';
+    } catch {
+      return false;
+    }
+  });
 
-  const userInitial =
-    user?.name?.trim()?.charAt(0).toUpperCase() || 'A';
+  const toggleSidebar = () => {
+    setCollapsed((current) => {
+      const next = !current;
+
+      try {
+        localStorage.setItem(
+          'lapormas-admin-sidebar',
+          next ? 'collapsed' : 'expanded'
+        );
+      } catch {
+        // Sidebar tetap dapat digunakan meskipun storage tidak tersedia.
+      }
+
+      return next;
+    });
+  };
 
   const handleLogout = () => {
     logout();
@@ -30,21 +53,43 @@ export default function AdminLayout({ title, subtitle, children }) {
   };
 
   return (
-    <div className="workspace admin-workspace">
-
+    <div
+      className={`workspace admin-workspace ${
+        collapsed ? 'admin-sidebar-collapsed' : ''
+      }`}
+    >
       {/* SIDEBAR ADMIN */}
       <aside className="workspace-sidebar admin-sidebar">
 
-        <Link to="/admin" className="brand">
-          LAPORMAS
-        </Link>
+        {/* LOGO DAN TOMBOL SIDEBAR */}
+        <div className="admin-sidebar-header">
+          <Link to="/admin" className="brand admin-brand">
+            <img
+              src="/images/logo.png"
+              alt="LAPORMAS"
+            />
+          </Link>
 
-        <div className="workspace-role">
-          PANEL ADMINISTRATOR
+          <button
+            type="button"
+            className="admin-sidebar-toggle"
+            onClick={toggleSidebar}
+            aria-label={collapsed ? 'Buka sidebar' : 'Tutup sidebar'}
+            aria-expanded={!collapsed}
+            title={collapsed ? 'Buka sidebar' : 'Tutup sidebar'}
+          >
+            {collapsed
+              ? <ChevronRight size={19} />
+              : <ChevronLeft size={19} />
+            }
+          </button>
         </div>
 
-        <div className="workspace-user">
-          <div className="avatar">{userInitial}</div>
+        {/* PROFIL ADMIN DI SIDEBAR */}
+        <div className="workspace-user admin-sidebar-profile">
+          <div className="avatar admin-profile-avatar">
+            <UserRound size={21} aria-hidden="true" />
+          </div>
 
           <div>
             <b>{user?.name || 'Admin LAPORMAS'}</b>
@@ -56,19 +101,32 @@ export default function AdminLayout({ title, subtitle, children }) {
           MENU UTAMA
         </div>
 
-        <nav aria-label="Navigasi administrator">
+        <nav
+          id="admin-navigation"
+          aria-label="Navigasi administrator"
+        >
           {adminLinks.map(([to, label, Icon]) => (
-            <NavLink end to={to} key={to}>
-              <Icon size={18} aria-hidden="true" />
-              {label}
+            <NavLink
+              end
+              to={to}
+              key={to}
+              title={collapsed ? label : undefined}
+            >
+              <Icon size={19} aria-hidden="true" />
+              <span>{label}</span>
             </NavLink>
           ))}
         </nav>
 
+        {/* KELUAR */}
         <div className="sidebar-bottom">
-          <button type="button" onClick={handleLogout}>
-            <LogOut size={17} aria-hidden="true" />
-            Keluar
+          <button
+            type="button"
+            onClick={handleLogout}
+            title={collapsed ? 'Keluar' : undefined}
+          >
+            <LogOut size={18} aria-hidden="true" />
+            <span>Keluar</span>
           </button>
         </div>
 
@@ -77,46 +135,22 @@ export default function AdminLayout({ title, subtitle, children }) {
       {/* AREA UTAMA ADMIN */}
       <main className="workspace-main admin-main">
 
-        <header className="workspace-top admin-top">
-
-          <div className="workspace-heading">
-
-            <div className="workspace-breadcrumb">
-              <span>LAPORMAS</span>
-              <span className="breadcrumb-divider">/</span>
-              <span>Administrator</span>
-              <span className="breadcrumb-divider">/</span>
-              <span className="breadcrumb-current">
-                {title}
-              </span>
-            </div>
+        {/* HEADER DENGAN FOTO BACKGROUND */}
+        <header className="admin-hero">
+          <div className="admin-hero-inner">
 
             <h1>{title}</h1>
             <p>{subtitle}</p>
 
           </div>
-
-          <div className="workspace-top-account admin-account">
-
-            <div className="workspace-top-account-info">
-              <b>{user?.name || 'Admin LAPORMAS'}</b>
-              <span>Administrator</span>
-            </div>
-
-            <div className="top-avatar">
-              {userInitial}
-            </div>
-
-          </div>
-
         </header>
 
+        {/* KONTEN DASHBOARD */}
         <div className="workspace-content admin-content">
           {children}
         </div>
 
       </main>
-
     </div>
   );
 }

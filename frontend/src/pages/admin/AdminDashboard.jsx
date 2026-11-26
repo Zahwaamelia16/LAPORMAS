@@ -50,7 +50,7 @@ function AdminRecentReports({ reports = [] }) {
       <div className="empty-state compact">
         <ClipboardList />
         <b>Belum ada laporan</b>
-        <span>Laporan akan muncul setelah tersedia.</span>
+        <span>Laporan akan muncul setelah tersedia</span>
       </div>
     );
   }
@@ -185,7 +185,7 @@ function AdminReportTrendChart({ data = [] }) {
         <div className="empty-state compact">
           <BarChart3 />
           <b>Belum ada data grafik</b>
-          <span>Data akan muncul setelah tersedia.</span>
+          <span>Data akan muncul setelah tersedia</span>
         </div>
       ) : (
         <div className="admin-chart-svg-wrap">
@@ -387,7 +387,7 @@ useEffect(() => {
   return (
     <AdminLayout
       title="Dashboard admin"
-      subtitle="Pantau keseluruhan laporan dan verifikasi akun pengelola."
+      subtitle="Pantau keseluruhan laporan dan verifikasi akun pengelola"
     >
       {error && <Notice>{error}</Notice>}
 
@@ -447,7 +447,7 @@ useEffect(() => {
                 </h2>
 
                 <p>
-                  Perkembangan jumlah laporan yang masuk ke LAPORMAS.
+                  Perkembangan jumlah laporan yang masuk ke LAPORMAS
                 </p>
               </div>
 
@@ -487,7 +487,7 @@ useEffect(() => {
 
                   {!trendLoading && trendError && (
                     <span className="admin-chart-error">
-                      Gagal memperbarui grafik. Data sebelumnya tetap ditampilkan.
+                      Gagal memperbarui grafik. Data sebelumnya tetap ditampilkan
                     </span>
                   )}
                 </div>
@@ -520,7 +520,7 @@ useEffect(() => {
               <div>
                 <h2>Pengajuan pengelola</h2>
                 <p>
-                  Periksa bukti penugasan sebelum memberikan akses pengelola.
+                  Periksa bukti penugasan sebelum memberikan akses pengelola
                 </p>
               </div>
 
@@ -592,7 +592,7 @@ useEffect(() => {
                 <BadgeCheck />
                 <b>Tidak ada pengajuan menunggu</b>
                 <span>
-                  Semua pengajuan pengelola sudah diproses.
+                  Semua pengajuan pengelola sudah diproses
                 </span>
               </div>
             )}
@@ -604,7 +604,7 @@ useEffect(() => {
               <div>
                 <h2>Laporan terbaru seluruh wilayah</h2>
                 <p>
-                  Admin dapat memantau dan meninjau laporan dari semua area.
+                  Admin dapat memantau dan meninjau laporan dari semua area
                 </p>
               </div>
 

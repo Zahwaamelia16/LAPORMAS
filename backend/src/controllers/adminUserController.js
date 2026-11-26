@@ -16,7 +16,10 @@ exports.getUsers = async (req, res) => {
         p.address,
         p.area_id,
         p.area_verification_status,
-        a.village_name,
+        COALESCE(
+          NULLIF(BTRIM(a.village_name), ''),
+          NULLIF(BTRIM(p.village_name), '')
+        ) AS village_name,
         a.district_name,
         a.regency_name
       FROM users u

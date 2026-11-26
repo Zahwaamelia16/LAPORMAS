@@ -79,7 +79,7 @@ export default function AdminStaffRequestsPage() {
   return (
     <AdminLayout
       title="Verifikasi pengelola"
-      subtitle="Setujui atau tolak pengajuan berdasarkan bukti penugasan."
+      subtitle="Setujui atau tolak pengajuan berdasarkan bukti penugasan"
     >
       {error && (
         <div className="notice error" role="alert">
@@ -88,17 +88,17 @@ export default function AdminStaffRequestsPage() {
         </div>
       )}
 
-      <div className="panel">
-        <div className="panel-heading">
+      <div className="panel admin-filter-panel admin-staff-requests-panel">
+        <div className="panel-heading admin-staff-requests-heading">
           <div>
             <h2>Daftar pengajuan</h2>
             <p>
-              Pengguna baru memperoleh role pengelola setelah disetujui.
+              Pengguna baru memperoleh role pengelola setelah disetujui
             </p>
           </div>
 
           <CustomSelect
-            className="select-compact"
+            className="select-compact admin-filter-select"
             value={status}
             onChange={(event) => setStatus(event.target.value)}
           >
@@ -191,7 +191,7 @@ export default function AdminStaffRequestsPage() {
             <ShieldCheck />
             <b>Tidak ada data pengajuan</b>
             <span>
-              Belum ada pengajuan pada kategori status ini.
+              Belum ada pengajuan pada kategori status ini
             </span>
           </div>
         )}

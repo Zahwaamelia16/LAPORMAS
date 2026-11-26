@@ -95,22 +95,6 @@
   border-top: 1px solid #dce8de;
 }
 
-.admin-workspace .admin-sidebar .sidebar-bottom > a,
-.admin-workspace .admin-sidebar .sidebar-bottom > button {
-  color: #496b58;
-  opacity: 1;
-  font-size: 11px;
-  font-weight: 700;
-  border-radius: 9px;
-  transition: background .2s ease, color .2s ease;
-}
-
-.admin-workspace .admin-sidebar .sidebar-bottom > a:hover,
-.admin-workspace .admin-sidebar .sidebar-bottom > button:hover {
-  background: #edf5ef;
-  color: #17643a;
-}
-
 .admin-workspace .admin-sidebar .sidebar-bottom svg,
 .admin-workspace .admin-sidebar .sidebar-bottom .admin-back-icon {
   color: currentColor;
@@ -188,8 +172,9 @@
 }
 
 .admin-stat-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 9px 22px rgba(20,58,36,.075);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(16,59,41,.09);
+  border-color: #C9DDCD;
 }
 
 .admin-stat-card .stat-card-icon {
@@ -217,12 +202,12 @@
 /* PANEL ADMIN */
 
 .admin-panel {
-  padding: 23px;
+  padding: 24px;
   margin-bottom: 0;
-  border: 1px solid #e4ebe5;
-  border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 4px 16px rgba(20,58,36,.035);
+  border: 1px solid #E5ECE6;
+  border-radius: 16px;
+  background: #FFFFFF;
+  box-shadow: 0 7px 24px rgba(24,62,39,.045);
 }
 
 .admin-panel .panel-heading {
@@ -230,21 +215,23 @@
 }
 
 .admin-panel .panel-heading h2 {
-  color: #173b2a;
-  font-size: 17px;
+  color: #173B2A;
+  font-size: 18px;
   font-weight: 800;
+  letter-spacing: -.025em;
 }
 
 .admin-panel .panel-heading p {
-  color: #819286;
+  color: #718477;
   font-size: 11px;
+  line-height: 1.65;
 }
 
 /* PENGAJUAN PENGELOLA */
 
 .admin-panel .request-item {
-  padding: 17px 0;
-  border-bottom: 1px solid #edf2ee;
+  padding: 19px 0;
+  border-bottom: 1px solid #EDF2EE;
 }
 
 .admin-panel .request-item:last-child {
@@ -252,8 +239,8 @@
 }
 
 .admin-panel .request-avatar {
-  background: #e8f3e9;
-  color: #17643a;
+  background: #EAF4EC;
+  color: #17643A;
 }
 
 .admin-panel .request-info > b {
@@ -270,8 +257,9 @@
 /* TABEL */
 
 .admin-table-wrap {
-  border-radius: 10px;
+  border-radius: 12px;
   overflow-x: auto;
+  border: 1px solid #E8EFE9;
 }
 
 .admin-table-wrap table {
@@ -280,15 +268,17 @@
 
 .admin-table-wrap th {
   padding: 14px 12px;
-  background: #f5f9f5;
-  color: #708475;
+  background: #F3F8F3;
+  color: #587563;
   font-size: 9px;
+  border-bottom: 1px solid #E2EBE3;
 }
 
 .admin-table-wrap td {
   padding: 14px 12px;
-  color: #536e5c;
+  color: #536E5C;
   font-size: 10px;
+  border-bottom: 1px solid #EDF2EE;
 }
 
 .admin-table-wrap td:first-child b {
@@ -300,11 +290,11 @@
 }
 
 .admin-table-wrap tbody tr:hover {
-  background: #f7faf7;
+  background: #F7FAF7;
 }
 
 .admin-table-wrap .table-link {
-  color: #17643a;
+  color: #17643A;
   font-weight: 800;
 }
 
@@ -445,10 +435,11 @@
   min-width: 0;
   min-height: 116px;
   padding: 20px;
-  border: 1px solid #e3ebe4;
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 4px 15px rgba(20,58,36,.035);
+  border: 1px solid #E5ECE6;
+  border-radius: 16px;
+  background: #FFFFFF;
+  box-shadow: 0 6px 20px rgba(16,59,41,.055);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
 
 .admin-content .admin-stat-card .stat-card-icon {
@@ -457,6 +448,8 @@
   width: 49px;
   height: 49px;
   border-radius: 12px;
+  background: #EAF4EC;
+  color: #17643A;
 }
 
 .admin-content .admin-stat-card > span {
@@ -484,7 +477,7 @@
 
 .admin-trend-panel {
   min-width: 0;
-  padding: 24px;
+  padding: 25px;
   overflow: hidden;
 }
 
@@ -509,7 +502,7 @@
   flex-wrap: wrap;
   gap: 6px;
   padding: 4px;
-  border-radius: 9px;
+  border-radius: 999px;
   background: #F1F6F2;
 }
 
@@ -517,9 +510,9 @@
   min-height: 33px;
   padding: 7px 12px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 999px;
   background: transparent;
-  color: #64806D;
+  color: #52745D;
   font-size: 10px;
   font-weight: 800;
   transition: .2s ease;
@@ -532,7 +525,7 @@
 .admin-chart-filters button.active {
   background: #17643A;
   color: #FFFFFF;
-  box-shadow: 0 3px 8px rgba(23,100,58,.15);
+  box-shadow: 0 3px 9px rgba(23,100,58,.16);
 }
 
 /* RINGKASAN GRAFIK */
@@ -549,9 +542,9 @@
   flex-direction: column;
   gap: 6px;
   padding: 13px 15px;
-  border: 1px solid #E7EEE8;
-  border-radius: 10px;
-  background: #FAFCFA;
+  border: 1px solid #E5ECE6;
+  border-radius: 12px;
+  background: #F8FBF8;
 }
 
 .admin-chart-metrics span {
@@ -960,52 +953,6 @@
   }
 }
 
-/* ===== USER FILTERS: FULL WIDTH & BALANCED ===== */
-
-.admin-user-filters {
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) 180px 180px;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  margin: 18px 0 22px;
-  box-sizing: border-box;
-}
-
-.admin-user-search {
-  width: 100%;
-  max-width: none;
-  min-width: 0;
-  height: 42px;
-  min-height: 42px;
-  box-sizing: border-box;
-  padding: 0 13px;
-}
-
-.admin-user-filters select {
-  width: 100%;
-  min-width: 0;
-  height: 42px;
-  min-height: 42px;
-  box-sizing: border-box;
-  font-size: 13px;
-}
-
-.admin-user-search input {
-  font-size: 13px;
-}
-
-@media (max-width: 768px) {
-  .admin-user-filters {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .admin-user-search {
-    grid-column: 1 / -1;
-    max-width: none;
-  }
-}
-
 /* =====================================================
    ADMIN - USER MANAGEMENT
    ===================================================== */
@@ -1014,114 +961,6 @@
 
 .admin-user-panel {
   min-width: 0;
-}
-
-/* SEARCH & FILTER */
-
-.admin-user-filters {
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) 180px 180px;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  margin: 18px 0 22px;
-  box-sizing: border-box;
-}
-
-/* Search container */
-
-.admin-user-search {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 100%;
-  max-width: none;
-  min-width: 0;
-  height: 42px;
-  min-height: 42px;
-  padding: 0 13px;
-  box-sizing: border-box;
-  border: 1px solid #dce8df;
-  border-radius: 9px;
-  color: #718579;
-  background: #fff;
-  transition: border-color .2s ease;
-}
-
-/* Ikon search */
-
-.admin-user-search svg {
-  width: 17px;
-  height: 17px;
-  flex-shrink: 0;
-}
-
-/* Input search */
-
-.admin-user-search input {
-  flex: 1;
-  width: 100%;
-  min-width: 0;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  border: 0 !important;
-  border-radius: 0;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  color: #244c36;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 400;
-  box-sizing: border-box;
-}
-
-.admin-user-search input:focus,
-.admin-user-search input:focus-visible,
-.admin-user-search input:hover {
-  border: 0 !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-}
-
-.admin-user-search input::placeholder {
-  color: #9aaa9e;
-  opacity: 1;
-}
-
-/* Efek fokus hanya pada container luar */
-
-.admin-user-search:focus-within {
-  border-color: #28794b;
-  box-shadow: none;
-  outline: none;
-}
-
-/* Dropdown filter */
-
-.admin-user-filters select {
-  width: 100%;
-  min-width: 0;
-  height: 42px;
-  min-height: 42px;
-  padding: 0 12px;
-  border: 1px solid #dce8df;
-  border-radius: 9px;
-  outline: none;
-  background: #fff;
-  color: #365b44;
-  font-family: inherit;
-  font-size: 13px;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-.admin-user-filters select:focus {
-  border-color: #28794b;
-  outline: none;
-  box-shadow: none;
 }
 
 /* STATUS PENGGUNA */
@@ -1148,69 +987,147 @@
 
 /* AKSI PENGGUNA */
 
+/* BADGE ROLE PENGGUNA */
+.admin-workspace .admin-user-table .role-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 7px 12px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+/* Admin: ungu lembut */
+.admin-workspace .admin-user-table .role-pill.role-admin {
+  color: #66519A;
+  background: #F1EDFA;
+  border-color: #E2D9F2;
+}
+
+/* Pengelola: biru teal */
+.admin-workspace .admin-user-table .role-pill.role-pengelola {
+  color: #246B83;
+  background: #EAF5F8;
+  border-color: #D5E9EF;
+}
+
+/* Warga: hijau */
+.admin-workspace .admin-user-table .role-pill.role-warga {
+  color: #287448;
+  background: #EAF5EC;
+  border-color: #D7EBDD;
+}
+
+/* CONTAINER IKON AKSI */
 .admin-user-actions {
   display: flex;
   align-items: center;
-  gap: 7px;
+  justify-content: flex-start;
+  gap: 8px;
+  white-space: nowrap;
 }
 
+/* DASAR TOMBOL AKSI */
 .admin-user-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 33px;
-  height: 33px;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   border: 1px solid transparent;
-  border-radius: 8px;
-  background: #f2f7f3;
-  color: #315e42;
+  border-radius: 10px;
+  background: #FFFFFF;
   cursor: pointer;
-  transition: background .18s ease, transform .18s ease;
+  transition:
+    color .2s ease,
+    background .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease;
 }
 
-.admin-user-action:hover {
-  transform: translateY(-1px);
+.admin-user-action svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
 }
 
+/* LIHAT DETAIL */
 .admin-user-action.view {
-  color: #276b9a;
-  background: #edf5fb;
+  color: #3277A9;
+  background: #F1F7FC;
+  border-color: #DCEAF5;
 }
 
 .admin-user-action.view:hover {
-  background: #e0eef9;
+  color: #FFFFFF;
+  background: #3277A9;
+  border-color: #3277A9;
 }
 
+/* EDIT PENGGUNA */
 .admin-user-action.edit {
-  color: #956b1c;
-  background: #fbf5e8;
+  color: #A47725;
+  background: #FCF7ED;
+  border-color: #F0E4CC;
 }
 
 .admin-user-action.edit:hover {
-  background: #f7ecd5;
+  color: #FFFFFF;
+  background: #A47725;
+  border-color: #A47725;
 }
 
+/* NONAKTIFKAN AKUN */
 .admin-user-action.deactivate {
-  color: #b64d4d;
-  background: #fff0ef;
+  color: #C35656;
+  background: #FFF4F3;
+  border-color: #F3DDDA;
 }
 
 .admin-user-action.deactivate:hover {
-  background: #ffe2e0;
+  color: #FFFFFF;
+  background: #C35656;
+  border-color: #C35656;
 }
 
+/* AKTIFKAN KEMBALI */
 .admin-user-action.activate {
-  color: #28794b;
-  background: #eaf5ed;
+  color: #287448;
+  background: #EFF7F0;
+  border-color: #D9EBDD;
 }
 
 .admin-user-action.activate:hover {
-  background: #dcefe1;
+  color: #FFFFFF;
+  background: #287448;
+  border-color: #287448;
+}
+
+/* INTERAKSI TOMBOL */
+.admin-user-action:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(20, 58, 36, .10);
+}
+
+.admin-user-action:focus-visible {
+  outline: 3px solid rgba(40, 122, 69, .2);
+  outline-offset: 2px;
 }
 
 .admin-user-action:disabled {
-  opacity: .5;
-  cursor: wait;
+  opacity: .45;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 /* TABEL */
@@ -1471,3 +1388,1443 @@
     flex-wrap: wrap;
   }
 }
+
+/* =====================================================
+   LAPORMAS ADMIN PORTAL - REDESIGN
+   Sidebar, Header Hero, dan Responsive
+   ===================================================== */
+
+/* LAYOUT UTAMA */
+
+.admin-workspace {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  min-height: 100vh;
+  background: #F5F8F5;
+  transition: grid-template-columns .25s ease;
+}
+
+.admin-workspace.admin-sidebar-collapsed {
+  grid-template-columns: 84px minmax(0, 1fr);
+}
+
+/* SIDEBAR SAGE GREEN */
+
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  padding: 22px 16px;
+  overflow-y: auto;
+  background: #EAF1EA;
+  color: #355C43;
+  border-right: 1px solid #DCE7DD;
+}
+
+/* HEADER SIDEBAR */
+
+.admin-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 52px;
+}
+
+.admin-sidebar .admin-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  color: #285C3B;
+}
+
+.admin-brand img {
+  display: block;
+  width: 168px;
+  max-width: 100%;
+  height: 52px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.admin-sidebar-toggle {
+  display: grid;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #D5E3D7;
+  border-radius: 9px;
+  background: #F6F9F6;
+  color: #426B4E;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+
+.admin-sidebar-toggle:hover {
+  background: #DCEBDD;
+  color: #205B39;
+}
+
+/* IDENTITAS ADMIN */
+
+.admin-sidebar .workspace-role {
+  margin: 28px 10px 11px;
+  color: #809385;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.admin-sidebar .workspace-user {
+  min-width: 0;
+  padding: 12px 10px;
+  margin: 0 0 25px;
+  gap: 10px;
+  border: 1px solid #DFE9DF;
+  border-radius: 11px;
+  background: #F5F8F4;
+}
+
+.admin-sidebar .workspace-user b {
+  color: #315841;
+  font-size: 11px;
+}
+
+.admin-sidebar .workspace-user span {
+  color: #829286;
+  font-size: 9px;
+}
+
+.admin-sidebar .avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  background: #DCEBDD;
+  color: #285C3B;
+}
+
+/* MENU */
+
+.admin-nav-label {
+  margin: 0 10px 10px;
+  color: #87998A;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.admin-sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-sidebar nav a {
+  display: flex;
+  min-height: 45px;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  color: #637B69;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease;
+}
+
+.admin-sidebar nav a svg {
+  flex: 0 0 19px;
+}
+
+.admin-sidebar nav a span {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.admin-sidebar nav a:not(.active):hover {
+  background: #DFEADF;
+  color: #285C3B;
+}
+
+.admin-sidebar nav a.active {
+  background: #D5E8D7;
+  color: #245B39;
+  box-shadow: inset 3px 0 #4F9564;
+}
+
+/* TOMBOL KELUAR */
+
+.admin-sidebar .sidebar-bottom {
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid #D6E2D7;
+}
+
+.admin-sidebar .sidebar-bottom > button {
+  display: flex;
+  width: 100%;
+  min-height: 42px;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #617966;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* SIDEBAR KETIKA DITUTUP */
+
+.admin-sidebar-collapsed .admin-sidebar {
+  padding: 20px 10px;
+}
+
+.admin-sidebar-collapsed .admin-sidebar-header {
+  flex-direction: column;
+  justify-content: center;
+}
+
+.admin-sidebar-collapsed .admin-sidebar .admin-brand {
+  justify-content: center;
+}
+
+.admin-sidebar-collapsed .admin-brand img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.admin-sidebar-collapsed .admin-sidebar-toggle {
+  align-self: center;
+}
+
+.admin-sidebar-collapsed .workspace-role,
+.admin-sidebar-collapsed .admin-nav-label {
+  display: none;
+}
+
+.admin-sidebar-collapsed .admin-sidebar .workspace-user {
+  justify-content: center;
+  padding: 8px 0;
+  margin: 19px 0 23px;
+  border: 0;
+  background: transparent;
+}
+
+.admin-sidebar-collapsed .admin-sidebar .workspace-user > div:last-child {
+  display: none;
+}
+
+.admin-sidebar-collapsed .admin-sidebar nav a {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.admin-sidebar-collapsed .admin-sidebar nav a span,
+.admin-sidebar-collapsed .admin-sidebar .sidebar-bottom span {
+  display: none;
+}
+
+.admin-sidebar-collapsed .admin-sidebar .sidebar-bottom > button {
+  justify-content: center;
+  padding: 11px 0;
+}
+
+/* HEADER FOTO ADMIN */
+
+.admin-hero {
+  position: relative;
+  display: flex;
+  min-height: 190px;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 28px 42px;
+  overflow: hidden;
+  border-radius: 0 0 30px 30px;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(9, 38, 23, .78),
+      rgba(8, 35, 22, .58)
+    ),
+    url('/images/dashboard%20warga.png') center 48% / cover no-repeat;
+}
+
+.admin-hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.admin-hero-breadcrumb {
+  margin-bottom: 11px;
+  color: rgba(255, 255, 255, .72);
+  font-size: 10px;
+}
+
+.admin-hero-breadcrumb .breadcrumb-divider {
+  color: rgba(255, 255, 255, .5);
+}
+
+.admin-hero-breadcrumb .breadcrumb-current {
+  color: #FFFFFF;
+  font-weight: 800;
+}
+
+.admin-hero h1 {
+  margin: 0 0 6px;
+  color: #FFFFFF;
+  font-family: Manrope, sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -.035em;
+}
+
+.admin-hero p {
+  max-width: 650px;
+  margin: 0;
+  color: rgba(255, 255, 255, .88);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+/* AREA KONTEN */
+
+.admin-main {
+  min-width: 0;
+  background: #F5F8F5;
+}
+
+.admin-content {
+  width: 100%;
+  max-width: 1600px;
+  box-sizing: border-box;
+  padding: 30px 42px 50px;
+  margin: 0;
+  gap: 22px;
+}
+
+/* RESPONSIVE TABLET */
+
+@media (max-width: 1000px) {
+  .admin-workspace {
+    grid-template-columns: 230px minmax(0, 1fr);
+  }
+
+  .admin-workspace.admin-sidebar-collapsed {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+
+  .admin-content {
+    padding: 25px;
+  }
+
+  .admin-hero {
+    padding: 25px;
+  }
+}
+
+/* RESPONSIVE MOBILE */
+
+@media (max-width: 760px) {
+  .admin-workspace,
+  .admin-workspace.admin-sidebar-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-sidebar,
+  .admin-sidebar-collapsed .admin-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 14px 18px;
+    overflow: visible;
+  }
+
+  .admin-sidebar-header,
+  .admin-sidebar-collapsed .admin-sidebar-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .admin-sidebar .admin-brand img,
+  .admin-sidebar-collapsed .admin-brand img {
+    width: 155px;
+    height: 45px;
+    object-position: left center;
+  }
+
+  .admin-sidebar-collapsed .admin-sidebar .admin-brand {
+    justify-content: flex-start;
+  }
+
+  .admin-sidebar-collapsed .admin-sidebar-toggle {
+    align-self: auto;
+  }
+
+  .admin-sidebar .workspace-role,
+  .admin-sidebar-collapsed .workspace-role {
+    display: none;
+  }
+
+  .admin-sidebar .workspace-user,
+  .admin-sidebar-collapsed .admin-sidebar .workspace-user {
+    display: flex;
+    justify-content: flex-start;
+    padding: 8px 10px;
+    margin: 12px 0;
+    border: 1px solid #DFE9DF;
+    background: #F5F8F4;
+  }
+
+  .admin-sidebar .workspace-user > div:last-child,
+  .admin-sidebar-collapsed .admin-sidebar .workspace-user > div:last-child {
+    display: flex;
+  }
+
+  .admin-sidebar .admin-nav-label,
+  .admin-sidebar-collapsed .admin-nav-label {
+    display: none;
+  }
+
+  .admin-sidebar nav,
+  .admin-sidebar-collapsed .admin-sidebar nav {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+
+  .admin-sidebar nav a,
+  .admin-sidebar-collapsed .admin-sidebar nav a {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    padding: 10px 12px;
+  }
+
+  .admin-sidebar nav a span,
+  .admin-sidebar-collapsed .admin-sidebar nav a span {
+    display: inline;
+  }
+
+  .admin-sidebar .sidebar-bottom,
+  .admin-sidebar-collapsed .admin-sidebar .sidebar-bottom {
+    margin-top: 9px;
+    padding-top: 8px;
+  }
+
+  .admin-sidebar .sidebar-bottom > button,
+  .admin-sidebar-collapsed .admin-sidebar .sidebar-bottom > button {
+    justify-content: flex-start;
+    padding: 9px 12px;
+  }
+
+  .admin-sidebar .sidebar-bottom span,
+  .admin-sidebar-collapsed .admin-sidebar .sidebar-bottom span {
+    display: inline;
+  }
+
+  .admin-hero {
+    min-height: 175px;
+    padding: 23px 20px;
+    border-radius: 0 0 22px 22px;
+  }
+
+  .admin-hero h1 {
+    font-size: 25px;
+  }
+
+  .admin-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 460px) {
+  .admin-hero {
+    min-height: 160px;
+    padding: 20px 17px;
+  }
+
+  .admin-hero h1 {
+    font-size: 22px;
+  }
+
+  .admin-content {
+    padding: 16px;
+  }
+}
+
+/* =====================================================
+   ADMIN OVERLAY SIDEBAR
+   Hero image tetap diam saat sidebar dibuka/tutup
+   ===================================================== */
+
+.admin-workspace {
+  --admin-sidebar-width: 270px;
+  display: block;
+  position: relative;
+  min-height: 100vh;
+  background: #F5F8F5;
+}
+
+.admin-workspace.admin-sidebar-collapsed {
+  --admin-sidebar-width: 84px;
+}
+
+/* SIDEBAR FIXED DI ATAS HALAMAN */
+
+.admin-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 1000;
+  width: var(--admin-sidebar-width);
+  height: 100vh;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #103B29;
+  color: #FFFFFF;
+  border-right: 1px solid #24543A;
+  transition: width .25s ease;
+}
+
+/* WARNA LOGO DAN TULISAN */
+
+.admin-sidebar .admin-brand {
+  color: #FFFFFF;
+}
+
+.admin-sidebar .workspace-role,
+.admin-sidebar .admin-nav-label {
+  color: #D0E2D4;
+}
+
+.admin-sidebar .workspace-user {
+  background: #1B4C35;
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+.admin-sidebar .workspace-user b {
+  color: #FFFFFF;
+}
+
+.admin-sidebar .workspace-user span {
+  color: #D0E2D4;
+}
+
+/* MENU DEFAULT PUTIH */
+
+.admin-sidebar nav a {
+  color: #FFFFFF;
+  background: transparent;
+}
+
+.admin-sidebar nav a:not(.active) {
+  color: #FFFFFF;
+  opacity: .76;
+}
+
+.admin-sidebar nav a:not(.active):hover {
+  background: #1B4C35;
+  color: #FFFFFF;
+  opacity: 1;
+}
+
+.admin-sidebar nav a.active {
+  color: #FFFFFF;
+  background: #24613F;
+  box-shadow: inset 3px 0 #A6D8AE;
+}
+
+.admin-sidebar nav a svg {
+  color: currentColor;
+}
+
+/* TOMBOL LOGOUT */
+
+.admin-sidebar .sidebar-bottom {
+  border-top: 1px solid #32634A;
+}
+
+/* TOMBOL SIDEBAR */
+
+.admin-sidebar-toggle {
+  color: #FFFFFF;
+  background: #1B4C35;
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+.admin-sidebar-toggle:hover {
+  color: #FFFFFF;
+  background: #286344;
+}
+
+/* MAIN TIDAK IKUT BERGESER */
+
+.admin-main {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+/* HERO MEMBENTANG PENUH */
+
+.admin-hero {
+  width: 100%;
+  min-height: 190px;
+  box-sizing: border-box;
+  padding: 28px 0;
+  margin: 0;
+}
+
+/* HANYA TEKS HERO YANG BERGESER */
+
+.admin-hero-inner {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-right: 42px;
+  padding-left: calc(var(--admin-sidebar-width) + 42px);
+  transition: padding-left .25s ease;
+}
+
+/* KONTEN DASHBOARD MENYESUAIKAN SIDEBAR */
+
+.admin-content {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  margin: 0;
+  padding-top: 30px;
+  padding-right: 42px;
+  padding-bottom: 50px;
+  padding-left: calc(var(--admin-sidebar-width) + 42px);
+  transition: padding-left .25s ease;
+}
+
+/* MOBILE: SIDEBAR KEMBALI MENJADI BAGIAN ATAS */
+
+@media (max-width: 760px) {
+  .admin-workspace,
+  .admin-workspace.admin-sidebar-collapsed {
+    display: block;
+    --admin-sidebar-width: 0px;
+  }
+
+  .admin-sidebar,
+  .admin-sidebar-collapsed .admin-sidebar {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: 14px 18px;
+  }
+
+  .admin-sidebar-header,
+  .admin-sidebar-collapsed .admin-sidebar-header {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .admin-sidebar-collapsed .admin-brand img {
+    width: 155px;
+    height: 45px;
+  }
+
+  .admin-sidebar-collapsed .admin-sidebar .workspace-user {
+    display: flex;
+    padding: 8px 10px;
+    margin: 12px 0;
+    background: #1B4C35;
+  }
+
+  .admin-sidebar-collapsed .admin-sidebar .workspace-user > div:last-child {
+    display: flex;
+  }
+
+  .admin-sidebar-collapsed .admin-sidebar nav a span {
+    display: inline;
+  }
+
+  .admin-sidebar-collapsed .admin-sidebar .sidebar-bottom span {
+    display: inline;
+  }
+
+  .admin-sidebar-collapsed .admin-sidebar nav a {
+    justify-content: flex-start;
+  }
+
+  .admin-hero {
+    padding: 23px 0;
+  }
+
+  .admin-hero-inner {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .admin-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 460px) {
+  .admin-content {
+    padding: 16px;
+  }
+
+  .admin-hero-inner {
+    padding-left: 17px;
+    padding-right: 17px;
+  }
+}
+
+/* HEADER SIDEBAR SELALU SEJAJAR */
+
+.admin-sidebar-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 52px;
+}
+
+.admin-sidebar-toggle {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* SAAT SIDEBAR DITUTUP */
+
+.admin-sidebar-collapsed .admin-sidebar-header {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.admin-sidebar-collapsed .admin-sidebar .admin-brand {
+  display: none;
+}
+
+.admin-sidebar-collapsed .admin-sidebar-toggle {
+  margin: 0;
+}
+/* HERO TITLE ALIGNMENT */
+
+.admin-hero {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.admin-hero-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 11px;
+}
+
+.admin-hero h1 {
+  margin: 0;
+}
+
+.admin-hero p {
+  margin: 0;
+  line-height: 1.65;
+}
+
+/* =====================================================
+   SIDEBAR ADMIN - WARNA FINAL
+   ===================================================== */
+
+/* Menu default */
+.admin-workspace .admin-sidebar nav a:not(.active) {
+  color: #FFFFFF;
+  opacity: 1;
+  transition: background .2s ease, color .2s ease;
+}
+
+.admin-workspace .admin-sidebar nav a:not(.active) svg {
+  color: currentColor;
+}
+
+/* Hover menu */
+.admin-workspace .admin-sidebar nav a:not(.active):hover {
+  background: #FFFFFF;
+  color: #216443;
+  opacity: 1;
+}
+
+/* Menu aktif */
+.admin-workspace .admin-sidebar nav a.active,
+.admin-workspace .admin-sidebar nav a.active:hover {
+  background: #24613F;
+  color: #FFFFFF;
+  opacity: 1;
+}
+
+/* Keluar: ikon dan tulisan putih */
+.admin-workspace .admin-sidebar .sidebar-bottom > button {
+  color: #FFFFFF;
+  background: transparent;
+  opacity: 1;
+  transition: background .2s ease, color .2s ease;
+}
+
+.admin-workspace .admin-sidebar .sidebar-bottom > button span,
+.admin-workspace .admin-sidebar .sidebar-bottom > button svg {
+  color: #FFFFFF;
+  stroke: currentColor;
+  opacity: 1;
+}
+
+/* Keluar saat hover: ikon dan tulisan hijau */
+.admin-workspace .admin-sidebar .sidebar-bottom > button:hover {
+  color: #216443;
+  background: #FFFFFF;
+}
+
+.admin-workspace .admin-sidebar .sidebar-bottom > button:hover span,
+.admin-workspace .admin-sidebar .sidebar-bottom > button:hover svg {
+  color: #216443;
+  stroke: currentColor;
+}
+
+/* Tombol buka dan tutup sidebar */
+.admin-workspace .admin-sidebar .admin-sidebar-toggle {
+  color: #FFFFFF;
+  background: #1B4C35;
+}
+
+.admin-workspace .admin-sidebar .admin-sidebar-toggle:hover {
+  color: #216443;
+  background: #FFFFFF;
+}
+
+
+/* PROFIL ADMIN TANPA KARTU */
+
+.admin-workspace .admin-sidebar .admin-sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0 0 18px;
+  margin: 35px 10px 24px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+
+  border-bottom: 1px solid #32634A;}
+
+.admin-workspace .admin-sidebar .admin-profile-avatar {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: #DCEBDD;
+  color: #285C3B;
+}
+
+.admin-workspace .admin-sidebar .admin-profile-avatar svg {
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.admin-workspace .admin-sidebar .admin-sidebar-profile > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.admin-workspace .admin-sidebar .admin-sidebar-profile b {
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-workspace .admin-sidebar .admin-sidebar-profile span {
+  color: #D0E2D4;
+  font-size: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Profil ketika sidebar tertutup */
+.admin-workspace.admin-sidebar-collapsed .admin-sidebar .admin-sidebar-profile {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  padding: 0 0 16px;
+  margin: 20px 0 24px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+
+  border-bottom: 1px solid #32634A;}
+
+/* Sembunyikan nama dan email sepenuhnya */
+.admin-workspace.admin-sidebar-collapsed .admin-sidebar .admin-sidebar-profile > div:last-child {
+  display: none;
+}
+
+/* Ikon profil tetap tepat di tengah */
+.admin-workspace.admin-sidebar-collapsed .admin-sidebar .admin-profile-avatar {
+  flex: 0 0 42px;
+  margin: 0;
+}
+
+/* END PROFIL ADMIN TANPA KARTU */
+
+
+/* BEGIN ADMIN DASHBOARD VISUAL FINAL */
+
+/* AREA DASHBOARD */
+.admin-workspace .admin-main {
+  background: #F5F8F5;
+}
+
+.admin-workspace .admin-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* KARTU STATISTIK */
+.admin-workspace .admin-content .admin-stat-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #E2EBE3;
+  border-radius: 17px;
+  background: #FFFFFF;
+  box-shadow: 0 5px 18px rgba(16, 59, 41, .055);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.admin-workspace .admin-content .admin-stat-card::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  content: "";
+  background: #9BC8A2;
+}
+
+.admin-workspace .admin-content .admin-stat-card:hover {
+  transform: translateY(-3px);
+  border-color: #C9DDCD;
+  box-shadow: 0 10px 24px rgba(16, 59, 41, .09);
+}
+
+.admin-workspace .admin-content .admin-stat-card .stat-card-icon {
+  border-radius: 14px;
+  background: #EAF4EC;
+  color: #17643A;
+}
+
+.admin-workspace .admin-content .admin-stat-card > span {
+  color: #718477;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-workspace .admin-content .admin-stat-card > strong {
+  color: #103B29;
+  font-family: Manrope, sans-serif;
+  font-size: 29px;
+  font-weight: 800;
+}
+
+/* PANEL GRAFIK DAN INFORMASI */
+.admin-workspace .admin-content .admin-panel {
+  box-sizing: border-box;
+  padding: 25px;
+  border: 1px solid #E3EBE4;
+  border-radius: 17px;
+  background: #FFFFFF;
+  box-shadow: 0 6px 22px rgba(16, 59, 41, .045);
+}
+
+.admin-workspace .admin-content .admin-panel .panel-heading {
+  margin-bottom: 22px;
+}
+
+.admin-workspace .admin-content .admin-panel .panel-heading h2 {
+  color: #143B2A;
+  font-family: Manrope, sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+
+.admin-workspace .admin-content .admin-panel .panel-heading p {
+  color: #718477;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.admin-workspace .admin-content .admin-panel .panel-heading h2 svg {
+  color: #287A45;
+}
+
+/* FILTER GRAFIK */
+.admin-workspace .admin-chart-filters {
+  padding: 4px;
+  border: 1px solid #E5ECE6;
+  border-radius: 999px;
+  background: #F5F8F5;
+}
+
+.admin-workspace .admin-chart-filters button {
+  min-height: 35px;
+  padding: 8px 15px;
+  border-radius: 999px;
+  color: #587563;
+  font-size: 10px;
+  font-weight: 800;
+  transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+}
+
+.admin-workspace .admin-chart-filters button:hover:not(.active) {
+  background: #E7F1E8;
+  color: #17643A;
+}
+
+.admin-workspace .admin-chart-filters button.active {
+  background: #17643A;
+  color: #FFFFFF;
+  box-shadow: 0 3px 9px rgba(23, 100, 58, .17);
+}
+
+/* RINGKASAN GRAFIK */
+.admin-workspace .admin-chart-metrics > div {
+  padding: 15px 16px;
+  border: 1px solid #E4ECE5;
+  border-radius: 13px;
+  background: #F7FAF7;
+}
+
+.admin-workspace .admin-chart-metrics span {
+  color: #718477;
+}
+
+.admin-workspace .admin-chart-metrics strong {
+  color: #17643A;
+  font-family: Manrope, sans-serif;
+}
+
+/* PENGAJUAN PENGELOLA */
+.admin-workspace .admin-panel .request-item {
+  padding: 19px 0;
+  border-bottom: 1px solid #EDF2EE;
+}
+
+.admin-workspace .admin-panel .request-avatar {
+  border: 1px solid #DCEBDD;
+  background: #EAF4EC;
+  color: #17643A;
+}
+
+.admin-workspace .admin-panel .request-info > b {
+  color: #173B2A;
+  font-size: 12px;
+}
+
+.admin-workspace .admin-panel .request-info > span,
+.admin-workspace .admin-panel .request-info > small {
+  color: #718477;
+}
+
+/* TOMBOL AKSI PENGAJUAN */
+.admin-workspace .admin-panel .request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-workspace .admin-panel .request-actions .btn {
+  min-height: 36px;
+  padding: 9px 15px;
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* Setujui: hijau */
+.admin-workspace .admin-panel .request-actions .btn-primary {
+  color: #FFFFFF;
+  background: #17643A;
+  border: 1px solid #17643A;
+  box-shadow: 0 4px 10px rgba(23, 100, 58, .13);
+}
+
+.admin-workspace .admin-panel .request-actions .btn-primary:hover {
+  color: #FFFFFF;
+  background: #0E4B2B;
+}
+
+/* Bukti tugas: putih dengan outline hijau */
+.admin-workspace .admin-panel .request-actions .btn-outline {
+  color: #17643A;
+  background: #FFFFFF;
+  border: 1px solid #A8C7AF;
+}
+
+.admin-workspace .admin-panel .request-actions .btn-outline:hover {
+  color: #17643A;
+  background: #EFF7F0;
+  border-color: #82A88C;
+}
+
+/* Tolak: oranye lembut */
+.admin-workspace .admin-panel .request-actions .btn-danger {
+  color: #A65B12;
+  background: #FFF4E8;
+  border: 1px solid #F0D2A9;
+  box-shadow: none;
+}
+
+.admin-workspace .admin-panel .request-actions .btn-danger:hover {
+  color: #8D4808;
+  background: #FBE8D0;
+}
+
+/* LINK MENU PANEL */
+.admin-workspace .admin-content .admin-panel .text-link {
+  color: #17643A;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.admin-workspace .admin-content .admin-panel .text-link:hover {
+  color: #0E8A45;
+}
+
+/* TABEL LAPORAN */
+.admin-workspace .admin-content .admin-table-wrap {
+  border: 1px solid #E5ECE6;
+  border-radius: 13px;
+  overflow-x: auto;
+}
+
+.admin-workspace .admin-content .admin-table-wrap th {
+  padding: 15px 13px;
+  background: #F1F7F2;
+  color: #557260;
+  font-size: 9px;
+  font-weight: 800;
+  border-bottom: 1px solid #E1EAE2;
+}
+
+.admin-workspace .admin-content .admin-table-wrap td {
+  padding: 15px 13px;
+  color: #536E5C;
+  border-bottom: 1px solid #EDF2EE;
+}
+
+.admin-workspace .admin-content .admin-table-wrap tbody tr {
+  transition: background .18s ease;
+}
+
+.admin-workspace .admin-content .admin-table-wrap tbody tr:hover {
+  background: #F5F9F5;
+}
+
+.admin-workspace .admin-content .admin-table-wrap td:first-child b {
+  color: #17643A;
+}
+
+.admin-workspace .admin-content .admin-table-wrap .table-link {
+  color: #17643A;
+  font-weight: 800;
+}
+
+/* RESPONSIVE */
+@media (max-width: 760px) {
+  .admin-workspace .admin-content {
+    gap: 17px;
+  }
+
+  .admin-workspace .admin-content .admin-panel {
+    padding: 18px;
+    border-radius: 14px;
+  }
+
+  .admin-workspace .admin-panel .request-actions {
+    gap: 7px;
+  }
+
+  .admin-workspace .admin-panel .request-actions .btn {
+    padding: 8px 11px;
+  }
+}
+
+
+/* BEGIN GLOBAL ADMIN TABLE HEADER */
+
+/* Header seluruh tabel di halaman Admin */
+.admin-workspace .admin-main table th {
+  background-color: #103B29 !important;
+  color: #FFFFFF !important;
+  border-bottom: 1px solid #28543B !important;
+  font-weight: 800;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+/* Ikon dan elemen di dalam header ikut putih */
+.admin-workspace .admin-main table th svg {
+  color: #FFFFFF !important;
+  stroke: #FFFFFF;
+}
+
+/* END GLOBAL ADMIN TABLE HEADER */
+
+/* END ADMIN DASHBOARD VISUAL FINAL */
+
+
+/* BEGIN ADMIN FILTER STANDARD FINAL */
+
+/* PANEL */
+.admin-workspace .admin-filter-panel {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 24px;
+  border: 1px solid #E3EBE4;
+  border-radius: 16px;
+  background: #FFFFFF;
+  box-shadow: 0 6px 20px rgba(16,59,41,.045);
+}
+
+/* JUDUL DAN DESKRIPSI */
+.admin-workspace .admin-filter-panel .panel-heading {
+  margin: 0 0 18px;
+}
+
+.admin-workspace .admin-filter-panel .panel-heading h2 {
+  margin: 0;
+  color: #143B2A;
+  font-family: Manrope, sans-serif;
+  font-size: 19px;
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+.admin-workspace .admin-filter-panel .panel-heading p {
+  margin: 4px 0 0;
+  color: #718477;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* VERIFIKASI: JUDUL DI ATAS DROPDOWN */
+.admin-workspace .admin-staff-requests-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 13px;
+  margin-bottom: 20px;
+}
+
+.admin-workspace .admin-staff-requests-heading > div:first-child {
+  width: 100%;
+}
+
+/* SEMUA DROPDOWN ADMIN */
+.admin-workspace .admin-filter-select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.admin-workspace .admin-filter-select .custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 46px;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 1px solid #DCE8DE;
+  border-radius: 11px;
+  background: #FFFFFF;
+  color: #365B44;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.admin-workspace .admin-filter-select .custom-select-trigger:hover:not(:disabled) {
+  border-color: #85AA8D;
+  background: #FCFEFC;
+}
+
+/* LAPORAN: JUDUL, FILTER, DAN TABEL */
+.admin-workspace .admin-reports-panel {
+  display: block;
+}
+
+.admin-workspace .admin-reports-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-bottom: 18px !important;
+}
+
+.admin-workspace .admin-reports-filters,
+.admin-workspace .admin-user-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) repeat(2, minmax(150px, 1fr));
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin: 0 0 22px;
+  box-sizing: border-box;
+}
+
+/* PENCARIAN LAPORAN DAN PENGGUNA */
+.admin-workspace .admin-reports-filter-search,
+.admin-workspace .admin-user-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 46px;
+  min-height: 46px;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0 13px;
+  border: 1px solid #DCE8DE;
+  border-radius: 11px;
+  background: #FFFFFF;
+  color: #789080;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.admin-workspace .admin-reports-filter-search svg,
+.admin-workspace .admin-user-search svg {
+  flex: 0 0 auto;
+  color: #789080;
+}
+
+.admin-workspace .admin-reports-filter-search:focus-within,
+.admin-workspace .admin-user-search:focus-within {
+  border-color: #75A985;
+  box-shadow: 0 0 0 3px rgba(40,122,69,.09);
+}
+
+/* Hilangkan border ganda pada input pencarian */
+.admin-workspace .admin-reports-filter-search input,
+.admin-workspace .admin-user-search input {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0 !important;
+  border-radius: 0;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  color: #244B33;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.admin-workspace .admin-reports-filter-search input::placeholder,
+.admin-workspace .admin-user-search input::placeholder {
+  color: #93A699;
+  opacity: 1;
+}
+
+/* Header manajemen pengguna tetap memiliki badge jumlah akun */
+.admin-workspace .admin-user-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+/* Jumlah hasil laporan */
+.admin-workspace .admin-reports-result-count {
+  margin: -10px 0 15px;
+  color: #718477;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .admin-workspace .admin-reports-filters,
+  .admin-workspace .admin-user-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-workspace .admin-reports-filter-search,
+  .admin-workspace .admin-user-search {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-workspace .admin-filter-panel {
+    padding: 17px;
+  }
+
+  .admin-workspace .admin-reports-filters,
+  .admin-workspace .admin-user-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .admin-workspace .admin-reports-filter-search,
+  .admin-workspace .admin-user-search {
+    grid-column: auto;
+  }
+
+  .admin-workspace .admin-user-heading {
+    align-items: flex-start;
+  }
+}
+
+/* END ADMIN FILTER STANDARD FINAL */

@@ -64,25 +64,41 @@ export default function AdminUsersPage() {
   const filteredUsers = useMemo(() => {
     const keyword = search.trim().toLowerCase();
 
-    return users.filter((user) => {
-      const matchesSearch =
-        !keyword ||
-        [user.name, user.email, user.phone, user.village_name]
-          .filter(Boolean)
-          .some((value) => String(value).toLowerCase().includes(keyword));
+    return users
+      .filter((user) => {
+        const matchesSearch =
+          !keyword ||
+          [user.name, user.email, user.phone, user.village_name]
+            .filter(Boolean)
+            .some((value) => String(value).toLowerCase().includes(keyword));
 
-      const role = user.role === 'petugas' ? 'pengelola' : user.role;
-      const matchesRole =
-        roleFilter === 'semua' || role === roleFilter;
+        const role = user.role === 'petugas' ? 'pengelola' : user.role;
+        const matchesRole =
+          roleFilter === 'semua' || role === roleFilter;
 
-      const isActive = user.is_active !== false;
-      const matchesStatus =
-        statusFilter === 'semua' ||
-        (statusFilter === 'aktif' && isActive) ||
-        (statusFilter === 'nonaktif' && !isActive);
+        const isActive = user.is_active !== false;
+        const matchesStatus =
+          statusFilter === 'semua' ||
+          (statusFilter === 'aktif' && isActive) ||
+          (statusFilter === 'nonaktif' && !isActive);
 
-      return matchesSearch && matchesRole && matchesStatus;
-    });
+        return matchesSearch && matchesRole && matchesStatus;
+      })
+      .sort((a, b) => {
+        const inactiveA = a.is_active === false ? 1 : 0;
+        const inactiveB = b.is_active === false ? 1 : 0;
+
+        // Akun aktif selalu berada di atas.
+        if (inactiveA !== inactiveB) {
+          return inactiveA - inactiveB;
+        }
+
+        // Dalam kelompok yang sama, akun terbaru di atas.
+        const dateA = Date.parse(a.created_at || '') || 0;
+        const dateB = Date.parse(b.created_at || '') || 0;
+
+        return dateB - dateA;
+      });
   }, [users, search, roleFilter, statusFilter]);
 
   function openDetail(user) {
@@ -195,7 +211,7 @@ export default function AdminUsersPage() {
         </div>
       )}
 
-      <div className="panel admin-user-panel">
+      <div className="panel admin-user-panel admin-filter-panel">
         <div className="panel-heading admin-user-heading">
           <div>
             <h2>Daftar pengguna</h2>
@@ -223,6 +239,7 @@ export default function AdminUsersPage() {
           </div>
 
           <CustomSelect
+            className="admin-filter-select"
             value={roleFilter}
             onChange={(event) => setRoleFilter(event.target.value)}
             aria-label="Filter role"
@@ -234,6 +251,7 @@ export default function AdminUsersPage() {
           </CustomSelect>
 
           <CustomSelect
+            className="admin-filter-select"
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
             aria-label="Filter status akun"
@@ -277,13 +295,14 @@ export default function AdminUsersPage() {
                       <td>{user.phone || '-'}</td>
 
                       <td>
-                        <span className="role-pill">{role}</span>
+                        <span className={`role-pill role-${role}`}>{role}</span>
                       </td>
 
                       <td>
-                        {user.village_name
-                          ? `${user.village_name}, ${user.district_name || ''}`
-                          : '-'}
+                        {[
+                          user.village_name,
+                          user.district_name,
+                        ].filter(Boolean).join(', ') || '-'}
                       </td>
 
                       <td>
