@@ -304,3 +304,725 @@
     border-radius: 8px;
   }
 }
+
+/* =====================================================
+   LAPORMAS - REGISTRASI WARGA
+   Penyesuaian tampilan berdasarkan desain Figma
+   ===================================================== */
+
+/* LAYOUT DESKTOP: DUA PANEL */
+
+.auth-page-v2.auth-register-page {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+/* PANEL KIRI TETAP */
+
+.auth-page-v2.auth-register-page > .auth-visual {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  align-self: stretch;
+  overflow: hidden;
+}
+
+/* PANEL KANAN SCROLL MANDIRI */
+
+.auth-page-v2.auth-register-page > .auth-register-side {
+  display: block !important;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 36px clamp(28px, 5.8vw, 88px) 45px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #b9cdbd #f5f8f5;
+}
+
+.auth-page-v2.auth-register-page > .auth-register-side::-webkit-scrollbar {
+  width: 7px;
+}
+
+.auth-page-v2.auth-register-page > .auth-register-side::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #b9cdbd;
+}
+
+/* LEBAR FORM */
+
+.auth-page-v2 .auth-register-wrap {
+  width: min(100%, 592px);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* HEADER REGISTRASI */
+
+.auth-page-v2 .auth-register-title {
+  margin: 0 0 25px;
+}
+
+.auth-page-v2 .auth-register-title h2 {
+  margin: 0 0 7px;
+  color: #151515;
+  font-family: Manrope, sans-serif;
+  font-size: clamp(28px, 2.2vw, 34px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.25;
+}
+
+.auth-page-v2 .auth-register-title p {
+  max-width: 540px;
+  margin: 0;
+  color: #66736a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* TAB WARGA DAN PENGELOLA */
+
+.auth-page-v2 .auth-register-role-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  min-height: 56px;
+  gap: 5px;
+  padding: 5px;
+  margin: 0 0 28px;
+  border: 0;
+  border-radius: 15px;
+  background: #17643a;
+  box-sizing: border-box;
+}
+
+.auth-page-v2 .auth-register-role-switch a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px;
+  border-radius: 11px;
+  color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .2s ease, color .2s ease;
+}
+
+.auth-page-v2 .auth-register-role-switch a.active {
+  background: #ffffff;
+  color: #17643a;
+  box-shadow: 0 2px 6px rgba(16, 59, 41, .10);
+}
+
+.auth-page-v2 .auth-register-role-switch a:not(.active):hover {
+  background: rgba(255, 255, 255, .12);
+}
+
+/* JARAK DAN BAGIAN FORM */
+
+.auth-page-v2 .auth-register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 21px;
+}
+
+.auth-page-v2 .auth-register-section {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.auth-page-v2 .auth-register-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #dce5de;
+}
+
+.auth-page-v2 .auth-register-section-heading h3 {
+  margin: 0;
+  color: #17643a;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.auth-page-v2 .auth-register-section-heading > span {
+  color: #84958a;
+  font-size: 11px;
+}
+
+/* LABEL INPUT */
+
+.auth-page-v2 .auth-register-section > label,
+.auth-page-v2 .auth-register-grid > label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+  color: #293b30;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* UKURAN INPUT */
+
+.auth-page-v2 .auth-register-section > label > input,
+.auth-page-v2 .auth-register-grid input,
+.auth-page-v2 .auth-register-grid select {
+  width: 100%;
+  min-width: 0;
+  min-height: 51px;
+  padding: 12px 15px;
+  box-sizing: border-box;
+  border: 1px solid #d4ded7;
+  border-radius: 11px;
+  outline: none;
+  background: #ffffff;
+  color: #183d2b;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  box-shadow: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.auth-page-v2 .auth-register-section > label > input::placeholder,
+.auth-page-v2 .auth-register-grid input::placeholder {
+  color: #9aaa9e;
+  opacity: 1;
+}
+
+.auth-page-v2 .auth-register-section > label > input:focus,
+.auth-page-v2 .auth-register-grid input:focus,
+.auth-page-v2 .auth-register-grid select:focus {
+  border-color: #72a383;
+  box-shadow: 0 0 0 3px rgba(42, 125, 66, .08);
+}
+
+/* EMAIL, TELEPON, PASSWORD DAN KOORDINAT */
+
+.auth-page-v2 .auth-register-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px 13px;
+  min-width: 0;
+}
+
+.auth-page-v2 .auth-coordinate-grid {
+  margin-top: 1px;
+}
+
+/* KETERANGAN LOKASI */
+
+.auth-page-v2 .auth-register-hint {
+  margin: -2px 0 2px;
+  color: #84958a;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+/* PETA */
+
+.auth-page-v2 .registration-location-picker {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #dce9df;
+  border-radius: 13px;
+  background: #eef5ef;
+  box-sizing: border-box;
+}
+
+.auth-page-v2 .registration-map-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 53px;
+  padding: 8px 12px;
+  background: #eaf4ec;
+}
+
+.auth-page-v2 .registration-map-toolbar > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #315a3f;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.auth-page-v2 .registration-map-toolbar > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 8px 13px;
+  border: 0;
+  border-radius: 22px;
+  background: #17643a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-page-v2 .registration-map-toolbar > button:hover:not(:disabled) {
+  background: #10532f;
+}
+
+.auth-page-v2 .registration-map-toolbar > button:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.auth-page-v2 .registration-map-canvas {
+  width: 100%;
+  height: clamp(220px, 27vh, 280px);
+  background: #e4f0e6;
+}
+
+.auth-page-v2 .registration-map-coordinate {
+  padding: 9px 12px;
+  background: #ffffff;
+  color: #63786a;
+  font-size: 11px;
+}
+
+/* STATUS DETEKSI LOKASI */
+
+.auth-page-v2 .auth-location-feedback {
+  margin-top: -7px;
+  color: #688071;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.auth-page-v2 .auth-location-feedback.done {
+  color: #17643a;
+}
+
+.auth-page-v2 .auth-location-feedback.error {
+  color: #b44b40;
+}
+
+.auth-page-v2 .registration-map-attribution {
+  margin-top: -5px;
+  color: #87958b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.auth-page-v2 .registration-map-attribution a {
+  color: #477354;
+  text-decoration: underline;
+}
+
+/* HASIL DETEKSI WILAYAH */
+
+.auth-page-v2 .auth-area-heading {
+  margin-top: 5px;
+}
+
+.auth-page-v2 .auth-area-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.auth-page-v2 .auth-area-grid input[readonly] {
+  min-height: 47px;
+  padding: 10px;
+  overflow: hidden;
+  border-color: #d4ded7;
+  background: #f1f5f1;
+  color: #68796e;
+  text-overflow: ellipsis;
+  font-size: 11px;
+}
+
+/* INFORMASI PRIVASI */
+
+.auth-page-v2 .auth-register-privacy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  padding: 13px;
+  border: 1px solid #dce9df;
+  border-radius: 11px;
+  background: #f0f6f1;
+  color: #476b53;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.auth-page-v2 .auth-register-privacy svg {
+  flex-shrink: 0;
+}
+
+/* CHECKBOX PERSETUJUAN */
+
+.auth-page-v2 .auth-register-consent {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 9px !important;
+  margin: 1px 0;
+  color: #526457 !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.auth-page-v2 .auth-register-consent input[type="checkbox"] {
+  appearance: auto !important;
+  -webkit-appearance: checkbox !important;
+  display: inline-block !important;
+  width: 15px !important;
+  min-width: 15px !important;
+  max-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+  max-height: 15px !important;
+  flex: 0 0 15px !important;
+  padding: 0 !important;
+  margin: 2px 0 0 !important;
+  accent-color: #17643a;
+}
+
+/* TOMBOL DAFTAR */
+
+.auth-page-v2 .auth-register-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 51px;
+  margin-top: 1px;
+  padding: 13px 18px;
+  border: 1px solid #c5820d;
+  border-radius: 10px;
+  background: #c5820d;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+
+.auth-page-v2 .auth-register-submit:hover:not(:disabled) {
+  border-color: #aa6f07;
+  background: #aa6f07;
+  transform: translateY(-1px);
+}
+
+/* LINK SUDAH PUNYA AKUN */
+
+.auth-page-v2 .auth-register-login {
+  margin: 20px 0 8px;
+  color: #59675e;
+  font-size: 12px;
+  text-align: center;
+}
+
+.auth-page-v2 .auth-register-login a {
+  color: #4778c5;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-page-v2 .auth-register-login a:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVE TABLET DAN HP */
+
+@media (max-width: 760px) {
+  .auth-page-v2.auth-register-page {
+    display: flex !important;
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .auth-page-v2.auth-register-page > .auth-visual {
+    width: 100%;
+    height: 280px;
+    min-height: 280px;
+    flex: 0 0 280px;
+  }
+
+  .auth-page-v2.auth-register-page > .auth-register-side {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 30px 24px 42px;
+    overflow: visible;
+  }
+
+  .auth-page-v2 .auth-register-wrap {
+    width: min(100%, 620px);
+  }
+}
+
+@media (max-width: 560px) {
+  .auth-page-v2.auth-register-page > .auth-visual {
+    height: 240px;
+    min-height: 240px;
+    flex-basis: 240px;
+  }
+
+  .auth-page-v2.auth-register-page > .auth-register-side {
+    padding: 32px 19px 36px;
+  }
+
+  .auth-page-v2 .auth-register-title h2 {
+    font-size: 27px;
+  }
+
+  .auth-page-v2 .auth-register-title p {
+    font-size: 12px;
+  }
+
+  .auth-page-v2 .auth-register-grid,
+  .auth-page-v2 .auth-area-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-page-v2 .registration-map-toolbar {
+    align-items: flex-start;
+  }
+
+  .auth-page-v2 .registration-map-canvas {
+    height: 220px;
+  }
+}
+
+/* PASSWORD TOGGLE - REGISTER WARGA */
+
+.auth-page-v2 .auth-register-password-field {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.auth-page-v2 .auth-register-password-field input {
+  width: 100%;
+  padding-right: 48px;
+  box-sizing: border-box;
+}
+
+.auth-page-v2 .auth-register-password-field button {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  display: grid;
+  width: 35px;
+  height: 35px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #84958a;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: background .2s ease, color .2s ease;
+}
+
+.auth-page-v2 .auth-register-password-field button:hover {
+  background: #f0f5f1;
+  color: #17643a;
+}
+
+.auth-page-v2 .auth-register-password-field button:focus-visible {
+  outline: 2px solid #17643a;
+  outline-offset: 2px;
+}
+
+/* =====================================================
+   LAPORMAS - REGISTER PENGELOLA
+   ===================================================== */
+
+/* JARAK FORM */
+
+.auth-page-v2 .auth-register-form {
+  gap: 22px;
+}
+
+.auth-page-v2 .auth-register-form .auth-register-section {
+  gap: 13px;
+}
+
+/* FIELD AREA TUGAS */
+
+.auth-page-v2 .auth-staff-area-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.auth-page-v2 .auth-staff-area-grid select {
+  min-height: 51px;
+  padding: 12px 15px;
+  border: 1px solid #d4ded7;
+  border-radius: 11px;
+  background-color: #ffffff;
+  color: #183d2b;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.auth-page-v2 .auth-staff-area-grid select:focus {
+  border-color: #72a383;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(42, 125, 66, .08);
+}
+
+.auth-page-v2 .auth-staff-area-grid label > small {
+  color: #84958a;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* UPLOAD SURAT TUGAS */
+
+.auth-page-v2 .auth-staff-upload {
+  position: relative;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 15px !important;
+  width: 100%;
+  min-height: 105px;
+  padding: 20px;
+  box-sizing: border-box;
+  border: 1.5px dashed #91b59a;
+  border-radius: 13px;
+  background: #f3f8f3;
+  color: #17643a;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.auth-page-v2 .auth-staff-upload:hover {
+  border-color: #4e8a5b;
+  background: #edf5ee;
+}
+
+.auth-page-v2 .auth-staff-upload > svg {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  color: #47835a;
+}
+
+.auth-page-v2 .auth-staff-upload > span {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-page-v2 .auth-staff-upload b {
+  color: #315a3f;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.auth-page-v2 .auth-staff-upload small {
+  overflow-wrap: anywhere;
+  color: #819187;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.auth-page-v2 .auth-staff-upload input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* INFORMASI FILE TERPILIH */
+
+.auth-page-v2 .auth-staff-file-info {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: -7px;
+  color: #47835a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* INFORMASI VERIFIKASI */
+
+.auth-page-v2 .auth-staff-verification {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 15px;
+  border: 1px solid #dce9df;
+  border-radius: 11px;
+  background: #f0f6f1;
+  color: #476b53;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.auth-page-v2 .auth-staff-verification svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: #47835a;
+}
+
+/* SUBMIT */
+
+.auth-page-v2 .auth-register-submit {
+  min-height: 52px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 560px) {
+  .auth-page-v2 .auth-staff-upload {
+    min-height: 95px;
+    padding: 16px;
+  }
+
+  .auth-page-v2 .auth-staff-upload b {
+    font-size: 12px;
+  }
+
+  .auth-page-v2 .auth-staff-upload small {
+    font-size: 10px;
+  }
+}

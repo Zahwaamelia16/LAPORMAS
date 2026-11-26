@@ -1,3 +1,4 @@
+import CustomSelect from '../../components/CustomSelect';
 
 import { useEffect, useState } from 'react';
 import {
@@ -264,7 +265,7 @@ export default function ProfilePageModule() {
 
             <label>
               Area tempat tinggal
-              <select
+              <CustomSelect
                 value={form.area_id}
                 onChange={(event) => updateField('area_id', event.target.value)}
               >
@@ -274,7 +275,7 @@ export default function ProfilePageModule() {
                     {area.village_name}, {area.district_name} ({area.regency_name})
                   </option>
                 ))}
-              </select>
+              </CustomSelect>
             </label>
 
             <div className="form-actions">

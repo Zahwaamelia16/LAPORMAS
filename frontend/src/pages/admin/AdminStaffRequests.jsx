@@ -1,3 +1,4 @@
+import CustomSelect from '../../components/CustomSelect';
 import { useEffect, useState } from 'react';
 import { ShieldCheck, AlertTriangle } from 'lucide-react';
 
@@ -96,7 +97,7 @@ export default function AdminStaffRequestsPage() {
             </p>
           </div>
 
-          <select
+          <CustomSelect
             className="select-compact"
             value={status}
             onChange={(event) => setStatus(event.target.value)}
@@ -105,7 +106,7 @@ export default function AdminStaffRequestsPage() {
             <option value="approved">Disetujui</option>
             <option value="rejected">Ditolak</option>
             <option value="semua">Semua</option>
-          </select>
+          </CustomSelect>
         </div>
 
         {loading ? (

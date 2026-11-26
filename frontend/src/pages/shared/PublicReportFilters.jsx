@@ -1,3 +1,4 @@
+import CustomSelect from '../../components/CustomSelect';
 
 import { Filter, Search, RotateCcw } from 'lucide-react';
 
@@ -79,7 +80,7 @@ export default function PublicReportFilters({
           />
         </div>
 
-        <select
+        <CustomSelect
           aria-label="Filter kategori"
           value={filters.category}
           onChange={(event) =>
@@ -96,9 +97,9 @@ export default function PublicReportFilters({
               {category.category_name}
             </option>
           ))}
-        </select>
+        </CustomSelect>
 
-        <select
+        <CustomSelect
           aria-label="Filter status"
           value={filters.status}
           onChange={(event) =>
@@ -115,7 +116,7 @@ export default function PublicReportFilters({
               {status.status_name}
             </option>
           ))}
-        </select>
+        </CustomSelect>
 
       </div>
 
@@ -139,7 +140,7 @@ export default function PublicReportFilters({
 
         <div className="public-area-selects">
 
-          <select
+          <CustomSelect
             aria-label="Kabupaten atau kota"
             value={filters.regency}
             onChange={(event) =>
@@ -153,9 +154,9 @@ export default function PublicReportFilters({
                 {name}
               </option>
             ))}
-          </select>
+          </CustomSelect>
 
-          <select
+          <CustomSelect
             aria-label="Kecamatan"
             value={filters.district}
             onChange={(event) =>
@@ -170,9 +171,9 @@ export default function PublicReportFilters({
                 {name}
               </option>
             ))}
-          </select>
+          </CustomSelect>
 
-          <select
+          <CustomSelect
             aria-label="Desa atau kelurahan"
             value={filters.village}
             onChange={(event) =>
@@ -190,7 +191,7 @@ export default function PublicReportFilters({
                 {area.village_name}
               </option>
             ))}
-          </select>
+          </CustomSelect>
 
         </div>
       </section>

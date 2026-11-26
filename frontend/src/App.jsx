@@ -1,3 +1,4 @@
+import CustomSelect from './components/CustomSelect';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboardPage from './pages/admin/AdminDashboard';
 import AdminReportsPage from './pages/admin/AdminReports';
@@ -1575,6 +1576,8 @@ function RegisterCitizen() {
   });
 
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showRegisterConfirmPassword, setShowRegisterConfirmPassword] = useState(false);
   const [accepted, setAccepted] = useState(false);
 
   const [position, setPosition] = useState(null);
@@ -1863,32 +1866,56 @@ function RegisterCitizen() {
                 <label>
                   Kata sandi
 
-                  <input
-                    type="password"
-                    minLength="8"
-                    value={form.password}
-                    onChange={(event) =>
-                      update('password', event.target.value)
-                    }
-                    placeholder="Minimal 8 karakter"
-                    autoComplete="new-password"
-                    required
-                  />
+                  <div className="auth-register-password-field">
+                    <input
+                      type={showRegisterPassword ? 'text' : 'password'}
+                      minLength="8"
+                      value={form.password}
+                      onChange={(event) =>
+                        update('password', event.target.value)
+                      }
+                      placeholder="Minimal 8 karakter"
+                      autoComplete="new-password"
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowRegisterPassword((current) => !current)}
+                      aria-label={showRegisterPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                      aria-pressed={showRegisterPassword}
+                    >
+                      {showRegisterPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                    </button>
+                  </div>
                 </label>
 
                 <label>
                   Konfirmasi kata sandi
 
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(event) =>
-                      setConfirmPassword(event.target.value)
-                    }
-                    placeholder="Ulangi kata sandi"
-                    autoComplete="new-password"
-                    required
-                  />
+                  <div className="auth-register-password-field">
+                    <input
+                      type={showRegisterConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(event) =>
+                        setConfirmPassword(event.target.value)
+                      }
+                      placeholder="Ulangi kata sandi"
+                      autoComplete="new-password"
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowRegisterConfirmPassword((current) => !current)
+                      }
+                      aria-label={showRegisterConfirmPassword ? 'Sembunyikan konfirmasi kata sandi' : 'Tampilkan konfirmasi kata sandi'}
+                      aria-pressed={showRegisterConfirmPassword}
+                    >
+                      {showRegisterConfirmPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                    </button>
+                  </div>
                 </label>
 
               </div>
@@ -2111,6 +2138,7 @@ function RegisterCitizen() {
   );
 }
 
+
 function RegisterStaff() {
   const [areas, setAreas] = useState([]);
 
@@ -2126,14 +2154,21 @@ function RegisterStaff() {
   });
 
   const [proof, setProof] = useState(null);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Ambil daftar wilayah dari database
   useEffect(() => {
     api('/areas')
       .then((data) => setAreas(data.areas || []))
-      .catch(() => {});
+      .catch((err) => {
+        setError(err.message || 'Gagal mengambil daftar wilayah.');
+      });
   }, []);
 
   const update = (key, value) => {
@@ -2143,14 +2178,66 @@ function RegisterStaff() {
     }));
   };
 
+  // Upload surat tugas
+  const handleProofChange = (event) => {
+    const file = event.target.files?.[0] || null;
+
+    if (!file) {
+      setProof(null);
+      return;
+    }
+
+    const allowedTypes = [
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      setError('Format surat tugas harus PDF, JPG, atau PNG.');
+      event.target.value = '';
+      setProof(null);
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Ukuran surat tugas maksimal 5 MB.');
+      event.target.value = '';
+      setProof(null);
+      return;
+    }
+
+    setError('');
+    setProof(file);
+  };
+
+  // Proses pengajuan akun pengelola
   const submit = async (event) => {
     event.preventDefault();
 
     setError('');
     setSuccess('');
 
+    if (form.password.length < 8) {
+      return setError('Kata sandi minimal 8 karakter.');
+    }
+
+    if (form.password !== confirmPassword) {
+      return setError('Konfirmasi kata sandi tidak sama.');
+    }
+
+    if (!form.area_id) {
+      return setError('Pilih wilayah tugas terlebih dahulu.');
+    }
+
     if (!proof) {
-      return setError('Unggah bukti penugasan terlebih dahulu.');
+      return setError('Unggah surat tugas atau SK penugasan terlebih dahulu.');
+    }
+
+    if (!accepted) {
+      return setError(
+        'Setujui Syarat & Ketentuan dan Kebijakan Privasi terlebih dahulu.'
+      );
     }
 
     const body = new FormData();
@@ -2159,6 +2246,8 @@ function RegisterStaff() {
       body.append(key, value);
     });
 
+    // Konfirmasi password hanya divalidasi di frontend
+    // dan tidak dikirim sebagai field database.
     body.append('proof', proof);
 
     setBusy(true);
@@ -2182,9 +2271,17 @@ function RegisterStaff() {
         password: '',
       });
 
+      setConfirmPassword('');
       setProof(null);
+      setAccepted(false);
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+
+      const fileInput = document.getElementById('staff-proof-input');
+      if (fileInput) fileInput.value = '';
+
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Gagal mengirim pengajuan.');
     } finally {
       setBusy(false);
     }
@@ -2193,16 +2290,18 @@ function RegisterStaff() {
   return (
     <div className="auth-page auth-page-v2 auth-register-page">
 
+      {/* PANEL KIRI */}
       <AuthVisualPanel />
 
+      {/* PANEL KANAN */}
       <section className="auth-form-side auth-register-side">
         <div className="auth-register-wrap">
 
+          {/* HEADER */}
           <div className="auth-register-title">
-            <h2>Pengajuan akun pengelola</h2>
+            <h2>Buat akun pengelola</h2>
             <p>
-              Daftarkan instansi dan wilayah tugas untuk
-              membantu penanganan laporan warga.
+              Daftar untuk menangani laporan warga di area tugasmu.
             </p>
           </div>
 
@@ -2217,187 +2316,336 @@ function RegisterStaff() {
             </Link>
           </div>
 
-          <div className="auth-register-section-heading">
-            <h3>Data pengelola</h3>
-          </div>
-
           <form
             onSubmit={submit}
             className="form-stack auth-register-form"
           >
 
-            <div className="auth-register-grid">
+            {/* DATA PENGELOLA */}
+            <section className="auth-register-section">
 
-              <label>
-                Nama lengkap
-                <input
-                  value={form.name}
-                  onChange={(event) =>
-                    update('name', event.target.value)
-                  }
-                  placeholder="Nama lengkap"
-                  required
-                />
-              </label>
+              <div className="auth-register-section-heading">
+                <h3>Data pengelola</h3>
+              </div>
 
-              <label>
-                Email dinas
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(event) =>
-                    update('email', event.target.value)
-                  }
-                  placeholder="nama@instansi.go.id"
-                  required
-                />
-              </label>
+              <div className="auth-register-grid">
 
-              <label>
-                Nomor telepon
-                <input
-                  type="tel"
-                  value={form.phone}
-                  onChange={(event) =>
-                    update('phone', event.target.value)
-                  }
-                  placeholder="Nomor telepon"
-                  required
-                />
-              </label>
+                {/* NAMA */}
+                <label className="auth-register-full">
+                  Nama lengkap
 
-              <label>
-                Instansi
-                <input
-                  value={form.agency}
-                  onChange={(event) =>
-                    update('agency', event.target.value)
-                  }
-                  placeholder="Nama instansi"
-                  required
-                />
-              </label>
+                  <input
+                    value={form.name}
+                    onChange={(event) =>
+                      update('name', event.target.value)
+                    }
+                    placeholder="Masukkan nama lengkapmu"
+                    autoComplete="name"
+                    maxLength={150}
+                    required
+                  />
+                </label>
 
-              <label>
-                Unit kerja
-                <input
-                  value={form.unit_name}
-                  onChange={(event) =>
-                    update('unit_name', event.target.value)
-                  }
-                  placeholder="Nama unit kerja"
-                  required
-                />
-              </label>
+                {/* EMAIL */}
+                <label>
+                  Email dinas
 
-              <label>
-                Wilayah tugas
-                <select
-                  value={form.area_id}
-                  onChange={(event) =>
-                    update('area_id', event.target.value)
-                  }
-                  required
-                >
-                  <option value="">Pilih desa/kelurahan</option>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(event) =>
+                      update('email', event.target.value)
+                    }
+                    placeholder="nama@instansi.go.id"
+                    autoComplete="email"
+                    required
+                  />
+                </label>
 
-                  {areas.map((area) => (
-                    <option
-                      key={area.area_id}
-                      value={area.area_id}
+                {/* NOMOR TELEPON */}
+                <label>
+                  No. telepon
+
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(event) =>
+                      update('phone', event.target.value)
+                    }
+                    placeholder="08xxxxxxxxxx"
+                    autoComplete="tel"
+                    required
+                  />
+                </label>
+
+                {/* INSTANSI */}
+                <label>
+                  Instansi
+
+                  <input
+                    value={form.agency}
+                    onChange={(event) =>
+                      update('agency', event.target.value)
+                    }
+                    placeholder="Nama instansi"
+                    maxLength={150}
+                    required
+                  />
+                </label>
+
+                {/* UNIT KERJA */}
+                <label>
+                  Unit kerja
+
+                  <input
+                    value={form.unit_name}
+                    onChange={(event) =>
+                      update('unit_name', event.target.value)
+                    }
+                    placeholder="Nama unit kerja"
+                    maxLength={150}
+                    required
+                  />
+                </label>
+
+                {/* ALAMAT KANTOR */}
+                <label className="auth-register-full">
+                  Alamat kantor
+
+                  <input
+                    value={form.office_address}
+                    onChange={(event) =>
+                      update('office_address', event.target.value)
+                    }
+                    placeholder="Masukkan alamat lengkap kantor"
+                    autoComplete="street-address"
+                    required
+                  />
+                </label>
+
+                {/* PASSWORD */}
+                <label>
+                  Kata sandi
+
+                  <div className="auth-register-password-field">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      minLength={8}
+                      value={form.password}
+                      onChange={(event) =>
+                        update('password', event.target.value)
+                      }
+                      placeholder="Minimal 8 karakter"
+                      autoComplete="new-password"
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowPassword((current) => !current)
+                      }
+                      aria-label={
+                        showPassword
+                          ? 'Sembunyikan kata sandi'
+                          : 'Tampilkan kata sandi'
+                      }
+                      aria-pressed={showPassword}
                     >
-                      {area.village_name} · {area.district_name} · {area.regency_name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                      {showPassword
+                        ? <Eye size={18} />
+                        : <EyeOff size={18} />}
+                    </button>
+                  </div>
+                </label>
 
-              <label className="auth-register-full">
-                Alamat kantor
+                {/* KONFIRMASI PASSWORD */}
+                <label>
+                  Konfirmasi kata sandi
+
+                  <div className="auth-register-password-field">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(event) =>
+                        setConfirmPassword(event.target.value)
+                      }
+                      placeholder="Ulangi kata sandi"
+                      autoComplete="new-password"
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword((current) => !current)
+                      }
+                      aria-label={
+                        showConfirmPassword
+                          ? 'Sembunyikan konfirmasi kata sandi'
+                          : 'Tampilkan konfirmasi kata sandi'
+                      }
+                      aria-pressed={showConfirmPassword}
+                    >
+                      {showConfirmPassword
+                        ? <Eye size={18} />
+                        : <EyeOff size={18} />}
+                    </button>
+                  </div>
+                </label>
+
+              </div>
+            </section>
+
+            {/* SURAT TUGAS */}
+            <section className="auth-register-section">
+
+              <div className="auth-register-section-heading">
+                <h3>Surat tugas / SK penugasan</h3>
+              </div>
+
+              <p className="auth-register-hint">
+                Unggah dokumen resmi yang membuktikan penugasanmu
+                sebagai pengelola wilayah.
+              </p>
+
+              <label className="upload-field auth-staff-upload">
+
+                <UploadCloud size={27} aria-hidden="true" />
+
+                <span>
+                  <b>
+                    {proof
+                      ? 'Dokumen berhasil dipilih'
+                      : 'Pilih atau seret berkas ke sini'}
+                  </b>
+
+                  <small>
+                    {proof
+                      ? proof.name
+                      : 'PDF, JPG, atau PNG · Maksimal 5 MB'}
+                  </small>
+                </span>
+
                 <input
-                  value={form.office_address}
-                  onChange={(event) =>
-                    update('office_address', event.target.value)
-                  }
-                  placeholder="Alamat lengkap kantor"
+                  id="staff-proof-input"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                  onChange={handleProofChange}
                   required
                 />
               </label>
 
-              <label className="auth-register-full">
-                Kata sandi
-                <input
-                  type="password"
-                  minLength="8"
-                  value={form.password}
-                  onChange={(event) =>
-                    update('password', event.target.value)
-                  }
-                  placeholder="Minimal 8 karakter"
-                  required
-                />
-              </label>
+              {proof && (
+                <div className="auth-staff-file-info">
+                  <FileCheck2 size={15} />
+                  <span>
+                    {(proof.size / (1024 * 1024)).toFixed(2)} MB
+                  </span>
+                </div>
+              )}
 
-            </div>
+            </section>
 
-            <label className="upload-field">
-              <UploadCloud />
+            {/* AREA TUGAS */}
+            <section className="auth-register-section">
+
+              <div className="auth-register-section-heading">
+                <h3>Area tugas</h3>
+              </div>
+
+              <p className="auth-register-hint">
+                Pilih wilayah yang menjadi tanggung jawabmu.
+                Laporan pada wilayah tersebut akan ditampilkan
+                di dashboard pengelolamu.
+              </p>
+
+              <div className="auth-register-grid auth-staff-area-grid">
+
+                <label className="auth-register-full">
+                  Wilayah tugas
+
+                  <CustomSelect
+                    value={form.area_id}
+                    onChange={(event) =>
+                      update('area_id', event.target.value)
+                    }
+                    required
+                  >
+                    <option value="">Pilih desa/kelurahan</option>
+
+                    {areas.map((area) => (
+                      <option
+                        key={area.area_id}
+                        value={area.area_id}
+                      >
+                        {area.village_name} · {area.district_name} · {area.regency_name}
+                      </option>
+                    ))}
+                  </CustomSelect>
+
+                  <small>
+                    Wilayah dipilih dari daftar area yang tersedia
+                    pada LAPORMAS.
+                  </small>
+                </label>
+
+              </div>
+
+            </section>
+
+            {/* INFORMASI VERIFIKASI */}
+            <div className="notice info auth-staff-verification">
+              <ShieldCheck size={18} aria-hidden="true" />
 
               <span>
-                <b>Bukti penugasan</b>
-                <small>
-                  {proof
-                    ? proof.name
-                    : 'Unggah surat tugas atau dokumen resmi (JPG/PNG/WEBP, maksimal 5 MB)'}
-                </small>
+                Akun pengelola akan aktif setelah pengajuan dan
+                surat tugas diverifikasi oleh admin LAPORMAS.
               </span>
+            </div>
+
+            {/* PERSETUJUAN */}
+            <label className="auth-register-consent">
 
               <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={(event) => {
-                  const file = event.target.files?.[0] || null;
-
-                  if (file && file.size > 5 * 1024 * 1024) {
-                    setError('Ukuran bukti penugasan maksimal 5 MB.');
-                    event.target.value = '';
-                    setProof(null);
-                    return;
-                  }
-
-                  setError('');
-                  setProof(file);
-                }}
+                type="checkbox"
+                checked={accepted}
+                onChange={(event) =>
+                  setAccepted(event.target.checked)
+                }
                 required
               />
+
+              <span>
+                Saya menyetujui Syarat &amp; Ketentuan dan
+                Kebijakan Privasi LAPORMAS.
+              </span>
+
             </label>
 
-            <div className="notice info">
-              <ShieldCheck size={16} />
-              <span>
-                Pengajuan akan diperiksa admin. Akses pengelola
-                diberikan setelah penugasan disetujui.
-              </span>
-            </div>
-
+            {/* PESAN */}
             {error && <Notice type="error">{error}</Notice>}
             {success && <Notice type="success">{success}</Notice>}
 
+            {/* TOMBOL AJUKAN */}
             <button
               type="submit"
               className="btn btn-primary btn-block auth-register-submit"
               disabled={busy}
             >
-              {busy ? 'Mengirim pengajuan...' : 'Kirim pengajuan'}
+              {busy
+                ? 'Mengirim pengajuan...'
+                : 'Ajukan Pendaftaran'}
             </button>
 
           </form>
 
+          {/* LINK LOGIN */}
           <div className="auth-register-login">
             Sudah punya akun?
             {' '}
             <Link to="/masuk?role=pengelola">
-              Masuk sebagai pengelola
+              Masuk
             </Link>
           </div>
 

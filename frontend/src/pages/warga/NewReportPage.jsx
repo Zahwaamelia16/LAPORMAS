@@ -1,3 +1,4 @@
+import CustomSelect from '../../components/CustomSelect';
 
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -299,7 +300,7 @@ export default function NewReportPage() {
               <div className="field-grid">
                 <label>
                   Kategori masalah *
-                  <select
+                  <CustomSelect
                     value={form.category_id}
                     onChange={(event) =>
                       update('category_id', event.target.value)
@@ -316,7 +317,7 @@ export default function NewReportPage() {
                         {category.category_name}
                       </option>
                     ))}
-                  </select>
+                  </CustomSelect>
                 </label>
 
                 <label>

@@ -1,3 +1,4 @@
+import CustomSelect from '../../components/CustomSelect';
 
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -221,7 +222,7 @@ export default function AdminUsersPage() {
             />
           </div>
 
-          <select
+          <CustomSelect
             value={roleFilter}
             onChange={(event) => setRoleFilter(event.target.value)}
             aria-label="Filter role"
@@ -230,9 +231,9 @@ export default function AdminUsersPage() {
             <option value="warga">Warga</option>
             <option value="pengelola">Pengelola</option>
             <option value="admin">Admin</option>
-          </select>
+          </CustomSelect>
 
-          <select
+          <CustomSelect
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
             aria-label="Filter status akun"
@@ -240,7 +241,7 @@ export default function AdminUsersPage() {
             <option value="semua">Semua status</option>
             <option value="aktif">Aktif</option>
             <option value="nonaktif">Nonaktif</option>
-          </select>
+          </CustomSelect>
         </div>
 
         {loading ? (

@@ -1,3 +1,4 @@
+import CustomSelect from '../../components/CustomSelect';
 
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -137,9 +138,9 @@ export default function StaffReportDetailPage({ admin = false }) {
 
             <label>
               Status terbaru
-              <select value={status} onChange={(e) => setStatus(e.target.value)}>
+              <CustomSelect value={status} onChange={(e) => setStatus(e.target.value)}>
                 {statusOptions.map((s) => <option key={s}>{s}</option>)}
-              </select>
+              </CustomSelect>
             </label>
 
             <label>

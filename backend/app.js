@@ -68,7 +68,7 @@ app.use((err, req, res, next) => {
     if (err instanceof require('multer').MulterError) {
         if (err.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({
-                message: 'Ukuran foto maksimal 5 MB',
+                message: 'Ukuran file maksimal 5 MB',
             });
         }
 
@@ -83,7 +83,10 @@ app.use((err, req, res, next) => {
         });
     }
 
-    if (err.message === 'Format foto harus JPG, PNG, atau WEBP') {
+    if (
+        err.message === 'Format foto harus JPG, PNG, atau WEBP' ||
+        err.message === 'Format surat tugas harus PDF, JPG, atau PNG'
+    ) {
         return res.status(400).json({
             message: err.message,
         });

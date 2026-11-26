@@ -1,3 +1,4 @@
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
 const { createToken } = require('../middleware/auth');
@@ -436,10 +437,204 @@ async function changePassword(req, res) {
     }
 }
 
+async function registerPetugas(req, res) {
+    const name = String(req.body?.name || '').trim();
+    const email = String(req.body?.email || '').trim().toLowerCase();
+    const phone = String(req.body?.phone || '').trim();
+    const agency = String(req.body?.agency || '').trim();
+    const unitName = String(req.body?.unit_name || '').trim();
+    const officeAddress = String(req.body?.office_address || '').trim();
+    const password = String(req.body?.password || '');
+    const areaId = Number(req.body?.area_id);
+
+    const cleanupProof = async () => {
+        if (req.file?.path) {
+            await fs.promises.unlink(req.file.path).catch(() => {});
+        }
+    };
+
+    if (
+        !name ||
+        !email ||
+        !phone ||
+        !agency ||
+        !unitName ||
+        !officeAddress ||
+        !password ||
+        !req.body?.area_id ||
+        !req.file
+    ) {
+        await cleanupProof();
+
+        return res.status(400).json({
+            message: 'Lengkapi seluruh data dan unggah surat tugas.',
+        });
+    }
+
+    if (name.length > 150 || agency.length > 150 || unitName.length > 150) {
+        await cleanupProof();
+
+        return res.status(400).json({
+            message: 'Nama, instansi, dan unit kerja maksimal 150 karakter.',
+        });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) {
+        await cleanupProof();
+
+        return res.status(400).json({
+            message: 'Format email belum benar.',
+        });
+    }
+
+    if (!/^[0-9+\s-]{8,20}$/.test(phone)) {
+        await cleanupProof();
+
+        return res.status(400).json({
+            message: 'Nomor telepon harus berisi 8–20 karakter angka, spasi, +, atau -.',
+        });
+    }
+
+    if (password.length < 8) {
+        await cleanupProof();
+
+        return res.status(400).json({
+            message: 'Kata sandi minimal 8 karakter.',
+        });
+    }
+
+    if (!Number.isSafeInteger(areaId) || areaId <= 0) {
+        await cleanupProof();
+
+        return res.status(400).json({
+            message: 'Pilih wilayah tugas yang valid.',
+        });
+    }
+
+    let client;
+    let transactionStarted = false;
+
+    try {
+        client = await pool.connect();
+
+        await client.query('BEGIN');
+        transactionStarted = true;
+
+        const areaResult = await client.query(
+            `SELECT area_id, village_name
+             FROM areas
+             WHERE area_id = $1`,
+            [areaId]
+        );
+
+        if (!areaResult.rows.length) {
+            await client.query('ROLLBACK');
+            transactionStarted = false;
+            await cleanupProof();
+
+            return res.status(400).json({
+                message: 'Wilayah tugas tidak ditemukan.',
+            });
+        }
+
+        const area = areaResult.rows[0];
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        const userResult = await client.query(`
+            INSERT INTO users (
+                name,
+                email,
+                password_hash,
+                role,
+                is_active
+            )
+            VALUES ($1, $2, $3, 'pengelola', TRUE)
+            RETURNING user_id
+        `, [
+            name,
+            email,
+            passwordHash,
+        ]);
+
+        const userId = userResult.rows[0].user_id;
+
+        await client.query(`
+            INSERT INTO user_profiles (
+                user_id,
+                phone,
+                address,
+                village_name,
+                area_id,
+                area_verification_status,
+                location_check_status
+            )
+            VALUES ($1, $2, $3, $4, $5, 'menunggu', 'belum_diperiksa')
+        `, [
+            userId,
+            phone,
+            officeAddress,
+            area.village_name,
+            areaId,
+        ]);
+
+        const proofUrl = `/uploads/staff-proofs/${req.file.filename}`;
+
+        await client.query(`
+            INSERT INTO staff_requests (
+                user_id,
+                agency,
+                unit_name,
+                office_address,
+                area_id,
+                proof_url,
+                status
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, 'pending')
+        `, [
+            userId,
+            agency,
+            unitName,
+            officeAddress,
+            areaId,
+            proofUrl,
+        ]);
+
+        await client.query('COMMIT');
+        transactionStarted = false;
+
+        return res.status(201).json({
+            message: 'Pengajuan akun pengelola berhasil dikirim dan menunggu verifikasi admin.',
+        });
+
+    } catch (error) {
+        if (transactionStarted && client) {
+            await client.query('ROLLBACK').catch(() => {});
+        }
+
+        await cleanupProof();
+
+        if (error.code === '23505') {
+            return res.status(409).json({
+                message: 'Email sudah terdaftar. Silakan gunakan email lain.',
+            });
+        }
+
+        console.error('Gagal mendaftar pengelola:', error.message);
+
+        return res.status(500).json({
+            message: 'Gagal mengirim pengajuan pengelola. Silakan coba lagi.',
+        });
+
+    } finally {
+        client?.release();
+    }
+}
+
 module.exports = {
     login,
     me,
     registerWarga,
+    registerPetugas,
     updateMe,
     changePassword,
 };
