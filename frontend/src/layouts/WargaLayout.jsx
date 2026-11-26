@@ -1,98 +1,58 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  ClipboardList,
-  UserRound,
-  Home,
-  LogOut,
-} from 'lucide-react';
-import { useAuth } from '../auth';
 
-const wargaLinks = [
-  ['/warga', 'Ringkasan', LayoutDashboard],
-  ['/warga/laporan', 'Laporan saya', ClipboardList],
-  ['/warga/profil', 'Profil saya', UserRound],
-];
+import { Link } from 'react-router-dom';
 
-export default function WargaLayout({ title, subtitle, children }) {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+import SiteHeader from '../components/SiteHeader';
+import SiteFooter from '../components/SiteFooter';
 
-  const userInitial = user?.name?.trim()?.charAt(0).toUpperCase() || 'W';
-  const displayName = user?.name || 'Warga LAPORMAS';
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+export default function WargaLayout({
+  title,
+  subtitle,
+  heroContent,
+  heroVariant = 'dashboard',
+  children,
+}) {
+  const hasHero = heroContent !== undefined && heroContent !== null;
 
   return (
-    <div className="workspace">
-      <aside className="workspace-sidebar citizen-sidebar">
-        <Link to="/" className="brand">
-          LAPORMAS
-        </Link>
+    <div className="citizen-site">
+      <SiteHeader />
 
-        <div className="workspace-role">RUANG WARGA</div>
-
-        <div className="workspace-user">
-          <div className="avatar">{userInitial}</div>
-          <div>
-            <b>{displayName}</b>
-            <span>{user?.email || 'Akun warga'}</span>
-          </div>
-        </div>
-
-        <nav>
-          {wargaLinks.map(([to, label, Icon]) => (
-            <NavLink end to={to} key={to}>
-              <Icon size={17} aria-hidden="true" />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="sidebar-bottom">
-          <Link to="/">
-            <Home size={17} aria-hidden="true" />
-            Kembali ke website
-          </Link>
-
-          <button type="button" onClick={handleLogout}>
-            <LogOut size={17} aria-hidden="true" />
-            Keluar
-          </button>
-        </div>
-      </aside>
-
-      <main className="workspace-main">
-        <header className="workspace-top citizen-top">
-          <div className="workspace-heading">
-            <div className="workspace-breadcrumb">
-              <span>LAPORMAS</span>
-              <span className="breadcrumb-divider">/</span>
-              <span>Warga</span>
-              <span className="breadcrumb-divider">/</span>
-              <span className="breadcrumb-current">{title}</span>
+      <main className="citizen-main">
+        {hasHero ? (
+          <section
+            className={`citizen-dashboard-hero ${
+              heroVariant === 'form' ? 'citizen-form-hero' : ''
+            }`}
+          >
+            <div className="citizen-hero-inner">
+              <h1>{title}</h1>
+              <p>{subtitle}</p>
+              {heroContent}
             </div>
+          </section>
+        ) : (
+          <section className="workspace-top citizen-page-top">
+            <div className="workspace-heading">
+              <div className="workspace-breadcrumb">
+                <Link to="/">Beranda</Link>
+                <span className="breadcrumb-divider">/</span>
+                <span>Warga</span>
+                <span className="breadcrumb-divider">/</span>
+                <span className="breadcrumb-current">{title}</span>
+              </div>
 
-            <h1>{title}</h1>
-            <p>{subtitle}</p>
-          </div>
-
-          <div className="workspace-top-account">
-            <div className="workspace-top-account-info">
-              <b>{displayName}</b>
-              <span>Warga LAPORMAS</span>
+              <h1>{title}</h1>
+              <p>{subtitle}</p>
             </div>
-            <div className="top-avatar">{userInitial}</div>
-          </div>
-        </header>
+          </section>
+        )}
 
-        <div className="workspace-content">
+        <div className="workspace-content citizen-content">
           {children}
         </div>
       </main>
+
+      <SiteFooter />
     </div>
   );
 }

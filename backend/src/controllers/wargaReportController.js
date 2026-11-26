@@ -80,21 +80,39 @@ function removeUploadedFiles(files = []) {
 }
 
 // GET /api/reports/mine  (wajib login)
+// GET /api/reports/mine (wajib login)
 async function getMyReports(req, res) {
     try {
         const result = await pool.query(
-            `${REPORT_SELECT} WHERE r.user_id = $1 ORDER BY r.created_at DESC, r.report_id DESC`,
+            `${REPORT_SELECT}
+             WHERE r.user_id = $1
+             ORDER BY r.created_at DESC, r.report_id DESC`,
             [req.user.user_id]
+        );
+
+        // Sertakan riwayat perkembangan untuk setiap laporan
+        const reports = await Promise.all(
+            result.rows.map(async (report) => {
+                const updates = await getUpdates(report.report_id);
+
+                return {
+                    ...report,
+                    updates,
+                };
+            })
         );
 
         return res.status(200).json({
             message: 'Berhasil mengambil laporan saya',
-            total: result.rowCount,
-            reports: result.rows,
+            total: reports.length,
+            reports,
         });
     } catch (error) {
         console.error('Gagal mengambil laporan saya:', error.message);
-        return res.status(500).json({ message: 'Gagal mengambil laporan saya.' });
+
+        return res.status(500).json({
+            message: 'Gagal mengambil laporan saya.',
+        });
     }
 }
 

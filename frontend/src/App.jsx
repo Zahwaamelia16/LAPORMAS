@@ -19,6 +19,7 @@ import StaffLayout from './layouts/PengelolaLayout';
 import PublicReportFilters from './pages/shared/PublicReportFilters';
 import { usePublicReports } from './pages/shared/usePublicReports';
 import ReportLocationMap from './components/ReportLocationMap';
+import SiteHeader from './components/SiteHeader';
 
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -246,7 +247,7 @@ function PublicLayout({ children }) {
 
   return (
     <>
-      <PublicNav />
+      <SiteHeader />
       {children}
       <Footer />
     </>
@@ -707,7 +708,13 @@ function ReportCards({ reports = [] }) {
             <div className="public-report-content">
 
               <div className="public-report-topline">
-                <div className="public-report-identity">
+              <div className="public-report-identity">
+
+                <span className="public-report-category-icon">
+                  <CategoryIcon size={15} />
+                </span>
+
+                <div className="public-report-identity-text">
                   <span className="public-report-category">
                     {report.category_name}
                   </span>
@@ -716,6 +723,8 @@ function ReportCards({ reports = [] }) {
                     {reportCode}
                   </span>
                 </div>
+
+              </div>
 
                 <Status value={report.status_name} />
               </div>
@@ -919,6 +928,24 @@ function GlobeIcon() {
 
 function PublicReportDetail({ track = false, manager = false }) {
   const { id, code } = useParams();
+  const navigate = useNavigate();
+  const currentLocation = useLocation();
+
+  const fallbackPath = manager
+    ? '/pengelola/laporan-publik'
+    : currentLocation.pathname.startsWith('/warga/laporan/')
+      ? '/warga'
+      : track
+        ? '/'
+        : '/laporan';
+
+  const handleBack = () => {
+    if (currentLocation.key !== 'default') {
+      navigate(-1);
+    } else {
+      navigate(fallbackPath);
+    }
+  };
   const [report, setReport] = useState(null);
   const [error, setError] = useState('');
 
@@ -949,13 +976,27 @@ function PublicReportDetail({ track = false, manager = false }) {
         subtitle,
       } : {})}
     >
-      {!manager && (
-        <PageIntro
-          eyebrow="DETAIL LAPORAN"
-          title={report?.title || 'Detail laporan'}
-          subtitle={subtitle}
-        />
-      )}
+    {!manager && (
+      <section className="page-intro">
+        <div className="container">
+          <div className="eyebrow detail-page-eyebrow">
+            <button
+              type="button"
+              onClick={handleBack}
+              aria-label="Kembali ke halaman sebelumnya"
+              title="Kembali"
+            >
+              <ArrowLeft size={17} />
+            </button>
+
+            <span>DETAIL LAPORAN</span>
+          </div>
+
+          <h1>{report?.title || 'Detail laporan'}</h1>
+          <p>{subtitle}</p>
+        </div>
+      </section>
+    )}
 
       {manager && (
         <Link to="/pengelola/laporan-publik" className="text-link back-inline">
